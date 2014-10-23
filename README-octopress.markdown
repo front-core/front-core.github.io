@@ -1,9 +1,3 @@
-# front-core.github.io
-
-Frontcore organization site.
-
-Powered by [Octopress](http://octopress.org/).
-
 ## What is Octopress?
 
 Octopress is [Jekyll](https://github.com/mojombo/jekyll) blogging at its finest.
