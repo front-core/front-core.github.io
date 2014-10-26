@@ -1,10 +1,10 @@
-# [![Frontcore](https://raw.githubusercontent.com/front-core/front-core.github.io/source/source/images/logo-rectangle.png)](http://front-core.github.io/)
+# [![Frontcore](https://raw.githubusercontent.com/front-core/front-core.github.io/source/source/images/logo-rectangle.png)](http://front-core.org/)
 
 ## Overview
 
-目指すは日本一**ワールドワイド**なフロントエンド・エンジニアのためのブログ！ [front-core.org](http://front-core.github.io/) は世界中の良質なフロントエンド関連リソースを日本語に翻訳（または英語に翻訳）したり、我々 Frontcore チームのナレッジをワールドワイドにシェアして行きます。
+目指すは日本一ワールドワイドなフロントエンド・エンジニアのためのブログ！ [front-core.org](http://front-core.org/) は世界中の良質なフロントエンド関連リソースを日本語に翻訳（または英語に翻訳）したり、我々 Frontcore チームのナレッジをワールドワイドにシェアして行きます。
 
-翻訳記事の主なリソース原はこちらになします。
+**翻訳記事の主なリソース原**
 
 * [HTML5 Weekly](http://html5weekly.com/)
 * [CSS Weekly](http://css-weekly.com/)
@@ -15,14 +15,20 @@
 
 ## Contributing
 
-* サイトのバグや改善点はもちろん、掲載して欲しい内容のリクエストがあれば[イシュー](https://github.com/front-core/front-core.github.io/issues)を作成してください。
-* 新しいブログ記事やページの作成・開発を行った際には、直接メイン開発ブランチにマージせず、必ず[プルリクエスト](https://github.com/front-core/front-core.github.io/pulls)を送ってください。
-* 作成・開発が長引く場合は、途中であっても、「WIP: <タイトル>」のように WIP (Work in progress)  プルリクエストを送って、常に他のメンバーが進捗状況を把握できるようにしてください。
-（特に翻訳のブログ記事などの場合は、ブランチ作成と同時に WIP のプルリクエストを送って、お互い同じ内容の記事を書いてしまうような事を防ぎます。）
+サイトのバグや改善点はもちろん、掲載して欲しい内容のリクエストがあれば  [GitHub イシュー](https://github.com/front-core/front-core.github.io/issues)を作成してください。
+
+運用ルールや環境構築の手順、ブログ記事やページ作成の方法については  [Wiki](https://github.com/front-core/front-core.github.io/wiki) のドキュメントを参照してください。
 
 ## Documentation
 
-運用ルールや環境構築の手順、新しいブログ記事・ページ作成の方法については  [Wiki](https://github.com/front-core/front-core.github.io/wiki) のドキュメントを参照してください。
+開発・運用に関するドキュメントは全て [Wiki](https://github.com/front-core/front-core.github.io/wiki) まとめています。
+
+* [開発環境](https://github.com/front-core/front-core.github.io/wiki/Development-Environment)
+* [運用ルール](https://github.com/front-core/front-core.github.io/wiki/Operational-Rules)
+* ブログ記事・ページの作成
+ * [新しいブログ記事を作る](https://github.com/front-core/front-core.github.io/wiki/Creating-Post)
+ * [新しいページを作る](https://github.com/front-core/front-core.github.io/wiki/Creating-Page)
+* ...and more...
 
 ## License
 
