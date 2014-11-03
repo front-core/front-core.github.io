@@ -1,0 +1,13 @@
+global:
+    language-switch: Language Switch
+    japanese: Japanese
+    english: English
+    
+navigation:
+    blog: Blog
+    archives: Archives
+    about: About
+    contact: Contact
+    
+sidebar:
+    recent-posts: Recent Posts

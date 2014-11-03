@@ -1,10 +1,9 @@
 ---
 layout: page
-title: "Contact"
-date: 2014-10-23 01:43
+title: "お問い合わせ"
 comments: true
 sharing: true
 footer: true
 ---
 
-Come on, now !
+お問い合わせはこちら！
