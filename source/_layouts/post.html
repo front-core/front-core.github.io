@@ -17,7 +17,6 @@ single: true
     {% endunless %}
     
     {% comment %} 前後の同じ言語のポーストを探してナビゲーション設定 {% endcomment %}
-
     {% for target_post in site.posts %}
       {% if target_post.language == page.language %}
 
