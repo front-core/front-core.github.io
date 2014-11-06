@@ -4,7 +4,8 @@ layout: default
 
 <div class="blog-index">
   {% assign index = true %}
-  {% for post in paginator.posts %}
+  {% language_array site.posts language_posts page.language %}
+  {% for post in language_posts %}
   {% assign content = post.content %}
     <article>
       {% include article.html %}
@@ -14,7 +15,7 @@ layout: default
     {% if paginator.next_page %}
       <a class="prev" href="{{paginator.next_page_path}}">&larr; Older</a>
     {% endif %}
-    <a href="/blog/archives">Blog Archives</a>
+    <a href="{{ root_url }}/{{page.language}}/blog/archives">Blog Archives</a>
     {% if paginator.previous_page %}
     <a class="next" href="{{paginator.previous_page_path}}">Newer &rarr;</a>
     {% endif %}

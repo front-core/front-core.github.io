@@ -1,0 +1,13 @@
+global:
+    language-switch: 言語切り替え
+    japanese: 日本語
+    english: 英語
+
+navigation:
+    blog: ブログ
+    archives: アーカイブ
+    about: このサイトについて
+    contact: お問い合わせ
+
+sidebar:
+    recent-posts: 最新記事
