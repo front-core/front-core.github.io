@@ -20,6 +20,15 @@
 
 {% if category != '0' %}
 <footer>
-  <span class="categories">posted in {{ post.categories | category_links }}</span>
+  <span class="categories">
+
+  posted in
+
+  {% for category in post.categories %}
+    <a class="category" href="/{{ page.language }}/blog/categories/{{ category }}">{{ category }}</a>
+    {% if forloop.index < forloop.length %}, {% endif %}
+  {% endfor %}
+
+  </span>
 </footer>
 {% endif %}
