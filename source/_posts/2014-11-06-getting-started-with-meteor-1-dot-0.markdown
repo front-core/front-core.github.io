@@ -7,3 +7,5 @@ categories: [Meteor]
 author: "カン"
 written-language: "ja"
 ---
+
+これは日本語オンリーであります。

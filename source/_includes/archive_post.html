@@ -19,16 +19,14 @@
 <time datetime="{{ post.date | datetime | date_to_xmlschema }}" pubdate>{{ post.date | date: "<span class='month'>%b</span> <span class='day'>%d</span> <span class='year'>%Y</span>"}}</time>
 
 {% if category != '0' %}
-<footer>
-  <span class="categories">
+  <footer>
+    <span class="categories"><!--
+   -->posted in <!--
 
-  posted in
-
-  {% for category in post.categories %}
-    <a class="category" href="/{{ page.language }}/blog/categories/{{ category }}">{{ category }}</a>
-    {% if forloop.index < forloop.length %}, {% endif %}
-  {% endfor %}
-
-  </span>
-</footer>
+      {% for category in post.categories %}
+     --><a class="category" href="/{{ post.language }}/blog/categories/{{ category }}">{{ category }}</a><!--
+     -->{% if forloop.length > forloop.index %}, {% endif %}<!--
+      {% endfor %}
+ --></span>
+  </footer>
 {% endif %}

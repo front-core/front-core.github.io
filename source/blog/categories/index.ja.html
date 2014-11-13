@@ -3,3 +3,10 @@ layout: page
 title: "カテゴリー"
 footer: false
 ---
+
+<span class="categories"><!--
+  {% for category in site.categories %}
+ --><a class="category" href="/{{ page.language }}/blog/categories/{{ category[0] }}">{{ category[0] }}</a><!---
+-->{% if forloop.length > forloop.index %}, {% endif %}<!--
+  {% endfor %}
+--></span>
