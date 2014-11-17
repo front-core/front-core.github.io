@@ -37,10 +37,36 @@ single: true
 
     <p class="meta">
       {% if previous_post.url %}
-        <a class="basic-alignment left" href="{{previous_post.url}}" title="Previous Post: {{previous_post.title}}">&laquo; {{previous_post.title}}</a>
+        <a class="basic-alignment left" href="{{previous_post.url}}" title="Previous Post: {{previous_post.title}}"><!--
+       -->&laquo; <!--
+          {% comment %} 選択中の言語と違う言語の記事は、タイトルの横にその言語名を表示 {% endcomment %}
+          {% if page.language == "ja" %}
+            {% if next_post.written-language == "en" %}
+         --><span>（英語）</span><!--
+            {% endif %}
+          {% else if page.language == "en" %}
+            {% if next_post.written-language == "ja" %}
+         --><span> (Japanese)</span><!--
+            {% endif %}
+          {% endif %}
+       --><span>{{previous_post.title}}</span><!--
+     --></a>
       {% endif %}
       {% if next_post.url %}
-        <a class="basic-alignment right" href="{{next_post.url}}" title="Next Post: {{next_post.title}}">{{next_post.title}} &raquo;</a>
+        <a class="basic-alignment right" href="{{next_post.url}}" title="Next Post: {{next_post.title}}"><!--
+       --><span>{{next_post.title}}</span><!--
+          {% comment %} 選択中の言語と違う言語の記事は、タイトルの横にその言語名を表示 {% endcomment %}
+          {% if page.language == "ja" %}
+            {% if next_post.written-language == "en" %}
+         --><span>（英語）</span><!--
+            {% endif %}
+          {% else if page.language == "en" %}
+            {% if next_post.written-language == "ja" %}
+         --><span> (Japanese)</span><!--
+            {% endif %}
+          {% endif %}
+     --> &raquo;<!--
+     --></a>
       {% endif %}
     </p>
   </footer>

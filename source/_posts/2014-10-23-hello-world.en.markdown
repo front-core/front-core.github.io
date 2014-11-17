@@ -13,4 +13,8 @@ Our blog is beginning.
 
 <!-- more -->
 
+```html
+<!-- more -->
+```
+
 It's super awesome \m/
