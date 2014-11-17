@@ -6,6 +6,7 @@ comments: true
 categories: [Meteor]
 author: "カン"
 written-language: "ja"
+published: false
 ---
 
 これは日本語オンリーであります。

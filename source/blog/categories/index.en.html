@@ -2,10 +2,11 @@
 layout: page
 title: Categories
 footer: false
+published: false
 ---
 
 {% comment %}
-  {{ site.categories }}
+  TODO: 主なカテゴリ一覧と説明
 {% endcomment %}
 
 <span class="categories"><!--
@@ -14,13 +15,3 @@ footer: false
 -->{% if forloop.length > forloop.index %}, {% endif %}<!--
   {% endfor %}
 --></span>
-
-{% comment %}
-  {% for post in site.categories["hello"] %}
-    {% if post.language == page.language %}
-      <article>
-        <h1>{{ post.title }}</h1>
-      </article>
-    {% endif %}
-  {% endfor %}
-{% endcomment %}
