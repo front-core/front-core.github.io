@@ -7,9 +7,9 @@
 {% t global.language-switch %} - 
 {% if page.language == "ja" %}
   {% capture link1 %}{{ site.baseurl }}/en/{{ page.url | remove_language }}{% endcapture %}
-  <a href="{{ link1 }}" >{% t global.english %}<img src='{{root_url}}/images/en.png' alt='{% t global.language-switch %} {% t global.english %}' class='flag' style="display:none"/></a>
+  <a href="{{ link1 }}" >{% t global.english %}</a>
 {% else if page.language == "en" %}
   {% capture link2 %}{{ site.baseurl }}/ja/{{ page.url | remove_language }}{% endcapture %}
-  <a href="{{ link2 }}" >{% t global.japanese %}<img src='{{root_url}}/images/ja.png' alt='{% t global.language-switch %} {% t global.japanese %}' class='flag' style="display:none"/></a>
+  <a href="{{ link2 }}" >{% t global.japanese %}</a>
 {% endif %}
 </div>
