@@ -30,9 +30,10 @@ module.exports = function(grunt) {
       tmp: '.tmp',
       tmpImages: '<%= path.tmp %>/images',
       app: 'public',
-      appImages: '<%= path.app %>/images',
-      appStyles: '<%= path.app %>/styles',
-      appScripts: '<%= path.app %>/scripts',
+      appResources: 'public-resources',
+      appImages: '<%= path.appResources %>/images',
+      appStyles: '<%= path.appResources %>/styles',
+      appScripts: '<%= path.appResources %>/scripts',
       dist: '_deploy',
       distImages: '<%= path.dist %>/images',
       distStyles: '<%= path.dist %>/styles',
@@ -50,6 +51,7 @@ module.exports = function(grunt) {
           middleware: function(connect) {
             return [
               connect.static(require('path').resolve(grunt.config('path.app'))),
+              connect.static(require('path').resolve(grunt.config('path.appResources'))),
 //               connect.static(require('path').resolve('.')),
 //               require('grunt-connect-proxy/lib/utils').proxyRequest
             ]
@@ -111,11 +113,19 @@ module.exports = function(grunt) {
           cwd: '<%= path.app %>',
           dest: '<%= path.dist %>',
           src: [
-            '**/*.html',
-            '*.ico',
+            '**/*'
+          ]
+        }, {
+          expand: true,
+          dot: true,
+          cwd: '<%= path.appResources %>',
+          dest: '<%= path.dist %>',
+          src: [
+            '*.{ico,png}',
+            'assets/**/*',
             '!bower_components/**',
-            '!styleguide/**/*.html',
-            '!styleguide-template/**/*.html'
+            '!styleguide/**',
+            '!styleguide-template/**'
           ]
         }, {
           expand: true,
@@ -149,6 +159,9 @@ module.exports = function(grunt) {
     },
 
     usemin: {
+      options: {
+        assetsDirs: ['_deploy', '_deploy/styles']
+      },
       html: [
         '<%= path.dist %>/**/*.html',
         '!<%= path.dist %>/bower_components/**/*.html'
@@ -168,7 +181,7 @@ module.exports = function(grunt) {
           expand: true,
           cwd: '<%= path.dist %>',
           src: [
-            'index.html'
+            '**/*.html'
           ],
           dest: '<%= path.dist %>'
         }]
@@ -212,6 +225,13 @@ module.exports = function(grunt) {
         command: 'bundle exec compass watch'
       },
 
+      rakeGenerate: {
+        command: 'bundle exec rake generate'
+      },
+      rakeWatch: {
+        command: 'bundle exec rake watch'
+      },
+
       styleguide: {
         command: 'mkdir -p <%= path.app %>/styleguide; node_modules/kss/bin/kss-node <%= path.appStyles %>/sass <%= path.app %>/styleguide -t <%= path.app %>/styleguide-template --css <%= path.appStyles %>/main.css'
       }
@@ -234,12 +254,14 @@ module.exports = function(grunt) {
     } else {
       tasks = [
         //'configureProxies',
-        'connect:livereload',
+        'shell:rakeWatch',
         'shell:compassWatch',
+        'connect:livereload',
         'watch'
       ];
     }
 
+    grunt.config('shell.rakeWatch.options.async', true);
     grunt.config('shell.compassWatch.options.async', true);
 
     grunt.task.run(tasks);
@@ -248,6 +270,7 @@ module.exports = function(grunt) {
   // Build task
   grunt.registerTask('build', 'Minify CSS/JS/HTML and revisioning all static files.', function() {
     var tasks = [
+      'shell:rakeGenerate',
       'shell:compassCompile',
       'clean:dist',
       'newer:image:dist',
@@ -261,7 +284,7 @@ module.exports = function(grunt) {
       'filerev:styles',
       'filerev:scripts',
       'usemin:html',
-      'htmlmin:dist'
+      //'htmlmin:dist'
     ];
 
     grunt.task.run(tasks);

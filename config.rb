@@ -7,10 +7,10 @@ require 'breakpoint' # Help with writing media queries.
 http_path = "/"
 http_images_path = "../images"
 http_generated_images_path = "../images"
-css_dir = "source/styles"
-sass_dir = "source/styles/sass"
-images_dir = "source/images"
-javascripts_dir = "source/scripts"
+css_dir = "public-resources/styles"
+sass_dir = "public-resources/styles/sass"
+images_dir = "public-resources/images"
+javascripts_dir = "public-resources/scripts"
 
 # You can select your preferred output style here (can be overridden via the command line):
 output_style = :expanded # or :nested or :compact or :compressed
