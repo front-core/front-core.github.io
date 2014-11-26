@@ -13,3 +13,5 @@ vendor
 node_modules
 Gemfile.lock
 .tmp
+public-resources/styles/**/*.css
+public-resources/styles/**/*.css.map
