@@ -3,17 +3,29 @@
   {% include head.html %}
 
   <body {% if page.body_id %} id="{{ page.body_id }}" {% endif %} {% if page.sidebar == false %} class="no-sidebar" {% endif %} {% if page.sidebar == 'collapse' or site.sidebar == 'collapse' %} class="collapse-sidebar sidebar-footer" {% endif %}>
-    <header role="banner">{% include header.html %}</header>
-    
-    <nav role="navigation">{% include navigation.html %}</nav>
-    
-    <div id="main">
+    <div id="main-container">
+      <header id="header">
+        <div class="container">
+          <nav role="navigation">{% include navigation.html %}</nav>
+
+          <div role="banner">{% include header.html %}</div>
+        </div>
+      </header>
+      
       <div id="content">
-        {{ content | expand_urls: root_url }}
+        <div class="container">
+          {{ content | expand_urls: root_url }}
+        </div>
       </div>
+      
+      <div id="sticky-footer-area"></div>
     </div>
     
-    <footer role="contentinfo">{% include footer.html %}</footer>
+    <footer id="footer" role="contentinfo">
+      <div class="container">
+        {% include footer.html %}
+      </div>
+    </footer>
     
     {% include after_footer.html %}
 

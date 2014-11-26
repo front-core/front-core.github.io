@@ -1,0 +1,266 @@
+@import "partials/base";
+
+// Global reset style
+@include global-reset;
+
+// =============================================================================
+// Additional reset
+// =============================================================================
+
+body {
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-touch-callout: none;
+  
+  @include user-select(none);
+  
+  -webkit-text-size-adjust: none;
+  
+  cursor: default;
+}
+
+button,
+a[ng-click] {
+  outline: none;
+}
+
+// =============================================================================
+// Mixins
+// =============================================================================
+
+// =====================================
+// Responsive Units
+// =====================================
+
+@mixin px-with-rem($property, $value) {
+  #{$property}: $value+px;
+  #{$property}: $value/10+rem; // `rem` supported browser: Firefox3.6+, Chrome, Safari5, IE9+
+}
+
+// =====================================
+// Font
+// =====================================
+
+@mixin font-weight($value) {
+  @if $value == thin {
+    font-weight: 100;
+  } @else if $value == extra-light {
+    font-weight: 200;
+  } @else if $value == light {
+    font-weight: 300;
+  } @else if $value == normal {
+    font-weight: 400;
+  } @else if $value == medium {
+    font-weight: 500;
+  } @else if $value == demi-bold {
+    font-weight: 600;
+  } @else if $value == bold {
+    font-weight: 700;
+  } @else if $value == heavy {
+    font-weight: 800;
+  } @else if $value == black {
+    font-weight: 900;
+  } @else {
+    font-weight: 400;
+  }
+}
+
+// =============================================================================
+// Configuration
+// =============================================================================
+
+$horizontal-padding: 10px;
+
+// =====================================
+// Breakpoint
+// (http://breakpoint-sass.com/)
+// =====================================
+
+$breakpoint-desktop: 960 + $horizontal-padding * 2 + px;
+$breakpoint-tablet: 768 + $horizontal-padding * 2 + px;
+// otherwise mobile (mobile first)
+
+// =====================================
+// Susy
+// (http://susy.oddbird.net/)
+// =====================================
+
+$susy: (
+  container: 980px,
+  columns: 12,
+  gutters: 1/3,
+  global-box-sizing: border-box,
+  use-custom: (rem: true),
+  debug: (
+    image: show,
+    //color: blue,
+    //output: background,
+    //toggle: top right,
+  ),
+);
+
+@include border-box-sizing;
+
+// =====================================
+// Vertical Rhythm
+// =====================================
+
+$gutter-height: 12;
+
+// =====================================
+// Compass Vertical Rhythm
+// (http://compass-style.org/reference/compass/typography/vertical_rhythm/)
+// =====================================
+
+//$base-line-height: $gutter-height + px;
+$base-line-height: $gutter-height / 10 + rem;
+
+// =============================================================================
+// Main style
+// =============================================================================
+
+html {
+  font-size: 62.5%; // this mean 1em equal to 10px
+}
+
+body{
+  // English Web Safe Fonts
+  // (http://www.cssfontstack.com/)
+  //font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  
+  // English Web Fonts 
+  // (http://www.cssfontstack.com/Web-Fonts)
+
+  // Japanese Web Safe Fonts
+  //（http://www.dtp-transit.jp/misc/web/post_1881.html）
+  // 1. ゴシック体
+  font-family: Verdana, "游ゴシック", YuGothic, "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, sans-serif;
+  // 2. 明朝体
+  // font-family: "Times New Roman", "游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "メイリオ", Meiryo, serif;
+  // 3. 等幅書体
+  // font-family: "Osaka－等幅", Osaka-mono, "ＭＳ ゴシック", "MS Gothic", monospace;
+  // 4. OS X限定 丸ゴシック体
+  // font-family: "ヒラギノ丸ゴ ProN W4", "Hiragino Maru Gothic ProN", "メイリオ", Meiryo, fantasy;
+
+  @include px-with-rem(font-size, 16);
+  @include px-with-rem(line-height, $gutter-height * 2);
+}
+
+// =====================================
+// Container
+// =====================================
+
+#main-container {
+  overflow: hidden;
+} // #main-container
+
+.container {
+  position: relative;
+  @include container;
+  @include clearfix;
+  padding-left: 10px;
+  padding-right: 10px;
+} // .container
+
+// =====================================
+// Header
+// =====================================
+
+#header {
+  background: #666;
+  
+  .logo {
+    @include breakpoint($breakpoint-tablet) {
+      @include span(8);
+    }
+
+    @include px-with-rem(margin-top, $gutter-height);
+    @include px-with-rem(margin-bottom, $gutter-height);
+
+    @include px-with-rem(font-size, 16);
+    @include font-weight(bold);
+    @include px-with-rem(line-height, $gutter-height * 2);
+
+    &:before {
+      content: '';
+      display: inline-block;
+      vertical-align: top;
+      @include px-with-rem(width, $gutter-height * 2);
+      @include px-with-rem(height, $gutter-height * 2);
+      margin-right: 8px;
+      @include background(image-url('logo.png') no-repeat);
+      @include background-size(contain);
+    }
+  }
+
+  nav {
+    @include breakpoint($breakpoint-tablet) {
+      @include span(4 last);
+    }
+
+    @include px-with-rem(margin-top, $gutter-height);
+    @include px-with-rem(margin-bottom, $gutter-height);
+
+    @include px-with-rem(font-size, 14);
+    @include font-weight(medium);
+    @include px-with-rem(line-height, $gutter-height * 2);
+    
+    ul {
+      @include display-flex;
+      @include flex-direction(row);
+      @include justify-content(flex-start);
+      
+      @include breakpoint($breakpoint-tablet) {
+        @include justify-content(space-between);
+      }
+
+      li {
+        margin-right: gutter();
+
+        @include breakpoint($breakpoint-tablet) {
+          margin-right: auto;
+        }
+      }
+    }
+  }
+} // #header
+
+// =====================================
+// Content
+// =====================================
+
+#content {
+
+  h2 {
+    @include px-with-rem(font-size, 16);
+    @include font-weight(medium);
+    @include px-with-rem(line-height, $gutter-height * 2);
+  }
+
+  h3 {
+    @include px-with-rem(font-size, 14);
+    @include font-weight(medium);
+    @include px-with-rem(line-height, $gutter-height * 2);
+  }
+
+} // #content
+
+// =====================================
+// Footer
+// =====================================
+
+#footer {
+  color: #9B9B9B;
+  background: #222;
+
+  @include px-with-rem(font-size, 14);
+  @include px-with-rem(line-height, $gutter-height * 3);
+  
+  .copyright {
+    @include span(4 last);
+    @include px-with-rem(font-size, 14);
+    @include px-with-rem(line-height, $gutter-height * 3);
+    text-align: right;
+  }
+} // #footer
+
+@include sticky-footer($gutter-height * 3 + px, "#main-container", "#sticky-footer-area", "#footer")

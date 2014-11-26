@@ -27,7 +27,10 @@
 <!--     <link rel="{{ root_url }}/apple-touch-icon-precomposed" href="apple-touch-icon-precomposed.png"> -->
 
     <!-- build:css(public-resources) {{ root_url }}/styles/main.css -->
-    <link rel="stylesheet" href="{{ root_url }}/styles/screen.css">
+    {% comment %}
+      <link rel="stylesheet" href="{{ root_url }}/styles/octopress/screen.css">
+    {% endcomment %}
+    <link rel="stylesheet" href="{{ root_url }}/styles/main.css">
     <!-- endbuild -->
 
     <!-- build:js(public-resources) {{ root_url }}/scripts/vendor/modernizr.js -->
