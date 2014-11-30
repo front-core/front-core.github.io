@@ -8,11 +8,11 @@
           {% comment %} 選択中の言語と違う言語の記事は、タイトルの横にその言語名を表示 {% endcomment %}
           {% if page.language == "ja" %}
             {% if post.written-language == "en" %}
-         --><span>（英語）</span><!--
+         --><span>（{% t global.english %}）</span><!--
             {% endif %}
           {% else if page.language == "en" %}
             {% if post.written-language == "ja" %}
-         --><span> (Japanese)</span><!--
+         --><span> ({% t global.japanese %})</span><!--
             {% endif %}
           {% endif %}
      --></a>
@@ -24,34 +24,46 @@
         {% comment %} 選択中の言語と違う言語の記事は、タイトルの横にその言語名を表示 {% endcomment %}
         {% if page.language == "ja" %}
           {% if page.written-language == "en" %}
-       --><span>（英語）</span><!--
+       --><span>（{% t global.english %}）</span><!--
           {% endif %}
         {% else if page.language == "en" %}
           {% if page.written-language == "ja" %}
-       --><span> (Japanese)</span><!--
+       --><span> ({% t global.japanese %})</span><!--
           {% endif %}
         {% endif %}
    --></h1>
     {% endif %}
+
     {% unless page.meta == false %}
-      <p class="meta">
-        {% include post/date.html %}{{ time }}
+      <div class="meta">
+        <!-- 投稿者と投稿日 -->
+        {% include post/author.html %}·{% include post/date.html %}{{ time }}
+        <!-- /投稿者と投稿日 -->
+        
+        <!-- コメント数・リンク表示 -->
         {% if site.disqus_short_name and page.comments != false and post.comments != false and site.disqus_show_comment_count == true %}
            | <a href="{% if index %}{{ root_url }}{{ post.url }}{% endif %}#disqus_thread"
              data-disqus-identifier="{% if post.meta.disqus_id %}{{ post.meta.disqus_id }}{% else %}{{ site.url }}{{ post.url }}{% endif %}">Comments</a>
         {% endif %}
-      </p>
+        <!-- /コメント数・リンク表示 -->
+        
+        <!-- 記事のカテゴリ -->
+        <p>{% include post/categories.html %}</p>
+        <!-- /記事のカテゴリ -->
+      </div>
     {% endunless %}
   </header>
 {% endunless %}
+
 {% if index %}
   <div class="entry-content">{{ content | excerpt }}</div>
+  
   {% capture excerpted %}{{ content | has_excerpt }}{% endcapture %}
   {% if excerpted == 'true' %}
     <footer>
-      <a rel="full-article" href="{{ root_url }}{{ post.url }}">{{ site.excerpt_link }}</a>
+      <a class="read-more" rel="full-article" href="{{ root_url }}{{ post.url }}">{% t global.read-more %}</a>
     </footer>
   {% endif %}
 {% else %}
-<div class="entry-content">{{ content }}</div>
+  <div class="entry-content full-article">{{ content }}</div>
 {% endif %}

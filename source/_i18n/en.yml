@@ -1,13 +1,21 @@
 global:
-    language-switch: Language Switch
     japanese: Japanese
     english: English
+    read-more: Read More...
     
 navigation:
     blog: Blog
     archives: Archives
     about: About
     contact: Contact
+
+pagination:
+    archives: — ARCHIVES —
+    older: « older
+    newer: newer »
     
 sidebar:
     recent-posts: Recent Posts
+    categories: Categories
+    follow-us: Follow us
+    language-switch: Languages

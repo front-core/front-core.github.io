@@ -39,4 +39,6 @@
     image-width($image-url) / $pixel-ratio 
     image-height($image-url) / $pixel-ratio
   );
+
+  background-position: center;
 }

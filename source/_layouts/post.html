@@ -4,86 +4,83 @@ single: true
 ---
 
 <div>
-<article class="hentry" role="article">
-  {% include article.html %}
-  <footer>
-    <p class="meta">
-      {% include post/author.html %}
-      {% include post/date.html %}{{ time }}{% if updated %} {{ updated }}{% endif %}
-      {% include post/categories.html %}
-    </p>
-    {% unless page.sharing == false %}
-      {% include post/sharing.html %}
-    {% endunless %}
-    
-    {% comment %} 前後の同じ言語のポーストを探してナビゲーション設定 {% endcomment %}
-    {% for target_post in site.posts %}
-      {% if target_post.language == page.language %}
+  <article class="hentry" role="article">
+    {% include article.html %}
+    <footer>
+      {% unless page.sharing == false %}
+        {% include post/sharing.html %}
+      {% endunless %}
 
-        {% if target_post.url == page.url %}
-          {% assign current_post_found = true %}
-          {% assign next_post = found_language_post %}
-        {% else %}
-          {% assign found_language_post = target_post %}
-          
-          {% if current_post_found && !previous_post_found %}
-            {% assign previous_post_found = true %}
-            {% assign previous_post = found_language_post %}
+      {% comment %} 前後の同じ言語のポーストを探してナビゲーション設定 {% endcomment %}
+      {% for target_post in site.posts %}
+        {% if target_post.language == page.language %}
+
+          {% if target_post.url == page.url %}
+            {% assign current_post_found = true %}
+            {% assign next_post = found_language_post %}
+          {% else %}
+            {% assign found_language_post = target_post %}
+
+            {% if current_post_found && !previous_post_found %}
+              {% assign previous_post_found = true %}
+              {% assign previous_post = found_language_post %}
+            {% endif %}
           {% endif %}
+
         {% endif %}
+      {% endfor %}
+    </footer>
+  </article>
 
+  <div class="pagination">
+  {% if previous_post.url %}
+    <a class="basic-alignment left" href="{{previous_post.url}}" title="Previous Post: {{previous_post.title}}"><!--
+   -->&laquo; <!--
+      {% comment %} 選択中の言語と違う言語の記事は、タイトルの横にその言語名を表示 {% endcomment %}
+      {% if page.language == "ja" %}
+        {% if next_post.written-language == "en" %}
+     --><span>（英語）</span><!--
+        {% endif %}
+      {% else if page.language == "en" %}
+        {% if next_post.written-language == "ja" %}
+     --><span> (Japanese)</span><!--
+        {% endif %}
       {% endif %}
-    {% endfor %}
-
-    <p class="meta">
-      {% if previous_post.url %}
-        <a class="basic-alignment left" href="{{previous_post.url}}" title="Previous Post: {{previous_post.title}}"><!--
-       -->&laquo; <!--
-          {% comment %} 選択中の言語と違う言語の記事は、タイトルの横にその言語名を表示 {% endcomment %}
-          {% if page.language == "ja" %}
-            {% if next_post.written-language == "en" %}
-         --><span>（英語）</span><!--
-            {% endif %}
-          {% else if page.language == "en" %}
-            {% if next_post.written-language == "ja" %}
-         --><span> (Japanese)</span><!--
-            {% endif %}
-          {% endif %}
-       --><span>{{previous_post.title}}</span><!--
-     --></a>
-      {% endif %}
-      {% if next_post.url %}
-        <a class="basic-alignment right" href="{{next_post.url}}" title="Next Post: {{next_post.title}}"><!--
-       --><span>{{next_post.title}}</span><!--
-          {% comment %} 選択中の言語と違う言語の記事は、タイトルの横にその言語名を表示 {% endcomment %}
-          {% if page.language == "ja" %}
-            {% if next_post.written-language == "en" %}
-         --><span>（英語）</span><!--
-            {% endif %}
-          {% else if page.language == "en" %}
-            {% if next_post.written-language == "ja" %}
-         --><span> (Japanese)</span><!--
-            {% endif %}
-          {% endif %}
-     --> &raquo;<!--
-     --></a>
-      {% endif %}
-    </p>
-  </footer>
-</article>
-{% if site.disqus_short_name and page.comments == true %}
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite">{% include post/disqus_thread.html %}</div>
-  </section>
-{% endif %}
-</div>
-{% unless page.sidebar == false %}
-<aside class="sidebar">
-  {% if site.post_asides.size %}
-    {% include_array post_asides %}
-  {% else %}
-    {% include_array default_asides %}
+   --><span>{{previous_post.title}}</span><!--
+ --></a>
   {% endif %}
-</aside>
+  {% if next_post.url %}
+    <a class="basic-alignment right" href="{{next_post.url}}" title="Next Post: {{next_post.title}}"><!--
+   --><span>{{next_post.title}}</span><!--
+      {% comment %} 選択中の言語と違う言語の記事は、タイトルの横にその言語名を表示 {% endcomment %}
+      {% if page.language == "ja" %}
+        {% if next_post.written-language == "en" %}
+     --><span>（英語）</span><!--
+        {% endif %}
+      {% else if page.language == "en" %}
+        {% if next_post.written-language == "ja" %}
+     --><span> (Japanese)</span><!--
+        {% endif %}
+      {% endif %}
+ --> &raquo;<!--
+ --></a>
+  {% endif %}
+</div>
+
+  {% if site.disqus_short_name and page.comments == true %}
+    <section>
+      <h1>Comments</h1>
+      <div id="disqus_thread" aria-live="polite">{% include post/disqus_thread.html %}</div>
+    </section>
+  {% endif %}
+</div>
+
+{% unless page.sidebar == false %}
+  <aside class="sidebar">
+    {% if site.post_asides.size %}
+      {% include_array post_asides %}
+    {% else %}
+      {% include_array default_asides %}
+    {% endif %}
+  </aside>
 {% endunless %}

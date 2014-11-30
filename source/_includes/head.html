@@ -3,7 +3,16 @@
   <head>
     <meta charset="utf-8">
 
-    <title>{% if page.title %}{% if site.titlecase %}{{ page.title | titlecase }}{% else %}{{ page.title }}{% endif %} - {% endif %}{{ site.title }}</title>
+    <title>
+      {% if page.title %}
+        {% if site.titlecase %}
+          {{ page.title | titlecase }}
+        {% else %}
+          {{ page.title }}
+        {% endif %} - 
+      {% endif %}{{ site.title }}
+    </title>
+    
     <meta name="author" content="{{ site.author }}">
 
     {% capture description %}{% if page.description %}{{ page.description }}{% else %}{{ content | raw_content }}{% endif %}{% endcapture %}
@@ -13,19 +22,23 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimal-ui">
 
+    <link rel="icon" href="{{ root_url }}/images/favicon.png" >
+    
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Frontcore.org">
+    <link rel="apple-touch-icon-precomposed" href="{{ root_url }}/images/apple-touch-icon-precomposed.png">
+
     <!-- http://t.co/dKP3o1e -->
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    
     {% capture canonical %}{{ site.url }}{% if site.permalink contains '.html' %}{{ page.url }}{% else %}{{ page.url | remove:'index.html' | strip_slash }}{% endif %}{% endcapture %}
     <link rel="canonical" href="{{ canonical }}">
     
-    <link href="{{ site.subscribe_rss }}" rel="alternate" title="{{site.title}}" type="application/atom+xml">
+    <link href="{{ root_url }}/{{ page.language }}{{ site.subscribe_rss }}" rel="alternate" title="{{site.title}}" type="application/atom+xml">
     
-    <link href="{{ root_url }}/favicon.png" rel="icon">
-<!--     <link rel="{{ root_url }}/apple-touch-icon-precomposed" href="apple-touch-icon-precomposed.png"> -->
-
     <!-- build:css(public-resources) {{ root_url }}/styles/main.css -->
     {% comment %}
       <link rel="stylesheet" href="{{ root_url }}/styles/octopress/screen.css">

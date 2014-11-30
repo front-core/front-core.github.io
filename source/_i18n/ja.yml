@@ -1,7 +1,7 @@
 global:
-    language-switch: 言語切り替え
     japanese: 日本語
     english: 英語
+    read-more: もっと見る...
 
 navigation:
     blog: ブログ
@@ -9,5 +9,13 @@ navigation:
     about: このサイトについて
     contact: お問い合わせ
 
+pagination:
+    archives: —アーカイブ—
+    older: « 古い記事
+    newer: 新しい記事 »
+
 sidebar:
     recent-posts: 最新記事
+    categories: カテゴリ
+    follow-us: フォロー
+    language-switch: 他の言語

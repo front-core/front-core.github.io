@@ -1,6 +1,7 @@
 <section>
   <h1>{% t sidebar.recent-posts %}</h1>
-  <ul id="recent_posts">
+  
+  <ul class="recent-posts">
     {% language_array site.posts language_posts page.language %}
     {% for post in language_posts limit: site.recent_posts %}
       <li class="post">
