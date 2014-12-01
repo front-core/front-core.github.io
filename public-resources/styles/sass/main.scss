@@ -442,6 +442,15 @@ $icon-sprite: get-sprite("icon@2x");
 
       .sharing {
         text-align: center;
+
+        .twitter-share-button {
+          width: 110px !important;
+        }
+
+        [id^="___plusone"] {
+          width: 78px !important;
+        }
+
         .fb-like {
           display: inline-block;
           height: 20px;
@@ -486,6 +495,14 @@ $icon-sprite: get-sprite("icon@2x");
     }
   } // pagination
 } // #content
+
+
+// TODO: Syntax Highlighting Style
+//@import "octopress/base/utilities";
+//@import "octopress/base/theme";
+//@import "octopress/base/typography";
+//@import "octopress/base/solarized";
+//@import "octopress/partials/syntax";
 
 // =====================================
 // Sidebar
@@ -695,6 +712,13 @@ $icon-sprite: get-sprite("icon@2x");
 
     text-align: center;
 
+    .twitter-share-button {
+      width: 110px !important;
+    }
+
+    [id^="___plusone"] {
+      width: 78px !important;
+    }
 
     .fb-like {
       display: inline-block;

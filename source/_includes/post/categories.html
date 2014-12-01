@@ -5,7 +5,7 @@
    -->posted in <!--
 
       {% for category in page.categories %}
-     --><a class="category" href="/{{ post.language }}/blog/categories/{{ category }}">{{ category | capitalize }}</a><!--
+     --><a class="category" href="{{ site.baseurl }}/{{ page.language }}/blog/categories/{{ category }}">{{ category | capitalize }}</a><!--
      -->{% if forloop.length > forloop.index %}, {% endif %}<!--
       {% endfor %}
 --></span>
