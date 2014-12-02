@@ -13,6 +13,7 @@ group :development do
   gem 'rubypants', '~> 0.2.0'
   gem 'rb-fsevent', '~> 0.9'
   gem 'stringex', '~> 1.4.0'
+  gem 'listen', '2.7.11'
   gem 'compass', '1.0.1'
   gem 'sass', '3.4.2'
   gem 'oily_png'
