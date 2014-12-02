@@ -14,7 +14,24 @@ Our blog is beginning.
 <!-- more -->
 
 ```html
-<!-- more -->
+<header id="header">
+  <div class="container">
+    <h1 role="banner">
+      <a class="logo" href="/ja">Frontcore</a>
+    </h1>
+
+    <button class="navigation-toggle">Menu</button>
+
+    <nav class="main-navigation" role="navigation">
+      <ul>
+        <li><a href="/ja">ブログ</a></li>
+        <li><a href="/ja/blog/archives">アーカイブ</a></li>  
+        <li><a href="/ja/about">このサイトについて</a></li>
+        <li><a href="/ja/contact">お問い合わせ</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
 ```
 
 It's super awesome \m/

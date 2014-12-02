@@ -403,7 +403,10 @@ $icon-sprite: get-sprite("icon@2x");
         @include px-with-rem(padding-bottom, $gutter-height);
       }
 
-
+      .code {
+        @include px-with-rem(margin-top, $gutter-height);
+        @include px-with-rem(margin-bottom, $gutter-height);
+      }
     } // .entry-content
 
     footer {
