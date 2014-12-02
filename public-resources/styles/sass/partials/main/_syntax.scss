@@ -1,11 +1,7 @@
-@import "partials/base";
-
 .highlight { 
   padding: 4px 10px;
   @include box-sizing(content-box);
 
-  font-size: 95%;
-  
   background: #f7f7f7;
   border: 1px solid #9B9B9B;
   @include border-radius(3px);
@@ -21,6 +17,10 @@
     text-align: right;
 
     border-right: 1px solid #9B9B9B;
+  }
+
+  .code {
+    padding-right: 10px;
   }
 
   .c { color: #999988; font-style: italic } /* Comment */

@@ -7,14 +7,14 @@ categories: [Hello, World]
 author: "カン"
 ---
 
-こんにちは! 
-
-Frontcore ブログを初めました。
+[フロントコア](http://front-core.org)のブログを初めました。
 
 <!-- more -->
 
-```html
-<!-- more -->
+```js
+console.log('こんにちは！');
 ```
 
-絶賛準備中ですので、お楽しみに \m/
+>絶賛準備中ですので
+
+お楽しみに \m/

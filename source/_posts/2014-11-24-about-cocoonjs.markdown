@@ -14,3 +14,5 @@ published: true
 CocoonJS は Ludei 社が提供する爆速の「HTML5 クロス・プラットフォーム」です。
 
 <!-- more -->
+
+>Ludei - We love HTML5
