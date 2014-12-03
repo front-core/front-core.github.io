@@ -65,7 +65,7 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script>!window.jQuery && document.write(unescape('%3Cscript src="./scripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
     {% endcomment %}
-    
+
     <!-- build:js(public-resources) {{ root_url }}/scripts/vendor.js -->
     <script src="{{ root_url }}/bower_components/jquery/dist/jquery.js"></script>
     <!-- endbuild -->
@@ -89,13 +89,15 @@
     <!-- GitHub レポジトリ表示スクリプト -->
     <script type="text/javascript">
       jQuery(function($){
-        if (!window.jXHR){
-          var jxhr = document.createElement('script');
-          jxhr.type = 'text/javascript';
-          jxhr.src = '{{ root_url}}/scripts/libs/jXHR.js';
-          var s = document.getElementsByTagName('script')[0];
-          s.parentNode.insertBefore(jxhr, s);
-        }
+        {% comment %}
+          if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '{{ root_url}}/scripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+          }
+        {% endcomment %}
 
         github.showRepos({
           user: '{{site.github_user}}',
