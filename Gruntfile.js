@@ -284,7 +284,7 @@ module.exports = function(grunt) {
       'filerev:styles',
       'filerev:scripts',
       'usemin:html',
-      //'htmlmin:dist'
+      'htmlmin:dist'
     ];
 
     grunt.task.run(tasks);
