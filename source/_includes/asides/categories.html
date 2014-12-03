@@ -1,7 +1,7 @@
-<section>
+<section class="categories">
   <h1>{% t sidebar.categories %}</h1>
   
-  <ul class="categories">
+  <ul>
     {% for category in site.categories %}
       <li>
         <a href="{{ site.baseurl }}/{{ page.language }}/blog/categories/{{ category[0] }}">{{ category[0] | capitalize }}</a>

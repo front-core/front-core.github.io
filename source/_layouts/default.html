@@ -23,7 +23,7 @@
               <li><a href="{{ root_url }}/{{page.language}}">{% t navigation.blog %}</a></li>
               <li><a href="{{ root_url }}/{{page.language}}/blog/archives">{% t navigation.archives %}</a></li>
               <li><a href="{{ root_url }}/{{page.language}}/about">{% t navigation.about %}</a></li>
-              <li><a href="{{ root_url }}/{{page.language}}/contact">{% t navigation.contact %}</a></li>
+              {% comment %}<li><a href="{{ root_url }}/{{page.language}}/contact">{% t navigation.contact %}</a></li>{% endcomment %}
             </ul>
           </nav>
         </div>
@@ -60,7 +60,7 @@
 
     <div class="overlay"></div>
     
-    {% include after_footer.html %}
+    
 
 <!--     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> -->
 <!--     <script>!window.jQuery && document.write(unescape('%3Cscript src="./scripts/libs/jquery.min.js"%3E%3C/script%3E'))</script> -->
@@ -75,8 +75,38 @@
     
     <!-- build:js(public-resources) {{ root_url }}/scripts/main.js -->
     <script src="{{ root_url }}/scripts/main.js" type="text/javascript"></script>
-<!--     <script src="{{ root_url }}/scripts/octopress.js" type="text/javascript"></script> -->
     <!-- endbuild -->
+
+    {% comment %}
+    <script src="{{ root_url }}/scripts/octopress.js" type="text/javascript"></script>
+    {% endcomment %}
+
+    <!-- その他プラグイン用スクリプト -->
+    {% include after_footer.html %}
+    <!-- /その他プラグイン用スクリプト -->
+
+    <!-- GitHub レポジトリ表示スクリプト -->
+    <script type="text/javascript">
+      $(document).ready(function(){
+        console.log('tst');
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = '{{ root_url}}/scripts/libs/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: '{{site.github_user}}',
+              count: {{site.github_repo_count}},
+              skip_forks: {{site.github_skip_forks}},
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="{{ root_url }}/scripts/github.js" type="text/javascript"> </script>
+    <!-- /GitHub レポジトリ表示スクリプト -->
 
   </body>
 </html>

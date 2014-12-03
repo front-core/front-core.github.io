@@ -4,6 +4,7 @@ layout: default
 
 <div class="blog-index">
   {% assign index = true %}
+  
   {% language_array site.posts language_posts page.language %}
   {% for post in language_posts %}
     {% assign content = post.content %}

@@ -126,7 +126,7 @@ $susy: (
   use-custom: (rem: true),
   debug: (
     //image: show,
-    //color: blue,
+    //color: rgba(255,0,0,.2),
     //output: background,
     //toggle: top right,
   ),
@@ -206,18 +206,19 @@ body {
     @include clearfix;
   } // .container
 
-  .overlay {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 1;
-
-    display: none;
-    background: rgba(0,0,0,.5);
-  }
 } // #main-container
+
+.overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+
+  display: none;
+  background: rgba(0,0,0,.5);
+} // .overlay
 
 // =====================================
 // Icon
@@ -326,13 +327,39 @@ $icon-sprite: get-sprite("icon@2x");
 // Content
 // =============================================================================
 
-
-
 #content {
   @include px-with-rem(padding-top, $gutter-height * 4);
 
   .container {
     @include px-with-rem(padding-top, $gutter-height);
+  }
+
+  // =====================================
+  // Archives
+  // =====================================
+
+  .blog-index {
+    > header {
+      @include px-with-rem(margin-bottom, $gutter-height);
+
+      .category-title {
+        @include px-with-rem(font-size, 24);
+        @include font-weight(bold);
+        @include px-with-rem(line-height, $gutter-height * 3);
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .blog-archives {
+    .year {
+      @include px-with-rem(margin-bottom, $gutter-height);
+      
+      @include px-with-rem(font-size, 24);
+      @include font-weight(bold);
+      @include px-with-rem(line-height, $gutter-height * 3);
+      text-decoration: underline;
+    }
   }
 
   // =====================================
@@ -367,6 +394,7 @@ $icon-sprite: get-sprite("icon@2x");
         @include font-weight(regular);
         font-style: italic;
         @include px-with-rem(line-height, $gutter-height * 2);
+        //line-height: 1.5;
 
         .author {
             font-style: normal;
@@ -557,6 +585,20 @@ $icon-sprite: get-sprite("icon@2x");
   } // pagination
 
   // =====================================
+  // Comments
+  // =====================================
+
+  .comments {
+    @include px-with-rem(padding-top, $gutter-height);
+    //@include px-with-rem(padding-bottom, $gutter-height * 2);
+    border-top: 1px solid #9B9B9B;
+
+    > h1 {
+      display: none;
+    }
+  }
+
+  // =====================================
   // Sidebar
   // =====================================
 
@@ -574,7 +616,7 @@ $icon-sprite: get-sprite("icon@2x");
         @include px-with-rem(line-height, $gutter-height * 2);
       }
 
-      .recent-posts {
+      &.recent-posts {
         li {
           position: relative;
           padding-left: 16px;
@@ -604,7 +646,7 @@ $icon-sprite: get-sprite("icon@2x");
         } // li
       } // .recent-posts
 
-      .categories {
+      &.categories {
         li {
           position: relative;
           display: inline-block;
@@ -637,103 +679,153 @@ $icon-sprite: get-sprite("icon@2x");
         } // li
       } // .categories
 
-      .follow-us {
-        @include px-with-rem(height, $gutter-height * 3);
-        @include flexbox((
-          display: flex,
-          flex-direction: row,
-          align-items: center,
-          justify-content: flex-start
-        ));
+      &.follow-us {
+        ul {
+          @include px-with-rem(height, $gutter-height * 3);
+          @include flexbox((
+            display: flex,
+            flex-direction: row,
+            align-items: center,
+            justify-content: flex-start
+          ));
 
-        li {
-          margin-right: 10px;
+          li {
+            margin-right: 10px;
 
-          a {
-            display: block;
-            @include hide-text;
-            @include px-with-rem(line-height, $gutter-height * 3);
-            @include sprite-base($icon-sprite, 2);
+            a {
+              display: block;
+              @include hide-text;
+              @include px-with-rem(line-height, $gutter-height * 3);
+              @include sprite-base($icon-sprite, 2);
 
-            &.github {
-              @include sprite-part($icon-sprite, 'icon-github@2x', 2);
+              &.github {
+                @include sprite-part($icon-sprite, 'icon-github@2x', 2);
 
-              &:hover,
-              &:active,
-              &.active {
-                @include sprite-part($icon-sprite, 'icon-github-active@2x', 2);
+                &:hover,
+                &:active,
+                &.active {
+                  @include sprite-part($icon-sprite, 'icon-github-active@2x', 2);
+                }
               }
-            }
 
-            &.twitter {
-              @include sprite-part($icon-sprite, 'icon-twitter@2x', 2);
+              &.twitter {
+                @include sprite-part($icon-sprite, 'icon-twitter@2x', 2);
 
-              &:hover,
-              &:active,
-              &.active {
-                @include sprite-part($icon-sprite, 'icon-twitter-active@2x', 2);
+                &:hover,
+                &:active,
+                &.active {
+                  @include sprite-part($icon-sprite, 'icon-twitter-active@2x', 2);
+                }
               }
-            }
 
-            &.rss {
-              @include sprite-part($icon-sprite, 'icon-rss@2x', 2);
+              &.rss {
+                @include sprite-part($icon-sprite, 'icon-rss@2x', 2);
 
-              &:hover,
-              &:active,
-              &.active {
-                @include sprite-part($icon-sprite, 'icon-rss-active@2x', 2);
+                &:hover,
+                &:active,
+                &.active {
+                  @include sprite-part($icon-sprite, 'icon-rss-active@2x', 2);
+                }
               }
-            }
-          } // a
-        } // li
+            } // a
+          } // li
+        } // ul
       } // .follow-us
 
-      .language-switch {
-        @include px-with-rem(height, $gutter-height * 2);
-        @include flexbox((
-          display: flex,
-          flex-direction: row,
-          align-items: center,
-          justify-content: flex-start
-        ));
+      &.github {
+        @include px-with-rem(font-size, 14);
+        @include font-weight(regular);
+        line-height: 1.4;
 
-        li {
-          margin-right: 10px;
-          @include px-with-rem(font-size, 14);
+        a {
+          color: #DF483D;
 
-          a {
+          @include ellipsis;
+          text-decoration: none;
+
+          &:hover,
+          &:active,
+          &.active {
+            color: #DF483D;
+            text-decoration: underline;
+          }
+        } // a
+
+        #gh_repos {
+          //@include px-with-rem(padding-top, $gutter-height / 2);
+
+          li {
             position: relative;
-            display: block;
-            padding-left: 14px;
-            color: #4A4A4A;
-            text-decoration: none;
-
+            //@include px-with-rem(height, $gutter-height * 3);
+            @include px-with-rem(margin-bottom, $gutter-height / 2);
+            padding-left: 16px;
+            
             &:before {
               content: '';
               @include vertical-center(absolute);
               left: 0;
               display: inline-block;
+              @include image-background('list-style@2x.png', 2);
             }
 
-            &:hover,
-            &:active,
-            &.active {
-              color: #DF483D;
-
-              &:before {
-                @include image-background('arrow-active@2x.png', 2);
-              }
+            
+            p {
+              @include px-with-rem(font-size, 12);
+              line-height: 1.4;
+              @include ellipsis;
             }
+          } // li
+        } // .gh_repos
+      } // .github
 
-            &[disabled] {
+      &.language-switch {
+        ul {
+          @include px-with-rem(height, $gutter-height * 2);
+          @include flexbox((
+            display: flex,
+            flex-direction: row,
+            align-items: center,
+            justify-content: flex-start
+          ));
+
+          li {
+            margin-right: 10px;
+            @include px-with-rem(font-size, 14);
+
+            a {
+              position: relative;
+              display: block;
+              padding-left: 14px;
               color: #4A4A4A;
+              text-decoration: none;
 
               &:before {
-                @include image-background('arrow@2x.png', 2);
+                content: '';
+                @include vertical-center(absolute);
+                left: 0;
+                display: inline-block;
               }
-            }
-          }
-        }
+
+              &:hover,
+              &:active,
+              &.active {
+                color: #DF483D;
+
+                &:before {
+                  @include image-background('arrow-active@2x.png', 2);
+                }
+              }
+
+              &[disabled] {
+                color: #4A4A4A;
+
+                &:before {
+                  @include image-background('arrow@2x.png', 2);
+                }
+              }
+            } // a
+          } // li
+        } // ul
       } // .language-switch
     } // section
   } // .sidebar

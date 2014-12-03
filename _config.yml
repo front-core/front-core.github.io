@@ -55,7 +55,7 @@ default_asides: [
     asides/recent_posts.html, 
     asides/categories.html, 
     asides/follow_us.html, 
-    #asides/github.html, 
+    asides/github.html, 
     #asides/delicious.html, 
     #asides/pinboard.html, 
     #asides/googleplus.html,
@@ -79,7 +79,7 @@ languages: ['ja', 'en']
 # Github repositories
 github_user: front-core
 github_repo_count: 5
-github_show_profile_link: true
+github_show_profile_link: false
 github_skip_forks: true
 
 # Twitter
@@ -104,7 +104,7 @@ delicious_user:
 delicious_count: 3
 
 # Disqus Comments
-disqus_short_name:
+disqus_short_name: front-core
 disqus_show_comment_count: false
 
 # Google Analytics

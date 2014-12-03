@@ -3,7 +3,7 @@ layout: post
 title: "こんにちは"
 date: 2014-10-23 01:38:57 +0900
 comments: true
-categories: [Hello, World]
+categories: [helloworld]
 author: "カン"
 ---
 
