@@ -140,7 +140,7 @@ module.exports = function(grunt) {
     },
 
     useminPrepare: {
-      html: '<%= path.app %>/**/*.html',
+      html: '<%= path.app %>/ja/index.html',
       options: {
         dest: '<%= path.dist %>'
       }
