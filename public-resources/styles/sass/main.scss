@@ -109,8 +109,8 @@ $horizontal-padding: 10px;
 // (http://breakpoint-sass.com/)
 // =====================================
 
-$breakpoint-desktop: 960 + $horizontal-padding * 2 + px;
-$breakpoint-tablet: 768 + $horizontal-padding * 2 + px;
+$breakpoint-desktop: 960 + $horizontal-padding * 2;
+$breakpoint-tablet: 768 + $horizontal-padding * 2;
 // otherwise mobile (mobile first)
 
 // =====================================
@@ -125,10 +125,9 @@ $susy: (
   global-box-sizing: border-box,
   use-custom: (rem: true),
   debug: (
-    //image: show,
-    //color: rgba(255,0,0,.2),
-    //output: background,
-    //toggle: top right,
+    image: show,
+    color: rgba(255,0,0,.1),
+    output: background
   ),
 );
 
@@ -147,6 +146,8 @@ $gutter-height: 12;
 
 //$base-line-height: $gutter-height + px;
 $base-line-height: $gutter-height / 10 + rem;
+
+$grid-background-baseline-color: rgba(0, 0, 0, 0.1);
 
 // =============================================================================
 // Main style
@@ -196,20 +197,21 @@ body {
 // =====================================
 
 #main-container {
+  position: relative;
   overflow: hidden;
-
-  .container {
-    position: relative;
-    @include container;
-    padding-left: $horizontal-padding;
-    padding-right: $horizontal-padding;
-    @include clearfix;
-  } // .container
-
+  background: #fff;
 } // #main-container
 
+.container {
+  position: relative;
+  @include container;
+  padding-left: $horizontal-padding;
+  padding-right: $horizontal-padding;
+  @include clearfix;
+} // .container
+
 .overlay {
-  position: fixed;
+  position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
@@ -854,25 +856,41 @@ $icon-sprite: get-sprite("icon@2x");
 
   .share-buttons {
 
-    @include px-with-rem(min-height, $gutter-height * 2);
+    @include px-with-rem(height, $gutter-height * 2);
     @include px-with-rem(margin-top, $gutter-height);
+
+    @include flexbox((
+      display: flex,
+      flex-direction: row,
+      align-items: center,
+      justify-content: center
+    ));
 
     text-align: center;
 
     .twitter-share-button {
+      display: block !important;
       width: 110px !important;
     }
 
     [id^="___plusone"] {
+      display: block !important;
       width: 78px !important;
     }
 
     .fb-like {
-      display: inline-block;
+      display: block;
       height: 20px;
       > span {
         vertical-align: baseline !important;
       }
+    }
+
+    @include breakpoint($breakpoint-tablet) {
+      @include span(isolate 6 at 4);
+      @include px-with-rem(height, $gutter-height * 3);
+      margin-top: 0;
+      //@include vertical-center;
     }
   } // .share-buttons
 
@@ -881,6 +899,11 @@ $icon-sprite: get-sprite("icon@2x");
     @include px-with-rem(font-size, 12);
     @include px-with-rem(line-height, $gutter-height * 2);
     text-align: center;
+
+    @include breakpoint($breakpoint-tablet) {
+      @include span(3);
+      @include px-with-rem(line-height, $gutter-height * 3);
+    }
   } // .copyright
 
   .powered-by {
@@ -900,6 +923,12 @@ $icon-sprite: get-sprite("icon@2x");
       &.active {
         text-decoration: underline;
       }
+    }
+
+    @include breakpoint($breakpoint-tablet) {
+      @include span(3 last);
+      margin-bottom: 0;
+      @include px-with-rem(line-height, $gutter-height * 3);
     }
   } // .powered-by
 } // #footer

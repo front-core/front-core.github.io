@@ -6,8 +6,16 @@ jQuery(function($) {
   var mainNavigation = $('.main-navigation');
   $('.navigation-toggle').bind('click touchstart', function(event) {
     event.preventDefault();
-    mainNavigation.toggle();
-    overlay.toggle();
+    
+    if (mainNavigation.is(":visible")) {
+      mainNavigation.slideUp('fast', function() {
+        overlay.fadeOut('fast'); 
+      });
+    } else {
+      overlay.fadeIn('fast', function() {
+        mainNavigation.slideDown('fast');
+      });
+    }
   });
 
   var buttons = $('a, button');
