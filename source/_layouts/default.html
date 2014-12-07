@@ -12,12 +12,6 @@
     <div id="main-container">
       <header id="header">
         <div class="container">
-          <h1 role="banner">
-            <a class="logo" href="{{ root_url }}/{{page.language}}">Frontcore</a>
-          </h1>
-          
-          <button class="navigation-toggle">Menu</button>
-
           <nav class="main-navigation" role="navigation">
             <ul>
               <li><a href="{{ root_url }}/{{page.language}}">{% t navigation.blog %}</a></li>
@@ -26,6 +20,12 @@
               {% comment %}<li><a href="{{ root_url }}/{{page.language}}/contact">{% t navigation.contact %}</a></li>{% endcomment %}
             </ul>
           </nav>
+          
+          <button class="navigation-toggle">Menu</button>
+          
+          <h1 role="banner">
+            <a class="logo" href="{{ root_url }}/{{page.language}}">Frontcore</a>
+          </h1>
         </div>
       </header>
       
