@@ -3,9 +3,9 @@
 # ----------------------- #
 
 url: http://front-core.org
-title: Frontcore
+title: FrontCore.org
 subtitle: Super awesome blog for front-end engineers.
-author: Frontcore
+author: FrontCore
 simple_search: https://www.google.com/search
 description:
 
@@ -54,11 +54,11 @@ titlecase: true       # Converts page and post titles to titlecase
 default_asides: [
     asides/recent_posts.html, 
     asides/categories.html, 
-    asides/follow_us.html, 
     asides/github.html, 
     #asides/delicious.html, 
     #asides/pinboard.html, 
     #asides/googleplus.html,
+    asides/follow_us.html, 
     asides/language_switch.html
 ]
 
@@ -83,7 +83,7 @@ github_show_profile_link: false
 github_skip_forks: true
 
 # Twitter
-twitter_user: heavymery
+twitter_user: frontcoreOrg
 twitter_tweet_button: true
 
 # Google +1

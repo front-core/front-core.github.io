@@ -6,7 +6,7 @@
   border: 1px solid #9B9B9B;
   @include border-radius(3px);
 
-  overflow: scroll;
+  overflow: auto;
 
   .line-numbers {
     display: inline-block;

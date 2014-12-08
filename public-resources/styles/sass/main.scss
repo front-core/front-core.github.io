@@ -125,7 +125,7 @@ $susy: (
   global-box-sizing: border-box,
   use-custom: (rem: true),
   debug: (
-    image: show,
+    //image: show,
     color: rgba(255,0,0,.1),
     output: background
   ),
@@ -182,10 +182,18 @@ body {
 
   &.language-ja {
     font-family: Verdana, "游ゴシック", YuGothic, "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, sans-serif;
+
+    input {
+      font-family: Verdana, "游ゴシック", YuGothic, "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, sans-serif;
+    }
   }
 
   &.language-en {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    
+    input {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
   }
   
   @include px-with-rem(font-size, 16);
@@ -226,30 +234,30 @@ body {
 // Icon
 // =====================================
 
-$icon-sprite: get-sprite("icon@2x");
+$main-sprite: get-sprite("sprite@2x");
 
 .icon {
-  @include sprite-base($icon-sprite, 2);
+  @include sprite-base($main-sprite, 2);
   @include hide-text;
 
   &.menu {
-    @include sprite-part($icon-sprite, 'icon-menu@2x', 2);
+    @include sprite-part($main-sprite, 'icon-menu@2x', 2);
   }
 
   &.search {
-    @include sprite-part($icon-sprite, 'icon-search@2x', 2);
+    @include sprite-part($main-sprite, 'icon-search@2x', 2);
   }
 
   &.github {
-    @include sprite-part($icon-sprite, 'icon-github@2x', 2);
+    @include sprite-part($main-sprite, 'icon-github@2x', 2);
   }
 
   &.twitter {
-    @include sprite-part($icon-sprite, 'icon-twitter@2x', 2);
+    @include sprite-part($main-sprite, 'icon-twitter@2x', 2);
   }
 
   &.rss {
-    @include sprite-part($icon-sprite, 'icon-rss@2x', 2);
+    @include sprite-part($main-sprite, 'icon-rss@2x', 2);
   }
 }
 
@@ -280,9 +288,19 @@ $icon-sprite: get-sprite("icon@2x");
     background-position: center;
 
     @include breakpoint($breakpoint-tablet) {
-      //margin: auto;
-      @include image-background('logo-large-light@2x.png', 2);
-      @include px-with-rem(height, $gutter-height * 12);
+      width: 100%;
+      @include px-with-rem(height, $gutter-height * 24);
+      @include background(image-url('logo-middle-light@2x.png') no-repeat);
+      @include background-size(contain);
+      background-position: center;
+    }
+
+    @include breakpoint($breakpoint-desktop) {
+      width: 100%;
+      @include px-with-rem(height, $gutter-height * 24);
+      @include background(image-url('logo-large-light@2x.png') no-repeat);
+      @include background-size(contain);
+      background-position: center;
     }
   } // .logo
 
@@ -291,7 +309,7 @@ $icon-sprite: get-sprite("icon@2x");
     @include transform(translateY(-50%));
  
     @include hide-text;
-    @include sprite($icon-sprite, 'icon-menu@2x', 2);
+    @include sprite($main-sprite, 'icon-menu@2x', 2);
     border: none;
 
     @include breakpoint($breakpoint-tablet) {
@@ -309,7 +327,7 @@ $icon-sprite: get-sprite("icon@2x");
       position: relative;
       top: 0;
       display: block !important;
-      @include span(4 last);
+      @include span(full);
     }
 
     ul {
@@ -340,19 +358,25 @@ $icon-sprite: get-sprite("icon@2x");
 
     @include breakpoint($breakpoint-tablet) {
       ul {
-        @include px-with-rem(height, $gutter-height * 5);
+        @include px-with-rem(line-height, $gutter-height * 5);
+        text-align: right;
 
-        @include flexbox((
+/*         @include flexbox((
           display: flex,
           flex-direction: row,
           align-items: center,
           justify-content: space-around
-        ));
+        )); */
 
         li {
+          display: inline-block;
+          
+          margin-right: gutter();
           border-top: none;
+
           &:last-child {
             border-bottom: none;
+            margin-right: auto;
           }
 
           a {
@@ -365,10 +389,36 @@ $icon-sprite: get-sprite("icon@2x");
               text-decoration: underline;
               background: transparent;
             }
-          }
-        }
-      }
-    }
+          } // a
+
+          .search-form {
+            position: relative;
+
+            .search {
+              display: block;
+              padding-right: 25px;
+              
+              color: #DF483D;
+              @include px-with-rem(font-size, 16);
+              @include px-with-rem(line-height, $gutter-height * 2);
+
+              border: none;
+              border-bottom: 1px solid #DF483D;
+              outline: none;
+            }
+
+            &:after {
+              content: '';
+              position: absolute;
+              top: 3px;
+              right: 0;
+              display: block;              
+              @include sprite($main-sprite, 'icon-search-active@2x', 2);
+            }
+          } // .search-form
+        } // li
+      } // ul
+    } // $breakpoint-tablet
   } // .main-navigation
 } // #header
 
@@ -380,7 +430,8 @@ $icon-sprite: get-sprite("icon@2x");
   @include px-with-rem(padding-top, $gutter-height * 4);
 
   @include breakpoint($breakpoint-tablet) {
-    @include px-with-rem(padding-top, $gutter-height);
+    //@include px-with-rem(padding-top, $gutter-height);
+    padding-top: 0;
   }
 
   .container {
@@ -402,6 +453,10 @@ $icon-sprite: get-sprite("icon@2x");
         text-decoration: underline;
       }
     }
+
+    @include breakpoint($breakpoint-desktop) {
+      @include span(8);
+    }
   }
 
   .blog-archives {
@@ -412,6 +467,22 @@ $icon-sprite: get-sprite("icon@2x");
       @include font-weight(bold);
       @include px-with-rem(line-height, $gutter-height * 3);
       text-decoration: underline;
+    }
+
+    @include breakpoint($breakpoint-desktop) {
+      @include span(8);
+    }
+  }
+
+  .blog-post {
+    @include breakpoint($breakpoint-desktop) {
+      @include span(8);
+    }
+  }
+
+  .blog-page {
+    @include breakpoint($breakpoint-desktop) {
+      @include span(8);
     }
   }
 
@@ -502,7 +573,7 @@ $icon-sprite: get-sprite("icon@2x");
 
       &.full-article {
         @include px-with-rem(padding-top, $gutter-height);
-        @include px-with-rem(padding-bottom, $gutter-height);
+        @include px-with-rem(padding-bottom, $gutter-height * 2);
       }
 
       a {
@@ -580,12 +651,13 @@ $icon-sprite: get-sprite("icon@2x");
         &:hover,
         &:active,
         &.active {
-          &:after {
+          text-decoration: underline;
+/*           &:after {
             display: block;
-          }
+          } */
         }
 
-        &:after {
+/*         &:after {
           content: '';
           position: absolute;
           bottom: 6px;
@@ -593,7 +665,7 @@ $icon-sprite: get-sprite("icon@2x");
           right: 0;
           display: none;
           border-bottom: 1px solid #DF483D;
-        }
+        } */
       } // .read-more
 
       .sharing {
@@ -603,6 +675,10 @@ $icon-sprite: get-sprite("icon@2x");
           align-items: center,
           justify-content: center
         ));
+
+        @include breakpoint($breakpoint-desktop) {
+          @include justify-content(flex-start);
+        }
 
         .twitter-share-button {
           display: block !important;
@@ -684,6 +760,16 @@ $icon-sprite: get-sprite("icon@2x");
     @include px-with-rem(padding-top, $gutter-height);
     border-top: 1px solid #9B9B9B;
 
+    @include breakpoint($breakpoint-desktop) {
+      @include span(4 last);
+    }
+
+    @include breakpoint($breakpoint-desktop) {
+      padding-top: 0;
+      padding-left: gutter();
+      border-top: none;
+    }
+
     section {
       @include px-with-rem(margin-bottom, $gutter-height);
 
@@ -704,6 +790,13 @@ $icon-sprite: get-sprite("icon@2x");
       }
 
       &.recent-posts {
+        @include breakpoint($breakpoint-tablet) {
+          @include span(6);
+        }
+        @include breakpoint($breakpoint-desktop) {
+          @include span(full);
+        }
+
         li {
           position: relative;
           padding-left: 16px;
@@ -738,6 +831,13 @@ $icon-sprite: get-sprite("icon@2x");
       } // .recent-posts
 
       &.categories {
+        @include breakpoint($breakpoint-tablet) {
+          @include span(6 last);
+        }
+        @include breakpoint($breakpoint-desktop) {
+          @include span(full);
+        }
+
         li {
           position: relative;
           display: inline-block;
@@ -779,6 +879,13 @@ $icon-sprite: get-sprite("icon@2x");
       } // .categories
 
       &.follow-us {
+        @include breakpoint($breakpoint-tablet) {
+          @include span(6 last);
+        }
+        @include breakpoint($breakpoint-desktop) {
+          @include span(full);
+        }
+
         ul {
           @include px-with-rem(height, $gutter-height * 3);
           @include flexbox((
@@ -795,35 +902,35 @@ $icon-sprite: get-sprite("icon@2x");
               display: block;
               @include hide-text;
               @include px-with-rem(line-height, $gutter-height * 3);
-              @include sprite-base($icon-sprite, 2);
+              @include sprite-base($main-sprite, 2);
 
               &.github {
-                @include sprite-part($icon-sprite, 'icon-github@2x', 2);
+                @include sprite-part($main-sprite, 'icon-github@2x', 2);
 
                 &:hover,
                 &:active,
                 &.active {
-                  @include sprite-part($icon-sprite, 'icon-github-active@2x', 2);
+                  @include sprite-part($main-sprite, 'icon-github-active@2x', 2);
                 }
               }
 
               &.twitter {
-                @include sprite-part($icon-sprite, 'icon-twitter@2x', 2);
+                @include sprite-part($main-sprite, 'icon-twitter@2x', 2);
 
                 &:hover,
                 &:active,
                 &.active {
-                  @include sprite-part($icon-sprite, 'icon-twitter-active@2x', 2);
+                  @include sprite-part($main-sprite, 'icon-twitter-active@2x', 2);
                 }
               }
 
               &.rss {
-                @include sprite-part($icon-sprite, 'icon-rss@2x', 2);
+                @include sprite-part($main-sprite, 'icon-rss@2x', 2);
 
                 &:hover,
                 &:active,
                 &.active {
-                  @include sprite-part($icon-sprite, 'icon-rss-active@2x', 2);
+                  @include sprite-part($main-sprite, 'icon-rss-active@2x', 2);
                 }
               }
             } // a
@@ -835,6 +942,14 @@ $icon-sprite: get-sprite("icon@2x");
         @include px-with-rem(font-size, 14);
         @include font-weight(regular);
         line-height: 1.4;
+
+        @include breakpoint($breakpoint-tablet) {
+          @include span(6);
+          @include px-with-rem(font-size, 16);
+        }
+        @include breakpoint($breakpoint-desktop) {
+          @include span(full);
+        }
 
         a {
           color: #DF483D;
@@ -858,6 +973,10 @@ $icon-sprite: get-sprite("icon@2x");
             //@include px-with-rem(height, $gutter-height * 3);
             @include px-with-rem(margin-bottom, $gutter-height / 2);
             padding-left: 16px;
+
+            &:last-child {
+              margin-bottom: auto;
+            }
             
             &:before {
               content: '';
@@ -866,18 +985,28 @@ $icon-sprite: get-sprite("icon@2x");
               display: inline-block;
               @include image-background('list-style@2x.png', 2);
             }
-
             
             p {
               @include px-with-rem(font-size, 12);
               line-height: 1.4;
               @include ellipsis;
+
+              @include breakpoint($breakpoint-tablet) {
+                @include px-with-rem(font-size, 14);
+              }
             }
           } // li
         } // .gh_repos
       } // .github
 
       &.language-switch {
+        @include breakpoint($breakpoint-tablet) {
+          @include span(6 last);
+        }
+        @include breakpoint($breakpoint-desktop) {
+          @include span(full);
+        }
+
         ul {
           @include px-with-rem(height, $gutter-height * 2);
           @include flexbox((
@@ -890,6 +1019,10 @@ $icon-sprite: get-sprite("icon@2x");
           li {
             margin-right: 10px;
             @include px-with-rem(font-size, 14);
+
+            @include breakpoint($breakpoint-tablet) {
+              @include px-with-rem(font-size, 16);
+            }
 
             a {
               position: relative;
@@ -911,7 +1044,7 @@ $icon-sprite: get-sprite("icon@2x");
                 color: #DF483D;
 
                 &:before {
-                  @include image-background('arrow-active@2x.png', 2);
+                  @include sprite($main-sprite, 'arrow-active@2x', 2);
                 }
               }
 
@@ -919,7 +1052,7 @@ $icon-sprite: get-sprite("icon@2x");
                 color: #4A4A4A;
 
                 &:before {
-                  @include image-background('arrow@2x.png', 2);
+                  @include sprite($main-sprite, 'arrow@2x', 2);
                 }
               }
             } // a
@@ -1032,4 +1165,11 @@ $icon-sprite: get-sprite("icon@2x");
   } // .powered-by
 } // #footer
 
-@include sticky-footer($gutter-height * 7 + px, "#main-container", "#sticky-footer-area", "#footer")
+@include sticky-footer($gutter-height * 7 + px, "#main-container", "#sticky-footer-area", "#footer");
+
+@include breakpoint($breakpoint-tablet) {
+  #footer,
+  #sticky-footer-area {
+    @include px-with-rem(height, $gutter-height * 3);
+  }
+}

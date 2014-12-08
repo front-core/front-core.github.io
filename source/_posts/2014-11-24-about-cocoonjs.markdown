@@ -8,7 +8,7 @@ categories: CocoonJS
 written-language: "ja"
 author: Shindeok Kang
 author-url: https://twitter.com/heavymery
-published: true
+published: false
 ---
 
 CocoonJS は Ludei 社が提供する爆速の「HTML5 クロス・プラットフォーム」です。
