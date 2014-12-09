@@ -231,13 +231,17 @@ module.exports = function(grunt) {
       rakeWatch: {
         command: 'bundle exec rake watch'
       },
+      rakeDeploy: {
+        command: 'mkdir -p _deploy && bundle exec rake deploy'
+      },
 
-      deployToGitHubPage: {
-        command: 'git subtree push --prefix <%= path.dist %> origin master'
-      },
-      dropGitHubPageBranch: {
-        command: 'git push origin :master'
-      },
+      // rakeDeploy が早い 
+//       deployToGitHubPage: {
+//         command: 'git subtree push --prefix <%= path.dist %> origin master'
+//       },
+//       dropGitHubPageBranch: {
+//         command: 'git push origin :master'
+//       },
 
       copyIndexHtml: {
         command: 'cp <%= path.dist %>/ja/index.html <%= path.dist %>/index.html'
@@ -304,13 +308,17 @@ module.exports = function(grunt) {
 
   // Deploy task
   grunt.registerTask('deploy', 'Deploy to GitHub Page.', function(target) {
-    var tasks = [
-      'shell:deployToGitHubPage'
-    ];
+//     var tasks = [
+//       'shell:deployToGitHubPage'
+//     ];
 
-    if (target === 'force') {
-      tasks.unshift('shell:dropGitHubPageBranch');
-    }
+//     if (target === 'force') {
+//       tasks.unshift('shell:dropGitHubPageBranch');
+//     }
+
+    var tasks = [
+      'shell:rakeDeploy'
+    ];
 
     grunt.task.run(tasks);
   });
