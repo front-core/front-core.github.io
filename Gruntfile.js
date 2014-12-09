@@ -34,7 +34,7 @@ module.exports = function(grunt) {
       appImages: '<%= path.appResources %>/images',
       appStyles: '<%= path.appResources %>/styles',
       appScripts: '<%= path.appResources %>/scripts',
-      dist: '_deploy',
+      dist: 'public-dist',
       distImages: '<%= path.dist %>/images',
       distStyles: '<%= path.dist %>/styles',
       distScripts: '<%= path.dist %>/scripts'
@@ -160,7 +160,7 @@ module.exports = function(grunt) {
 
     usemin: {
       options: {
-        assetsDirs: ['_deploy', '_deploy/styles']
+        assetsDirs: ['<%= path.dist %>', '<%= path.distStyles %>']
       },
       html: [
         '<%= path.dist %>/**/*.html',
@@ -233,7 +233,7 @@ module.exports = function(grunt) {
       },
 
       deployToGitHubPage: {
-        command: 'git subtree push --prefix _deploy origin master'
+        command: 'git subtree push --prefix <%= path.dist %> origin master'
       },
       dropGitHubPageBranch: {
         command: 'git push origin :master'
