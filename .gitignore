@@ -4,6 +4,8 @@
 .gist-cache
 .pygments-cache
 public
+public-dist
+_deploy
 sass.old
 source.old
 source/_stash
