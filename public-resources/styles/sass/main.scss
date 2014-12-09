@@ -1169,7 +1169,11 @@ $main-sprite: get-sprite("sprite@2x");
 
 @include breakpoint($breakpoint-tablet) {
   #footer,
-  #sticky-footer-area {
+  #main-container #sticky-footer-area {
     @include px-with-rem(height, $gutter-height * 3);
+  }
+
+  #main-container {
+    @include px-with-rem(margin-bottom, - $gutter-height * 3);
   }
 }
