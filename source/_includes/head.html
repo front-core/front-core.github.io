@@ -50,7 +50,10 @@
     <!-- build:js({.tmp,public-resources}) {{ root_url }}/scripts/vendor/modernizr.js -->
     <script src="{{ root_url }}/bower_components/modernizr/modernizr.js"></script>
     <!-- endbuild -->
-
-    {% include custom/head.html %}
+  
+    {% comment %}
+      {% include custom/head.html %}
+    {% endcomment %}
+    
     {% include google_analytics.html %}
   </head>
