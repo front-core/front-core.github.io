@@ -142,7 +142,14 @@ module.exports = function(grunt) {
     useminPrepare: {
       html: '<%= path.app %>/ja/index.html',
       options: {
-        dest: '<%= path.dist %>'
+        dest: '<%= path.dist %>',
+        flow: {
+          steps: {
+            js: ['concat', 'uglifyjs'],
+            css: ['concat']
+          },
+          post: {}
+        }
       }
     },
 
@@ -219,7 +226,7 @@ module.exports = function(grunt) {
       },
 
       compassCompile: {
-        command: 'bundle exec compass compile'
+        command: 'bundle exec compass compile -c config-build.rb --force'
       },
       compassWatch: {
         command: 'bundle exec compass watch'
@@ -291,7 +298,7 @@ module.exports = function(grunt) {
       'copy:build',
       'useminPrepare',
       'concat',
-      'cssmin',
+      // 'cssmin', flexbox など破綻した仕様の CSS を消してしまうので Sass の output-style で対応
       'filerev:images',
       'usemin:css',
       'uglify',

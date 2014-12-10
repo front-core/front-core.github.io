@@ -231,13 +231,21 @@ body {
 } // .overlay
 
 // =====================================
-// Icon
+// Sprites
 // =====================================
 
 $main-sprite: get-sprite("sprite@2x");
 
-.icon {
+%main-sprite-base {
   @include sprite-base($main-sprite, 2);
+}
+
+// =====================================
+// Icons
+// =====================================
+
+.icon {
+  @extend %main-sprite-base;
   @include hide-text;
 
   &.menu {
@@ -309,7 +317,8 @@ $main-sprite: get-sprite("sprite@2x");
     @include transform(translateY(-50%));
  
     @include hide-text;
-    @include sprite($main-sprite, 'icon-menu@2x', 2);
+    @extend %main-sprite-base;
+    @include sprite-part($main-sprite, 'icon-menu@2x', 2);
     border: none;
 
     @include breakpoint($breakpoint-tablet) {
@@ -356,17 +365,37 @@ $main-sprite: get-sprite("sprite@2x");
       }
     }
 
+    .search-form {
+      position: relative;
+
+      .search {
+        display: block;
+        padding-right: 25px;
+
+        color: #DF483D;
+        @include px-with-rem(font-size, 16);
+        @include px-with-rem(line-height, $gutter-height * 2);
+
+        border: none;
+        border-bottom: 1px solid #DF483D;
+        outline: none;
+      }
+
+      &:after {
+        content: '';
+        position: absolute;
+        top: 3px;
+        right: 0;
+        display: block;
+        @extend %main-sprite-base;
+        @include sprite-part($main-sprite, 'icon-search-active@2x', 2);
+      }
+    } // .search-form
+
     @include breakpoint($breakpoint-tablet) {
       ul {
         @include px-with-rem(line-height, $gutter-height * 5);
         text-align: right;
-
-/*         @include flexbox((
-          display: flex,
-          flex-direction: row,
-          align-items: center,
-          justify-content: space-around
-        )); */
 
         li {
           display: inline-block;
@@ -390,32 +419,6 @@ $main-sprite: get-sprite("sprite@2x");
               background: transparent;
             }
           } // a
-
-          .search-form {
-            position: relative;
-
-            .search {
-              display: block;
-              padding-right: 25px;
-              
-              color: #DF483D;
-              @include px-with-rem(font-size, 16);
-              @include px-with-rem(line-height, $gutter-height * 2);
-
-              border: none;
-              border-bottom: 1px solid #DF483D;
-              outline: none;
-            }
-
-            &:after {
-              content: '';
-              position: absolute;
-              top: 3px;
-              right: 0;
-              display: block;              
-              @include sprite($main-sprite, 'icon-search-active@2x', 2);
-            }
-          } // .search-form
         } // li
       } // ul
     } // $breakpoint-tablet
@@ -652,23 +655,16 @@ $main-sprite: get-sprite("sprite@2x");
         &:active,
         &.active {
           text-decoration: underline;
-/*           &:after {
-            display: block;
-          } */
         }
-
-/*         &:after {
-          content: '';
-          position: absolute;
-          bottom: 6px;
-          left: 0;
-          right: 0;
-          display: none;
-          border-bottom: 1px solid #DF483D;
-        } */
       } // .read-more
 
       .sharing {
+        @include flexbox((
+          display: box,
+          box-orient: horizontal,
+          box-align: center,
+          box-pack: center
+        ), $version: 1);
         @include flexbox((
           display: flex,
           flex-direction: row,
@@ -744,7 +740,6 @@ $main-sprite: get-sprite("sprite@2x");
 
   .comments {
     @include px-with-rem(padding-top, $gutter-height);
-    //@include px-with-rem(padding-bottom, $gutter-height * 2);
     border-top: 1px solid #9B9B9B;
 
     > h1 {
@@ -888,6 +883,13 @@ $main-sprite: get-sprite("sprite@2x");
 
         ul {
           @include px-with-rem(height, $gutter-height * 3);
+
+          @include flexbox((
+            display: box,
+            box-orient: horizontal,
+            box-align: center,
+            box-pack: start
+          ), $version: 1);
           @include flexbox((
             display: flex,
             flex-direction: row,
@@ -902,7 +904,7 @@ $main-sprite: get-sprite("sprite@2x");
               display: block;
               @include hide-text;
               @include px-with-rem(line-height, $gutter-height * 3);
-              @include sprite-base($main-sprite, 2);
+              @extend %main-sprite-base;
 
               &.github {
                 @include sprite-part($main-sprite, 'icon-github@2x', 2);
@@ -966,11 +968,8 @@ $main-sprite: get-sprite("sprite@2x");
         } // a
 
         #gh_repos {
-          //@include px-with-rem(padding-top, $gutter-height / 2);
-
           li {
             position: relative;
-            //@include px-with-rem(height, $gutter-height * 3);
             @include px-with-rem(margin-bottom, $gutter-height / 2);
             padding-left: 16px;
 
@@ -1007,8 +1006,30 @@ $main-sprite: get-sprite("sprite@2x");
           @include span(full);
         }
 
+        .language-list {
+          @include flexbox((
+            display: box,
+            box-orient: horizontal,
+            box-align: center,
+            box-pack: start
+          ), $version: 1);
+          @include flexbox((
+            display: flex,
+            flex-direction: row,
+            align-items: center,
+            justify-content: flex-start
+          ));
+        }
+
         ul {
           @include px-with-rem(height, $gutter-height * 2);
+
+          @include flexbox((
+            display: box,
+            box-orient: horizontal,
+            box-align: center,
+            box-pack: start
+          ), $version: 1);
           @include flexbox((
             display: flex,
             flex-direction: row,
@@ -1036,6 +1057,7 @@ $main-sprite: get-sprite("sprite@2x");
                 @include vertical-center(absolute);
                 left: 0;
                 display: inline-block;
+                @extend %main-sprite-base;
               }
 
               &:hover,
@@ -1044,7 +1066,7 @@ $main-sprite: get-sprite("sprite@2x");
                 color: #DF483D;
 
                 &:before {
-                  @include sprite($main-sprite, 'arrow-active@2x', 2);
+                  @include sprite-part($main-sprite, 'arrow-active@2x', 2);
                 }
               }
 
@@ -1052,7 +1074,7 @@ $main-sprite: get-sprite("sprite@2x");
                 color: #4A4A4A;
 
                 &:before {
-                  @include sprite($main-sprite, 'arrow@2x', 2);
+                  @include sprite-part($main-sprite, 'arrow@2x', 2);
                 }
               }
             } // a
@@ -1090,6 +1112,12 @@ $main-sprite: get-sprite("sprite@2x");
     @include px-with-rem(margin-top, $gutter-height);
 
     @include flexbox((
+      display: box,
+      box-orient: horizontal,
+      box-align: center,
+      box-pack: center
+    ), $version: 1);
+    @include flexbox((
       display: flex,
       flex-direction: row,
       align-items: center,
@@ -1120,7 +1148,6 @@ $main-sprite: get-sprite("sprite@2x");
       @include span(isolate 6 at 4);
       @include px-with-rem(height, $gutter-height * 3);
       margin-top: 0;
-      //@include vertical-center;
     }
   } // .share-buttons
 
