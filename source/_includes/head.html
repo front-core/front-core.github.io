@@ -40,10 +40,12 @@
     <link href="{{ root_url }}/{{ page.language }}{{ site.subscribe_rss }}" rel="alternate" title="{{site.title}}" type="application/atom+xml">
     
     {% comment %}
-      <link rel="stylesheet" href="{{ root_url }}/styles/octopress/screen.css">    
+      <!-- build:css(.tmp) {{ root_url }}/styles/octopress.css -->
+      <link rel="stylesheet" href="{{ root_url }}/styles/octopress/screen.css">
+      <!-- endbuild -->
     {% endcomment %}
 
-    <!-- build:css({.tmp,public-resources}) {{ root_url }}/styles/main.css -->
+    <!-- build:css(.tmp) {{ root_url }}/styles/main.css -->
     <link rel="stylesheet" href="{{ root_url }}/styles/main.css">
     <!-- endbuild -->
 
