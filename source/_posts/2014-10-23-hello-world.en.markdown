@@ -3,18 +3,12 @@ layout: post
 title: "Hello World"
 date: 2014-10-23 01:38:57 +0900
 comments: true
-categories: [Hello, World]
-author: "Shindeok Kang"
+categories: [helloworld]
+author: "FrontCore"
 ---
 
-Hello World! 
-
-Our blog is beginning.
-
-<!-- more -->
-
-```html
-<!-- more -->
+```js 
+console.log('Hello, World !');
 ```
 
-It's super awesome \m/
+Our blog is beginning \m/

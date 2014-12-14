@@ -1,5 +1,17 @@
-{% if page.date %}{% capture time %}{{ page.date_time_html }}{% endcapture %}{% endif %}
-{% if post.date %}{% capture time %}{{ post.date_time_html }}{% endcapture %}{% endif %}
+{% if page.language == "ja" %}
+  {% assign date_format = "%Y年%-m月%-d日" %}
+{% else %}
+  {% assign date_format = "%B %-d, %Y" %}
+{% endif %}
 
-{% if page.updated %}{% capture updated %}{{ page.date_time_updated_html }}{% endcapture %}{% endif %}
-{% if post.updated %}{% capture updated %}{{ post.date_time_updated_html }}{% endcapture %}{% endif %}
+{% if page.updated %}
+  {{ page.updated | date: date_format }}
+{% else if page.date %}
+  {{ page.date | date: date_format }}
+{% endif %}
+
+{% if post.updated %}
+  {{ post.updated | date: date_format }}
+{% else if post.date %}
+  {{ post.date | date: date_format }}
+{% endif %}

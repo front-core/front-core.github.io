@@ -3,18 +3,14 @@ layout: post
 title: "こんにちは"
 date: 2014-10-23 01:38:57 +0900
 comments: true
-categories: [Hello, World]
-author: "カン"
+categories: [helloworld]
+author: "FrontCore"
 ---
 
-こんにちは! 
-
-Frontcore ブログを初めました。
-
-<!-- more -->
-
-```html
-<!-- more -->
+```js
+console.log('Hello, World !');
 ```
 
-絶賛準備中ですので、お楽しみに \m/
+[FrontCore.org](http://front-core.org) のブログを初めました。
+
+絶賛準備中ですのでお楽しみに \m/

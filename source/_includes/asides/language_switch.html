@@ -1,0 +1,16 @@
+{% capture english_link %}{{ site.baseurl }}/en/{{ page.url | remove_language }}{% endcapture %}
+{% capture japanese_link %}{{ site.baseurl }}/ja/{{ page.url | remove_language }}{% endcapture %}
+
+<section class="language-switch">
+  <h1>{% t sidebar.language-switch %}</h1>
+
+  <ul>
+    {% if page.language == "ja" %}
+      <li><a href="{{ japanese_link }}" disabled>{% t global.japanese %}</a></li>
+      <li><a href="{{ english_link }}">{% t global.english %}</a></li>
+    {% else if page.language == "en" %}
+      <li><a href="{{ english_link }}" disabled>{% t global.english %}</a></li>
+      <li><a href="{{ japanese_link }}">{% t global.japanese %}</a></li>
+    {% endif %}
+  </ul>
+</section>

@@ -1,14 +1,126 @@
 {% capture root_url %}{{ site.root | strip_slash }}{% endcapture %}
-{% include head.html %}
-<body {% if page.body_id %} id="{{ page.body_id }}" {% endif %} {% if page.sidebar == false %} class="no-sidebar" {% endif %} {% if page.sidebar == 'collapse' or site.sidebar == 'collapse' %} class="collapse-sidebar sidebar-footer" {% endif %}>
-  <header role="banner">{% include header.html %}</header>
-  <nav role="navigation">{% include navigation.html %}</nav>
-  <div id="main">
-    <div id="content">
-      {{ content | expand_urls: root_url }}
+  
+  {% include head.html %}
+  
+  <body {% if page.body_id %} id="{{ page.body_id }}" {% endif %} 
+    class="
+      {% if page.sidebar == false %}no-sidebar{% endif %} 
+      {% if page.sidebar == 'collapse' or site.sidebar == 'collapse' %}collapse-sidebar sidebar-footer{% endif %} 
+      language-{{ page.language }}
+    ">
+    
+    <div id="main-container">
+      <header id="header">
+        <div class="container">
+          <nav class="main-navigation" role="navigation">
+            <ul>
+              <li><a href="{{ root_url }}/{{page.language}}">{% t navigation.blog %}</a></li>
+              <li><a href="{{ root_url }}/{{page.language}}/blog/archives">{% t navigation.archives %}</a></li>
+              <li><a href="{{ root_url }}/{{page.language}}/about">{% t navigation.about %}</a></li>
+              
+              {% comment %}
+                {% if site.simple_search %}
+                  <li>
+                    <form class="search-form" action="{{ site.simple_search }}" method="get">
+                      <fieldset role="search">
+                        <input type="hidden" name="q" value="site:{{ site.url | shorthand_url }}" />
+                        <input class="search" type="text" name="q" results="0" placeholder=""/>
+                      </fieldset>
+                    </form>
+                  </li>
+                {% endif %}
+              {% endcomment %}
+              
+              {% comment %}<li><a href="{{ root_url }}/{{page.language}}/contact">{% t navigation.contact %}</a></li>{% endcomment %}
+            </ul>
+          </nav>
+          
+          <button class="navigation-toggle">Menu</button>
+          
+          <h1 role="banner">
+            <a class="logo" href="{{ root_url }}/{{page.language}}">Frontcore</a>
+          </h1>
+        </div>
+      </header>
+      
+      <div id="content">
+        <div class="container">
+          {{ content | expand_urls: root_url }}
+        </div>
+      </div>
+      
+      <div id="sticky-footer-area"></div>
+
+      <div class="overlay"></div>
     </div>
-  </div>
-  <footer role="contentinfo">{% include footer.html %}</footer>
-  {% include after_footer.html %}
-</body>
+    
+    <footer id="footer" role="contentinfo">
+      <div class="container">
+        <div class="share-buttons">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-url="{{ site.url }}" data-lang="{{ page.language }}" data-hashtags="front-core.org" data-text="{{ site.title }}"></a>
+
+          <div class="g-plusone" data-href="{{ site.url }}" data-size="medium"></div>
+
+          <div class="fb-like" data-href="{{ site.url }}" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
+        </div>
+
+        <p class="copyright">
+          Copyright &copy; {{ site.time | date: "%Y" }} {{ site.author }}
+        </p>
+
+        <p class="powered-by">
+          Powered by <a href="http://octopress.org">Octopress</a>
+        </p>
+      </div>
+    </footer>
+    
+    {% comment %}
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>!window.jQuery && document.write(unescape('%3Cscript src="./scripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+    {% endcomment %}
+
+    <!-- build:js({.tmp,public-resources}) {{ root_url }}/scripts/vendor.js -->
+    <script src="{{ root_url }}/bower_components/jquery/dist/jquery.js"></script>
+    <!-- endbuild -->
+    
+    <!-- build:js({.tmp,public-resources}) {{ root_url }}/scripts/plugins.js -->
+    <script src="{{ root_url }}/scripts/github.js" type="text/javascript"> </script>
+    <!-- endbuild -->
+    
+    <!-- build:js({.tmp,public-resources}) {{ root_url }}/scripts/main.js -->
+    <script src="{{ root_url }}/scripts/main.js" type="text/javascript"></script>
+    <!-- endbuild -->
+
+    {% comment %}
+    <script src="{{ root_url }}/scripts/octopress.js" type="text/javascript"></script>
+    {% endcomment %}
+
+    <!-- その他プラグイン用スクリプト -->
+    {% include after_footer.html %}
+    <!-- /その他プラグイン用スクリプト -->
+
+    <!-- GitHub レポジトリ表示スクリプト -->
+    <script type="text/javascript">
+      jQuery(function($){
+        {% comment %}
+          if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '{{ root_url}}/scripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+          }
+        {% endcomment %}
+
+        github.showRepos({
+          user: '{{site.github_user}}',
+          count: {{site.github_repo_count}},
+          skip_forks: {{site.github_skip_forks}},
+          target: '#gh_repos'
+        });
+      });
+    </script>
+    <!-- /GitHub レポジトリ表示スクリプト -->
+
+  </body>
 </html>

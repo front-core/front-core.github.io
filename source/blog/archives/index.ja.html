@@ -1,17 +1,17 @@
 ---
-layout: page
+layout: default
 title: "ブログアーカイブ"
 footer: false
 ---
 
-<div id="blog-archives">
+<div class="blog-archives">
   {% language_array site.posts language_posts page.language %}
   {% for post in language_posts reverse %}
-    {% capture this_year %}{{ post.date | date: "%Y" }}{% endcapture %}
+    {% capture this_year %}{{ post.date | date: "%Y年%-m月" }}{% endcapture %}
     
     {% unless year == this_year %}
       {% assign year = this_year %}
-      <h2>{{ year }}</h2>
+      <h2 class="year">{{ year }}</h2>
     {% endunless %}
     
     <article>
@@ -19,3 +19,11 @@ footer: false
     </article>
   {% endfor %}
 </div>
+
+<aside class="sidebar">
+  {% if site.blog_index_asides.size %}
+    {% include_array blog_index_asides %}
+  {% else %}
+    {% include_array default_asides %}
+  {% endif %}
+</aside>

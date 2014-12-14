@@ -6,4 +6,4 @@ sharing: true
 footer: true
 ---
 
-We are World Wide Web developers !
+We are [FrontCore](http://front-core.org) organization.
