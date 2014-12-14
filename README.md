@@ -1,4 +1,4 @@
-# [![Frontcore](https://raw.githubusercontent.com/front-core/front-core.github.io/source/source/images/logo-rectangle.png)](http://front-core.org/)
+# [![Frontcore](https://raw.githubusercontent.com/front-core/front-core.github.io/source/public-resources/images/logo-large-light@2x.png)](http://front-core.org/)
 
 ## Overview
 
