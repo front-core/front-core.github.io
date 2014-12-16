@@ -500,7 +500,10 @@ $main-sprite: get-sprite("sprite@2x");
       .entry-title {
         @include px-with-rem(font-size, 20);
         @include font-weight(bold);
-        @include px-with-rem(line-height, $gutter-height * 2);
+        //@include px-with-rem(line-height, $gutter-height * 2);
+        line-height: 1.5;
+
+        color: #222;
 
         a {
           color: #222;
@@ -579,22 +582,35 @@ $main-sprite: get-sprite("sprite@2x");
         @include px-with-rem(padding-bottom, $gutter-height * 2);
       }
 
-      h1 {
-        @include px-with-rem(font-size, 20);
+      h1, h2, h3 {
+        @include px-with-rem(margin-top, $gutter-height * 2);
+        @include px-with-rem(margin-bottom, $gutter-height);
+        color: #222;
         @include font-weight(medium);
         line-height: 1.5;
+
+        &:first-child {
+          margin-top: 0;
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      h1 {
+        @include px-with-rem(font-size, 20);
+        border-bottom: 1px solid #9B9B9B;
       }
 
       h2 {
+        //@include px-with-rem(padding-bottom, 6);
         @include px-with-rem(font-size, 16);
-        @include font-weight(medium);
-        line-height: 1.5;
+        border-bottom: 1px solid #9B9B9B;
       }
 
       h3 {
         @include px-with-rem(font-size, 14);
-        @include font-weight(medium);
-        line-height: 1.5;
       }
 
       @include breakpoint($breakpoint-tablet) { 
@@ -610,6 +626,7 @@ $main-sprite: get-sprite("sprite@2x");
       }
 
       a {
+        display: inline-block;
         color: #DF483D;
         font-style: normal;
         text-decoration: none;
@@ -621,8 +638,9 @@ $main-sprite: get-sprite("sprite@2x");
         }
       }
 
-      p {
+      > p {
         @include px-with-rem(margin-bottom, $gutter-height);
+        @include clearfix;
 
         > code {
           padding: 1px 5px 1px;
@@ -633,19 +651,24 @@ $main-sprite: get-sprite("sprite@2x");
           @include border-radius(3px);
         }
 
-        > img {
+        img {
           max-width: 100%;
+        }
+
+        .block-center {
+          display: block;
+          text-align: center;
         }
       }
 
-      figure {
+      > figure {
         @include px-with-rem(margin-bottom, $gutter-height);
 
         // Syntax highlight syles 
         @import "partials/main/syntax";
       }
       
-      blockquote {
+      > blockquote {
         @include px-with-rem(margin-bottom, $gutter-height);
         @include px-with-rem(padding-left, 10);
         @include px-with-rem(padding-right, 10);
@@ -658,7 +681,7 @@ $main-sprite: get-sprite("sprite@2x");
         border-left: 4px solid #9B9B9B;  
       }
 
-      table {
+      > table {
 
         th {
           @include px-with-rem(padding-top, 0);
@@ -680,14 +703,23 @@ $main-sprite: get-sprite("sprite@2x");
         }
       }
 
-      ul {
+      > ul {
         @include px-with-rem(margin-bottom, $gutter-height);
+        padding-left: 2em;
+        list-style: disc;
+        
+        ul {
+          padding-left: 2em;
+          list-style: circle;
 
-        list-style: disc inside;
-        //padding-left: $horizontal-padding;
+          ul {
+            padding-left: 2em;
+            list-style: square;
+          }
+        }
       }
 
-      p, figure, blockquote, ul {
+      > p, > figure, > blockquote, > ul {
         &:last-child {
           margin-bottom: auto;
         }
