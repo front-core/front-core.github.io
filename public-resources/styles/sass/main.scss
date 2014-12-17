@@ -500,7 +500,10 @@ $main-sprite: get-sprite("sprite@2x");
       .entry-title {
         @include px-with-rem(font-size, 20);
         @include font-weight(bold);
-        @include px-with-rem(line-height, $gutter-height * 2);
+        //@include px-with-rem(line-height, $gutter-height * 2);
+        line-height: 1.5;
+
+        color: #222;
 
         a {
           color: #222;
@@ -579,7 +582,54 @@ $main-sprite: get-sprite("sprite@2x");
         @include px-with-rem(padding-bottom, $gutter-height * 2);
       }
 
+      h1, h2, h3 {
+        @include px-with-rem(margin-top, $gutter-height * 2);
+        @include px-with-rem(margin-bottom, $gutter-height);
+        color: #222;
+        @include font-weight(medium);
+        line-height: 1.5;
+
+        &:first-child {
+          margin-top: 0;
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      h1 {
+        @include px-with-rem(padding-bottom, $gutter-height);
+        @include px-with-rem(font-size, 20);
+        line-height: 1;
+        border-bottom: 2px solid #222;
+      }
+
+      h2 {
+        @include px-with-rem(padding-bottom, $gutter-height);
+        @include px-with-rem(font-size, 18);
+        line-height: 1;
+        border-bottom: 1px solid #9B9B9B;
+      }
+
+      h3 {
+        @include px-with-rem(font-size, 16);
+      }
+
+      @include breakpoint($breakpoint-tablet) { 
+        h1 {
+          @include px-with-rem(font-size, 22);
+        }
+        h2 {
+          @include px-with-rem(font-size, 20);
+        }
+        h3 {
+          @include px-with-rem(font-size, 18);
+        }
+      }
+
       a {
+        display: inline-block;
         color: #DF483D;
         font-style: normal;
         text-decoration: none;
@@ -591,8 +641,9 @@ $main-sprite: get-sprite("sprite@2x");
         }
       }
 
-      p {
+      > p {
         @include px-with-rem(margin-bottom, $gutter-height);
+        @include clearfix;
 
         > code {
           padding: 1px 5px 1px;
@@ -602,16 +653,25 @@ $main-sprite: get-sprite("sprite@2x");
           border: 1px solid #9B9B9B;
           @include border-radius(3px);
         }
+
+        img {
+          max-width: 100%;
+        }
+
+        .block-center {
+          display: block;
+          text-align: center;
+        }
       }
 
-      figure {
+      > figure {
         @include px-with-rem(margin-bottom, $gutter-height);
 
         // Syntax highlight syles 
         @import "partials/main/syntax";
       }
       
-      blockquote {
+      > blockquote {
         @include px-with-rem(margin-bottom, $gutter-height);
         @include px-with-rem(padding-left, 10);
         @include px-with-rem(padding-right, 10);
@@ -624,11 +684,50 @@ $main-sprite: get-sprite("sprite@2x");
         border-left: 4px solid #9B9B9B;  
       }
 
-      p, figure, blockquote {
+      > table {
+
+        th {
+          @include px-with-rem(padding-top, 0);
+          @include px-with-rem(padding-right, 10);
+          @include px-with-rem(padding-bottom, 0);
+          @include px-with-rem(padding-left, 10);
+          
+          @include font-weight(medium);
+          
+          border: 1px solid #9B9B9B;
+        }
+
+        td {
+          @include px-with-rem(padding-top, 0);
+          @include px-with-rem(padding-right, 10);
+          @include px-with-rem(padding-bottom, 0);
+          @include px-with-rem(padding-left, 10);
+          border: 1px solid #9B9B9B;
+        }
+      }
+
+      > ul {
+        @include px-with-rem(margin-bottom, $gutter-height);
+        padding-left: 2em;
+        list-style: disc;
+        
+        ul {
+          padding-left: 2em;
+          list-style: circle;
+
+          ul {
+            padding-left: 2em;
+            list-style: square;
+          }
+        }
+      }
+
+      > p, > figure, > blockquote, > ul {
         &:last-child {
           margin-bottom: auto;
         }
       }
+      
     } // .entry-content
 
     footer {
@@ -1090,6 +1189,15 @@ $main-sprite: get-sprite("sprite@2x");
   #content {
     article footer .read-more {
       @include font-weight(bold);
+    }
+
+    .entry-content {
+      h1, h2, h3 {
+        @include font-weight(bold);
+      }
+      table th {
+        @include font-weight(bold);
+      }
     }
 
     .sidebar h1 {
