@@ -24,7 +24,7 @@ PhoneGap がシステムの WebView を使うのに対し、CocoonJS は独自�
 
 システム WebView はとにかくパフォーマンスが悪く、OS や機種依存により挙動が違うなどの問題がありますが、
 CocoonJS は独自の実行環境で動作するため OS や機種依存の問題を解消し、
-システム WebView なんかに比べて圧倒的に早いです。
+システム WebView に比べて圧倒的に早いです。
 
 <span class="block-center">
 [![CocoonJS vs PhoneGap](/images/post/about-cocoonjs/cocoonjs-vs-phonegap.png)](https://www.ludei.com/landing/cocoonjs-phonegap/)
@@ -72,7 +72,7 @@ Chromium で作られた独自の WebView として、主に Android 向けに�
 Chromium を元にしているのでシステム WebView より端然早く、機種や OS バージョン毎の差異を気にしなくて済みます。
 (Android 4 以上)
 
-iOS の場合は iOS 8 以前は iOS 用の WebView+ はサポートされてませんでしたが、
+iOS 8 以前の iOS では WebView+ はサポートされてませんでしたが、
 iOS 8 からは WKWebView を基盤にした WebView+ がサポートされる様になりました。
 
 ### Apache Cordova
