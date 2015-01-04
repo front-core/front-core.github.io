@@ -52,13 +52,13 @@ CocoonJS Launcher アプリを立ち上げると、スプラッシュスクリ�
 CANVAS+ / WEBVIEW+ は CocoonJS の実行環境、WEBVIEW はシステム WebView です。（参照：[爆速の HTML5 クロス・プラットフォーム CocoonJS](http://front-core.org/ja/blog/2014/12/16/about-cocoonjs/)）
 
 iOS 8 未満の iOS では WEBVIEW+ は表示されません。
-またデモが対応しない実行環境はグレーアウトされ選択できません。
+またデモに対応しない実行環境はグレーアウトされ選択できません。
 
 <span class="block-center">
 ![デモ選択画面（非対応実行環境のグレーアウト）](/images/post/cocoonjs-launcher/runtime-gray-out.png =320x)
 </span>
 
-デモに対応した実行環境を１つ選択すると、デモのソースコードがダウンロードされ、実行画面に切り替わります。
+実行環境を１つ選択すると、デモのソースコードがダウンロードされた後、実行画面に切り替わります。
 
 <span class="block-center">
 ![デモ実行画面](/images/post/cocoonjs-launcher/demo-running-screen.png =569x)
@@ -86,13 +86,14 @@ CocoonJS 拡張機能の「アプリ内広告」を使ったデモです。バ�
 
 <span class="block-center">↓バナー広告↓</span>
 <span class="block-center">![Ads デモ - バーナー広告](/images/post/cocoonjs-launcher/demo-ads-1.png =569x)</span>
+
 <span class="block-center">↓フルスクリーン広告↓</span>
 <span class="block-center">![Ads デモ - フルスクリーン広告](/images/post/cocoonjs-launcher/demo-ads-2.png =569x)</span>
 
 ### Box2D 
 
 CocoonJS には Box2D がネイティヴで実装されており、JS から box2dweb API を通じて制御する事ができます。
-このデモではネイティヴパフォーマンスで動く2D物理演算処理のシミュレーションを確認できます。
+このデモではネイティヴパフォーマンスで動く 2D 物理演算処理のシミュレーションを確認できます。
 
 <span class="block-center">
 ![Box2D デモ](/images/post/cocoonjs-launcher/demo-box2d.png =569x)
@@ -132,8 +133,8 @@ CocoonJS では端末の位置情報システムにアクセスする事がで�
 
 ### Multichannel Sound
 
-CocoonJS はモバイルブラウザの HTML5 オーディオ要素に関する制約をすべて解消してくれます！
-その１つとして、このデモではマルチチャンネルのオーディオ再生を確認できます。
+CocoonJS はモバイルブラウザの HTML5 オーディオ要素に関する制約をすべて解消してくれます。
+このデモではマルチチャンネルのオーディオ再生を確認できます。
 
 <span class="block-center">
 ![Multichannel Sound デモ](/images/post/cocoonjs-launcher/demo-multichannel-sound.png =569x)
@@ -175,6 +176,7 @@ CocoonJS の「レーティング」サポート機能のデモです。
 <span class="block-center">
 ![Rate デモ](/images/post/cocoonjs-launcher/demo-rate.png =569x)
 </span>
+
 <span class="block-center">↓ストアのレビューページ↓</span>
 <span class="block-center">
 ![Rate デモ](/images/post/cocoonjs-launcher/demo-rate-store-screen.png =569x)
@@ -182,7 +184,7 @@ CocoonJS の「レーティング」サポート機能のデモです。
 
 ### Sumon 
 
-実際にストアで配信中の CocoonJS 用に作られた「Sumon」と言うゲームのサンプルです。
+実際にストアで配信中の CocoonJS で作られた「Sumon」と言うゲームのサンプルです。
 
 * [Sumon - iOS 版](https://itunes.apple.com/app/id470147794)
 * [Sumon - Android 版](https://play.google.com/store/apps/details?id=com.ideateca.sumon&hl=en)
@@ -267,7 +269,7 @@ https://sso.ludei.com/signup
 ![ログイン画面](/images/post/cocoonjs-launcher/your-app-login.png =320x)
 </span>
 
-## ZIP ファイル伝送して実行する方法
+## ZIP ファイル伝送して実行
 
 ZIP ファイルで伝送して置くと、オフラインでも CocoonJS Launcher で自分のコードを実行する事ができます。
 注意点として index.html は ZIP フォルダーのルートパスにある必要があります。
@@ -304,7 +306,7 @@ adb push <ZIPファイルのパス> /sdcard/
 ファイル伝送が完了したら、同じく YOUR APP の DOCUMENTS に追加された ZIP ファイルが表示されます。
 
 
-## URL を指定して実行する方法
+## URL を指定して実行
 
 HTML ページの URL を指定するとウェブサーバーに上のコードを直接実行できます。（index.html は省略可）
 
@@ -379,19 +381,17 @@ CocoonJS Launcher の設定画面では、デモ・アプリを実行する際�
 
 ## 設定画面
 
-設定可能なオプションは OS によって異なる場合があります。
-
-<span class="block-center">
-![設定画面](/images/post/cocoonjs-launcher/settings.png =320x)
-</span>
-
 主に以下のオプションが変更可能です。
 
 * Orientation mode: デモ・アプリの実行中の端末向きを設定できます。
 * Debug enabled: デバッグ機能をアクティブ/非アクティブできます。
 * Debug position: デバッグボタン（FPS 表示）の位置を変更できます。
 
+<span class="block-center">
+![設定画面](/images/post/cocoonjs-launcher/settings.png =320x)
+</span>
 
-# まとめ
+設定可能なオプションは OS によって異なる場合があります。
+
 
 
