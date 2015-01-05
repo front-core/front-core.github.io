@@ -26,7 +26,6 @@ CocoonJS Launcher は CocoonJS 用に開発してアプリやゲームを、簡�
 # メインメニュー
 
 CocoonJS Launcher アプリを立ち上げると、スプラッシュスクリーンの後にメインメニュー画面が表示されます。
-メニューには DEMOS, YOUR APP ２つのオプションがあります。
 
 <span class="block-center">
 ![メインメニュー](/images/post/cocoonjs-launcher/main-menu.png =320x)
@@ -34,7 +33,7 @@ CocoonJS Launcher アプリを立ち上げると、スプラッシュスクリ�
 
 # DEMOS
 
-メインメニューで DEMOS を選択すると、 CocoonJS の素敵なところを拝見できるデモ一覧が表示されます。
+メインメニューで DEMOS を選択すると、 CocoonJS の素敵なところを体験できるデモ一覧が表示されます。
 
 <span class="block-center">
 ![DEMOS](/images/post/cocoonjs-launcher/demos.png =320x)
@@ -58,7 +57,7 @@ iOS 8 未満の iOS では WEBVIEW+ は表示されません。
 ![デモ選択画面（非対応実行環境のグレーアウト）](/images/post/cocoonjs-launcher/runtime-gray-out.png =320x)
 </span>
 
-実行環境を１つ選択すると、デモのソースコードがダウンロードされた後、実行画面に切り替わります。
+実行環境を１つ選択すると、ソースコードがダウンロードされた後、デモ実行画面に切り替わります。
 
 <span class="block-center">
 ![デモ実行画面](/images/post/cocoonjs-launcher/demo-running-screen.png =569x)
@@ -66,7 +65,7 @@ iOS 8 未満の iOS では WEBVIEW+ は表示されません。
 
 CANVAS+ を選択した場合は画面の端っこに表示される「FPS(frames per second)」から動作パフォーマンスを確認できます。
 
-描画パフォーマンスは CANVAS+ が端然早いです！
+描画パフォーマンスは CANVAS+ が断然早いです！
 違う実行環境を選択してパフォーマンスを比較してみてください。
 
 実行中のデモを終了したい場合は「FPS」表示をタップしてデバッグコンソールにアクセスし、「Actions」をタップして表示されるメニューから「Exit」を選択すると終了します。
@@ -255,7 +254,7 @@ CocoonJS Launcher には載っていないデモもあります。
 # YOUR APP
 
 YOUR APP では自作コードや外部デモコードを直接 CocoonJS Launcher で動かす事ができます。
-やり方は ZIP ファイルを伝送して実行する方法と URL を指定して実行する方法の２通りあります。
+やり方は ZIP ファイルを転送して実行する方法と URL を指定して実行する方法の２通りあります。
 
 ## ログイン
 
@@ -269,10 +268,10 @@ https://sso.ludei.com/signup
 ![ログイン画面](/images/post/cocoonjs-launcher/your-app-login.png =320x)
 </span>
 
-## ZIP ファイル伝送して実行
+## ZIP ファイル転送して実行
 
-ZIP ファイルで伝送して置くと、オフラインでも CocoonJS Launcher で自分のコードを実行する事ができます。
-注意点として index.html は ZIP フォルダーのルートパスにある必要があります。
+ZIP ファイルで転送して置くと、オフラインでも CocoonJS Launcher で自分のコードを実行する事ができます。
+注意点として index.html は ZIP フォルダーのルートパスにおく必要があります。
 
 ### iOS の場合
 
@@ -282,33 +281,33 @@ ZIP ファイルで伝送して置くと、オフラインでも CocoonJS Launch
 ![iTune ファイル共有](/images/post/cocoonjs-launcher/itune-file-share-1.png)
 </span>
 
-3. CocoonJS を選択して、伝送するファイルをドラッグまたは「追加...」ボタンで追加します。
+3. CocoonJS を選択して、転送するファイルをドラッグまたは「追加...」ボタンで追加します。
 <span class="block-center">
 ![iTune ファイル共有](/images/post/cocoonjs-launcher/itune-file-share-2.png)
 </span>
 
 4. YOUR APP の DOCUMENTS に追加された ZIP ファイルが表示されます。
-5. ZIP ファイルをアイテムを選択状態にして、実行環境を選択すると実行画面に切り替わります。
+5. 実行したい ZIP ファイルを選択して、実行環境を選択すると実行画面に切り替わります。
 <span class="block-center">
 ![ログイン画面](/images/post/cocoonjs-launcher/your-app-documents.png =320x)
 </span>
 
 ### Android の場合
 
-Android の場合は SD カードに ZIP ファイルを伝送します。
+Android の場合は SD カードに ZIP ファイルを転送します。
 
-SD カードへのファイル伝送には色んな方法がありますが、ここでは Android SDK を使う場合のファイル伝送コマンドを記載します。
+SD カードへのファイル転送には色んな方法がありますが、ここでは Android SDK を使う場合のファイル転送コマンドを記載します。
 
 ```
 adb push <ZIPファイルのパス> /sdcard/
 ```
 
-ファイル伝送が完了したら、同じく YOUR APP の DOCUMENTS に追加された ZIP ファイルが表示されます。
+ファイル転送が完了したら、同じく YOUR APP の DOCUMENTS に追加された ZIP ファイルが表示されます。
 
 
 ## URL を指定して実行
 
-HTML ページの URL を指定するとウェブサーバーに上のコードを直接実行できます。（index.html は省略可）
+HTML ページの URL を指定するとウェブサーバー上のコードを直接実行できます。（index.html は省略可）
 
 また、[デモ一覧](https://cocoonjsservice.ludei.com/cocoonjslaunchersvr/demo-list/)の
 ダウンロードリンクのように ZIP ファイルの URL を指定すると、その ZIP ファイルがダウンロードされ実行されます。
@@ -393,5 +392,13 @@ CocoonJS Launcher の設定画面では、デモ・アプリを実行する際�
 
 設定可能なオプションは OS によって異なる場合があります。
 
+
+# まとめ
+
+CocoonJS はこの CocoonJS Launcher により実機テストやデバッグが簡単にできるので、他のネイティブアプリ開発ツールに比べて開発速度が早いです。
+
+ぜひ CocoonJS Launcher をダウンロードして、CocoonJS のすばらしいデモを体験してみてください。
+
+次回からは実際に CocoonJS で動くコードの実装方法をまとめて行きます。
 
 
