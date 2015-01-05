@@ -9,9 +9,9 @@
 
 body {
   -webkit-tap-highlight-color: rgba(0,0,0,0);
-  -webkit-touch-callout: none;
+  //-webkit-touch-callout: none;
   
-  @include user-select(none);
+  //@include user-select(none);
   
   -webkit-text-size-adjust: none;
   
@@ -641,6 +641,10 @@ $main-sprite: get-sprite("sprite@2x");
         }
       }
 
+      strong {
+        @include font-weight(medium);
+      }
+
       > p {
         @include px-with-rem(margin-bottom, $gutter-height);
         @include clearfix;
@@ -657,10 +661,14 @@ $main-sprite: get-sprite("sprite@2x");
         img {
           max-width: 100%;
         }
+      }
 
-        .block-center {
-          display: block;
-          text-align: center;
+      .block-center {
+        display: block;
+        text-align: center;
+
+        img {
+          max-width: 100%;
         }
       }
 
@@ -720,6 +728,12 @@ $main-sprite: get-sprite("sprite@2x");
             list-style: square;
           }
         }
+      }
+
+      > ol {
+        @include px-with-rem(margin-bottom, $gutter-height);
+        padding-left: 2em;
+        list-style: decimal;
       }
 
       > p, > figure, > blockquote, > ul {
@@ -1196,6 +1210,10 @@ $main-sprite: get-sprite("sprite@2x");
         @include font-weight(bold);
       }
       table th {
+        @include font-weight(bold);
+      }
+
+      strong {
         @include font-weight(bold);
       }
     }
