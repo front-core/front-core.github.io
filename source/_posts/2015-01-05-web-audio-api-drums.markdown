@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "ブラウザで楽器も作れる Web Audio APIでドラムを作成"
+title: "ブラウザで楽器も作れる！Web Audio APIでドラムを作成"
 date: 2015-1-5
 comments: true
 categories: WebAudioAPI
@@ -23,9 +23,10 @@ Web Audio API についてはこちらが勉強になりました。
 
 <!-- more -->
 
-今回は､ シンプルなドラムを作って実際に試してみました。
+今回は､ シンプルなドラムを作って実際に試してみました。  
+ぜひスマートフォンで見てください｡
 
-完成デモは[こちら](http://front-core.org/ja/)｡
+完成デモは[こちら](http://front-core.org/web-audio-api-drums-sample/index.html)｡
 
 気になった点
 ===================
@@ -66,7 +67,6 @@ chrome版のAngry Birdsは､ Web Audio APIを使用しているそうです｡
 
 [Angry Birds for Chrome](http://chrome.angrybirds.com/)
 
-Web Audio API についてさらに研究していきたいと思います。
-
+Web Audio API の情報は結構ありますので､ さらに研究していきたいと思います。
 
 
