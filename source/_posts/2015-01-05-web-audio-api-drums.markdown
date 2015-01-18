@@ -1,18 +1,21 @@
 ---
 layout: post
-title: "ブラウザで楽器も作れる！Web Audio APIでドラムを作成"
+title: "ブラウザで楽器も作れる！Web Audio API でドラムを作成"
 date: 2015-1-5
 comments: true
-categories: WebAudioAPI
+categories: WebAudio
 written-language: "ja"
 author: Keita Sakamoto
 author-url: https://github.com/motio
 published: true
 ---
 
-Web Audio API は､ 音声を処理・合成するためのWebアプリケーション向けのハイレベルなJavaScript APIです。
+Web Audio API は､ 音声ファイルを単に再生するだけでなく、 処理・合成することができる、 Webアプリケーション向けの高度なJavaScript API です。  
+JavaScriptを使用して様々な音を作ることができます。
 
-Web Audio APIについて
+<!-- more -->
+
+Web Audio API について
 ===================
 
 Web Audio API についてはこちらが勉強になりました。
@@ -21,21 +24,27 @@ Web Audio API についてはこちらが勉強になりました。
 <http://qiita.com/fnobi/items/2f08a67800dec1d61f21>  
 <http://qiita.com/sou/items/5688d4e7d3a37b4e2ff1>
 
-<!-- more -->
-
-今回は､ シンプルなドラムを作って実際に試してみました。  
+今回は､ Web Audio API の機能を簡潔に確認するため、 シンプルなドラムを作って実際に試してみました。  
 ぜひスマートフォンで見てください｡
+
+<span class="block-center">
+![ドラムサンプル](/images/post/web-audio-api-drums/capture-site.png =320x)
+</span>
+
+<span class="block-center">
+![QRコード](/images/post/web-audio-api-drums/qr-go-to-site.gif =150x)
+</span>
 
 完成デモは[こちら](http://front-core.org/web-audio-api-drums-sample/index.html)｡
 
 気になった点
 ===================
 
-上記のリンクの記事を参考に作成してみて､ 印象に残った箇所をいくつか挙げます｡
+上記のリンクの記事を参考に作成してみて､ 気になった点をいくつか挙げます｡
 
-## jQuery Ajaxが利用できない
+## jQuery Ajax が利用できない
 
-jQueryの $.ajax, $.get関数などはresponseTypeプロパティ 'arraybuffer' に対応していないため､ 利用することができないとのこと(現時点では)｡
+jQuery の $.ajax, $.get関数などはresponseType プロパティ `arraybuffer` に対応していないため､ 利用することができません(現時点では)｡
 
 そのため､ 以下のように記述します｡  
 ```javascript
@@ -44,16 +53,19 @@ request.open('get', url, true);
 request.responseType = 'arraybuffer';
 ```
 
-## sourceは毎回生成する
+responseType プロパティ arraybuffer は、 バイナリデータを扱うためのものです。  
+詳細は[こちら](http://www.html5rocks.com/ja/tutorials/file/xhr2/)をご確認ください。
+
+## source は毎回生成する
 
 再生の度に生成する必要があります｡ 
 ```javascript
 var source = context.createBufferSource();
 ```
 
-## noteOnではなく､startを使う
+## noteOn ではなく､start を使う
 
-noteOnは古い書き方のようです｡ start()を使います｡
+noteOn は古い書き方のようです｡ start() を使います｡
 ```javascript
 source.start(0);
 ```
@@ -63,10 +75,10 @@ source.start(0);
 
 やっぱり音が鳴ると楽しいですね。
 
-chrome版のAngry Birdsは､ Web Audio APIを使用しているそうです｡
+chrome版のAngry Birds は､ Web Audio API を使用しているそうです｡
 
 [Angry Birds for Chrome](http://chrome.angrybirds.com/)
 
-Web Audio API の情報は結構ありますので､ さらに研究していきたいと思います。
+今回はドラムを作ってみましたが、 他の楽器も今後制作予定ですので、 また当ブログで実装方法を紹介できたらと思います。
 
 
