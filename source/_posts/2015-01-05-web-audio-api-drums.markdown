@@ -15,8 +15,7 @@ JavaScriptを使用して様々な音を作ることができます。
 
 <!-- more -->
 
-Web Audio API について
-===================
+# Web Audio API について
 
 Web Audio API についてはこちらが勉強になりました。
 
@@ -24,21 +23,21 @@ Web Audio API についてはこちらが勉強になりました。
 <http://qiita.com/fnobi/items/2f08a67800dec1d61f21>  
 <http://qiita.com/sou/items/5688d4e7d3a37b4e2ff1>
 
-今回は､ Web Audio API の機能を簡潔に確認するため、 シンプルなドラムを作って実際に試してみました。  
+今回は､ Web Audio API の機能を簡潔に確認するため、 シンプルなドラムを実際に作ってみました。  
 ぜひスマートフォンで見てください｡
 
+完成デモは[こちら](http://front-core.org/web-audio-api-drums-sample/index.html)｡
+
+## QRコード
+<span class="block-center">
+![QRコード](/images/post/web-audio-api-drums/qr-go-to-site.gif =150x)
+</span>
+## 画面キャプチャ
 <span class="block-center">
 ![ドラムサンプル](/images/post/web-audio-api-drums/capture-site.png =320x)
 </span>
 
-<span class="block-center">
-![QRコード](/images/post/web-audio-api-drums/qr-go-to-site.gif =150x)
-</span>
-
-完成デモは[こちら](http://front-core.org/web-audio-api-drums-sample/index.html)｡
-
-気になった点
-===================
+# 気になった点
 
 上記のリンクの記事を参考に作成してみて､ 気になった点をいくつか挙げます｡
 
@@ -70,8 +69,7 @@ noteOn は古い書き方のようです｡ start() を使います｡
 source.start(0);
 ```
 
-おわり
-===================
+# おわり
 
 やっぱり音が鳴ると楽しいですね。
 
