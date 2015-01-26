@@ -6,44 +6,44 @@ comments: true
 categories: [OpenFrameworks, Arduino]
 author: Yutaka Moriya
 ---
-今回は回路のプッシュボタンをArduinoで送信、OpenFrameworks（v0.8.4使用）上で受信して表示を変更してみます。  
-まずは簡単にOpenFrameworksとArduinoを紹介します。
+今回は回路のプッシュボタンを Arduino で送信、OpenFrameworks（v0.8.4使用）上で受信して表示を変更してみます。  
+まずは簡単に OpenFrameworks と Arduino を紹介します。
 
 ## OpenFrameworksとは？
-簡単に言うとC++のフレームワークなんですが、アート作品を簡単に作ることを目的に作られています。  
-また、今回使うArduinoや、Kinect、LeapMotionなどのセンサーを組み込む事も容易であり、インタラクティブな制作が簡単に行えます。
+簡単に言うと C++ のフレームワークなんですが、アート作品を簡単に作ることを目的に作られています。  
+また、今回使う Arduino や、 Kinect 、 LeapMotion などのセンサーを組み込む事も容易であり、インタラクティブな制作が簡単に行えます。
 <iframe src="//player.vimeo.com/video/74124094" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> <p><a href="http://vimeo.com/74124094">OF Showreel</a> from <a href="http://vimeo.com/of">openFrameworks</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
 
 ## Arduinoとは？
-マイコンチップを搭載したハードウェアです。PCの専用ソフト`Arduino IDE`からArduinoへプログラムを書き込むことで回路を制御することができます。  
-言語はArduino言語というものですがC++/Cをベースとしており、馴染みのある記法なので難しいことはありません。  
+マイコンチップを搭載したハードウェアです。PCの専用ソフト`Arduino IDE`から Arduino へプログラムを書き込むことで回路を制御することができます。  
+言語は Arduino 言語というものですがC++/Cをベースとしており、馴染みのある記法なので難しいことはありません。  
 
 高度な電子工作とプログラミングを駆使すればこんなことも可能になります。
 <iframe src="//player.vimeo.com/video/9928343" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> <p><a href="http://vimeo.com/9928343">Super Mario Bros on an 8x8 LED matrix</a> from <a href="http://vimeo.com/chloester">Chloe Fan</a> on <a href="https://vimeo.com">Vimeo</a>.</p> 
 
 ## Arduinoの回路を組み立てる
 
-Arduinoの回路は以下のように、シンプルにプッシュボタンの状態をデジタル2ピンに送信するだけです。
+Arduino の回路は以下のように、シンプルにプッシュボタンの状態をデジタル2ピンに送信するだけです。
 
 ![My image link text](/images/post/openframeworks-arduino-ltika/breadboard.jpg)  
 簡単に解説すると、プッシュボタンを押すと3.3Vが2ピンに通電します。  
 押していない時はGND(グランド)へ繋ぐことで、0Vの状態にします。（OFFの状態）  
-ちなみに抵抗器を付けているのは、電源とGNDを無抵抗で繋げると壊れる恐れがあります。
+ちなみに抵抗器を付けているのは、電源と GND を無抵抗で繋げると壊れる恐れがあります。
 これをプルダウン抵抗といいます。
 
 ## Arduinoにスケッチを書き込む
 
-OpenFrameworks上でArduinoとシリアル通信を行うには、`ofSerial`と`ofArduino`の2パターンがありますが、今回は`ofArduino`を使用してみます。  
-（`ofArduino`の中身は結局`ofSerial`を実行しているのですが、Arduinoをより便利に使うメンバ関数が用意されています。なので`ofSerial`でもArduinoとシリアル通信を行うことが出来ます）
+OpenFrameworks 上で Arduino とシリアル通信を行うには、`ofSerial`と`ofArduino`の2パターンがありますが、今回は`ofArduino`を使用してみます。  
+（`ofArduino`の中身は結局`ofSerial`を実行しているのですが、 Arduino をより便利に使うメンバ関数が用意されています。なので`ofSerial`でも Arduino とシリアル通信を行うことが出来ます）
 
-`ofArduno`を使用するにはFirmataというプロトコルを使用する必要があります。Arduino IDE上にすでに用意されています。  
+`ofArduno`を使用するには Firmata というプロトコルを使用する必要があります。Arduino IDE 上にすでに用意されています。  
 [ファイル]->[スケッチの例]->[Firmata]->[SimpleDigitalFirmata]を選択してスケッチを呼び出し、それを書き込みます。
 
 ![My image link text](/images/post/openframeworks-arduino-ltika/arduino-firmata.jpg)
 
-## OpenFrameworksでプログラミング
+## OpenFrameworks でプログラミング
 
-OpenFrameworks上では`ofAruino`を使用してシリアル通信を行います。
+OpenFrameworks 上では`ofAruino`を使用してシリアル通信を行います。
 
 ```cpp ofApp.h
 #pragma once
@@ -63,7 +63,7 @@ public:
     ofArduino ard; //ofArduinoクラス
     bool bSetupArduino; //Arduinoとの通信状態を格納
     int inputPin = 2; //今回使用しているデジタルピン2ピン
-    ofImage light; //LEDを光らせているように見せる画像
+    ofImage light; //LEDを光らせているように見せる画像 各自で作ってみてください
 };
 
 ```
@@ -137,6 +137,8 @@ void ofApp::updateArduino() {
 ```
 
 ## LED（絵）を光らせよう！
+
+XcodeからBuildしてみましょう！以下の様なLEDが表示されると思います。
 
 ![My image link text](/images/post/openframeworks-arduino-ltika/led-off.png)
 
