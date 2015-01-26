@@ -2,7 +2,7 @@
 
 {% if categories_size != '0' %}
   <span class="categories"><!--
-   -->posted in <!--
+   -->posted in&nbsp;<!--
 
       {% for category in page.categories %}
      --><a class="category" href="{{ site.baseurl }}/{{ page.language }}/blog/categories/{{ category }}">{{ category | capitalize }}</a><!--

@@ -663,6 +663,10 @@ $main-sprite: get-sprite("sprite@2x");
         }
       }
 
+      > iframe {
+        max-width: 100%;
+      }
+
       .block-center {
         display: block;
         text-align: center;

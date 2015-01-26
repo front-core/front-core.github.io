@@ -24,7 +24,7 @@
 
     {% if category != '0' %}
         <span class="categories"><!--
-       -->posted in <!--
+       -->posted in&nbsp;<!--
 
           {% for category in post.categories %}
          --><a class="category" href="/{{ post.language }}/blog/categories/{{ category }}">{{ category | capitalize }}</a><!--
