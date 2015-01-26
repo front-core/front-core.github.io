@@ -6,7 +6,7 @@ comments: true
 categories: [OpenFrameworks, Arduino]
 author: Yutaka Moriya
 ---
-今回は回路のプッシュボタンをArduinoで送信、OpenFrameworks上で受信して表示を変更してみます。  
+今回は回路のプッシュボタンをArduinoで送信、OpenFrameworks（v0.8.4使用）上で受信して表示を変更してみます。  
 まずは簡単にOpenFrameworksとArduinoを紹介します。
 
 ## OpenFrameworksとは？
@@ -27,8 +27,8 @@ Arduinoの回路は以下のように、シンプルにプッシュボタンの�
 
 ![My image link text](/images/post/openframeworks-arduino-ltika/breadboard.jpg)
 
-OpenFrameworks上でArduinoとシリアル通信を行うには、`ofSerial`と`ofArduino`の2パターンがありますが、今回は`ofArduino`を使用してみます。
-（OpenFrameworks 0.8.4使用）
+OpenFrameworks上でArduinoとシリアル通信を行うには、`ofSerial`と`ofArduino`の2パターンがありますが、今回は`ofArduino`を使用してみます。  
+（`ofArduino`の中身は結局`ofSerial`を実行しているのですが、Arduinoをより便利に使うメンバ関数が用意されています。なので`ofSerial`でもArduinoとシリアル通信を行うことが出来ます）
 
 `ofArduno`を使用するにはFirmataというプロトコルを使用する必要があります。Arduino IDE上にすでに用意されています。  
 [ファイル]->[スケッチの例]->[Firmata]->[SimpleDigitalFirmata]を選択してスケッチを呼び出し、それを書き込みます。
