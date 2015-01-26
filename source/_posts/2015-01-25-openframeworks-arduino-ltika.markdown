@@ -52,10 +52,10 @@ public:
     void setupArduino(const int & version);
     void updateArduino();
     
-    ofArduino ard;
-    bool bSetupArduino;
-    int inputPin = 2;
-    ofImage light;
+    ofArduino ard; //ofArduinoクラス
+    bool bSetupArduino; //Arduinoとの通信状態を格納
+    int inputPin = 2; //今回使用しているデジタルピン2ピン
+    ofImage light; //LEDを光らせているように見せる画像
 };
 
 ```
@@ -66,30 +66,30 @@ public:
 //--------------------------------------------------------------
 void ofApp::setup(){
     
-    ofSetFrameRate(60);
-    ofSetCircleResolution(30);
-    ofEnableAlphaBlending();
-    ofBackground(0);
+    ofSetFrameRate(60); //フレームレート60fpsで描画
+    ofSetCircleResolution(30); //円の品質設定
+    ofEnableAlphaBlending(); //透過描画を有効化
+    ofBackground(0); //背景を黒に設定
     
-    light.loadImage("light.png");
+    light.loadImage("light.png"); //画像を読み込む
     
-    ard.connect("/dev/tty.usbmodem1411",57600);
-    ofAddListener(ard.EInitialized, this, &ofApp::setupArduino);
-    bSetupArduino = false;
+    ard.connect("/dev/tty.usbmodem1411",57600); //Arduinoが接続されているシリアルポートと転送レートを指定
+    ofAddListener(ard.EInitialized, this, &ofApp::setupArduino); //イベントリスナーを登録
+    bSetupArduino = false; //通信状態はfalseに設定
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     
-    updateArduino();
+    updateArduino(); //updateArduinoを実行
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     
+    //LEDの絵を描画
     float offsetX = 210;
     float offsetY = 200;
-    
     ofSetColor(255, 0, 0);
     ofCircle(25+offsetX, 20+offsetY, 20);
     ofRect(5+offsetX, 20+offsetY, 40, 30);
@@ -105,23 +105,25 @@ void ofApp::draw(){
     ofSetColor(255, 0, 0);
     ofRect(0+offsetX, 45+offsetY, 50, 5);
     
+    //arduinoと通信していたら
     if (bSetupArduino){
+        //指定したデジタルピンにインプットがあったら
         if (ard.getDigital(inputPin) == 1) {
-            light.draw(ofPoint(185, 165), 100, 100);
+            light.draw(ofPoint(185, 165), 100, 100); //画像を表示
         }
     }
 }
 
 void ofApp::setupArduino(const int & version) {
     
-    ofRemoveListener(ard.EInitialized, this, &ofApp::setupArduino);
-    ard.sendDigitalPinMode(inputPin, ARD_INPUT);
-    bSetupArduino = true;
+    ofRemoveListener(ard.EInitialized, this, &ofApp::setupArduino); //イベントリスナーを削除
+    ard.sendDigitalPinMode(inputPin, ARD_INPUT); //指定したデジタルピンを有効化
+    bSetupArduino = true; //接続状態をtrueに設定
 }
 
 void ofApp::updateArduino() {
     
-    ard.update();
+    ard.update(); //Arduinoの状態を更新
 }
 
 ```
