@@ -37,8 +37,7 @@ OpenFrameworks上でArduinoとシリアル通信を行うには、`ofSerial`と`
 
 OpenFrameworks上では`ofAruino`を使用してシリアル通信を行います。
 
-ofApp.h
-```
+```cpp ofApp.h
 #pragma once
 
 #include "ofMain.h"
@@ -60,8 +59,8 @@ public:
 };
 
 ```
-ofApp.cpp
-```
+
+```cpp ofApp.cpp
 #include "ofApp.h"
 
 //--------------------------------------------------------------
