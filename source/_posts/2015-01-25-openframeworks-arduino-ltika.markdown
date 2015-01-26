@@ -7,6 +7,22 @@ categories: [OpenFrameworks, Arduino]
 author: Yutaka Moriya
 ---
 今回は回路のプッシュボタンをArduinoで送信、OpenFrameworks上で受信して表示を変更してみます。  
+まずは簡単にOpenFrameworksとArduinoを紹介します。
+
+## OpenFrameworksとは？
+簡単に言うとC++のフレームワークなんですが、アート作品を簡単に作ることを目的に作られています。  
+また、今回使うArduinoや、Kinect、LeapMotionなどのセンサーを組み込む事も容易であり、インタラクティブな制作が簡単に行えます。
+<iframe src="//player.vimeo.com/video/74124094" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> <p><a href="http://vimeo.com/74124094">OF Showreel</a> from <a href="http://vimeo.com/of">openFrameworks</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
+
+## Arduinoとは？
+マイコンチップを搭載したハードウェアです。PCの専用ソフト`Arduino IDE`からArduinoへプログラムを書き込むことで回路を制御することができます。  
+言語はArduino言語というものですがC++/Cをベースとしており、馴染みのある記法なので難しいことはありません。  
+
+高度な電子工作とプログラミングを駆使すればこんなことも可能になります。
+<iframe src="//player.vimeo.com/video/9928343" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> <p><a href="http://vimeo.com/9928343">Super Mario Bros on an 8x8 LED matrix</a> from <a href="http://vimeo.com/chloester">Chloe Fan</a> on <a href="https://vimeo.com">Vimeo</a>.</p> 
+
+## Arduinoの回路を組み立てる
+
 Arduinoの回路は以下のように、シンプルにプッシュボタンの状態をデジタル2ピンに送信するだけです。
 
 ![My image link text](/images/post/openframeworks-arduino-ltika/breadboard.jpg)
