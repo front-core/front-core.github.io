@@ -9,6 +9,8 @@ author: Yutaka Moriya
 今回は回路のプッシュボタンを Arduino で送信、OpenFrameworks（v0.8.4使用）上で受信して表示を変更してみます。  
 まずは簡単に OpenFrameworks と Arduino を紹介します。
 
+<!-- more -->
+
 ## OpenFrameworksとは？
 簡単に言うと C++ のフレームワークなんですが、アート作品を簡単に作ることを目的に作られています。  
 また、今回使う Arduino や、 Kinect 、 LeapMotion などのセンサーを組み込む事も容易であり、インタラクティブな制作が簡単に行えます。
