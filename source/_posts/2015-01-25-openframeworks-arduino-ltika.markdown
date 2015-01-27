@@ -1,13 +1,13 @@
 ---
 layout: post
 title: "OpenFrameworks+ArduinoでLチカ"
-date: 2015-01-25 13:40:17 +0900
+date: 2015-01-27 00:00:00 +0900
 comments: true
 categories: [OpenFrameworks, Arduino]
 author: Yutaka Moriya
 ---
-今回は回路のプッシュボタンを Arduino で送信、OpenFrameworks（v0.8.4使用）上で受信して表示を変更してみます。  
-まずは簡単に OpenFrameworks と Arduino を紹介します。
+昨今のクリエイティブ表現はモニタ上で行う以外にも、プロジェクションマッピング、AR、インスタレーションなど、現実世界に介入したエンターテイメントがどんどん普及しています。  
+そういったメディア・アートの仕組みや作り方などを紹介していきたいと思います。  
 
 <!-- more -->
 
@@ -22,6 +22,8 @@ author: Yutaka Moriya
 
 高度な電子工作とプログラミングを駆使すればこんなことも可能になります。
 <iframe src="//player.vimeo.com/video/9928343" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> <p><a href="http://vimeo.com/9928343">Super Mario Bros on an 8x8 LED matrix</a> from <a href="http://vimeo.com/chloester">Chloe Fan</a> on <a href="https://vimeo.com">Vimeo</a>.</p> 
+
+今回の例として、回路のプッシュボタンを Arduino で送信、OpenFrameworks（v0.8.4使用）上で受信して表示を変更してみます。
 
 ## Arduinoの回路を組み立てる
 
