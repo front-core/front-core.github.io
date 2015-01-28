@@ -4,7 +4,7 @@
   <title><![CDATA[FrontCore.org]]></title>
   <link href="http://front-core.org/atom.xml" rel="self"/>
   <link href="http://front-core.org/"/>
-  <updated>2015-01-05T21:12:32+09:00</updated>
+  <updated>2015-01-28T11:26:14+09:00</updated>
   <id>http://front-core.org/</id>
   <author>
     <name><![CDATA[FrontCore]]></name>
@@ -14,10 +14,530 @@
 
   
   <entry>
+    <title type="html"><![CDATA[OpenFrameworks+ArduinoでLチカ]]></title>
+    <link href="http://front-core.org/en/blog/2015/01/27/openframeworks-arduino-ltika/"/>
+    <updated>2015-01-27T00:00:00+09:00</updated>
+    <id>http://front-core.org/en/blog/2015/01/27/openframeworks-arduino-ltika</id>
+    <content type="html"><![CDATA[<p>昨今のクリエイティブ表現はモニタ上で行う以外にも、プロジェクションマッピング、AR、インスタレーションなど、現実世界に介入したエンターテイメントがどんどん普及しています。<br/>
+そういったメディア・アートの仕組みや作り方などを紹介していきたいと思います。</p>
+
+<!-- more -->
+
+
+<h2>OpenFrameworksとは？</h2>
+
+<p>簡単に言うと C++ のフレームワークなんですが、アート作品を簡単に作ることを目的に作られています。<br/>
+また、今回使う Arduino や、 Kinect 、 LeapMotion などのセンサーを組み込む事も容易であり、インタラクティブな制作が簡単に行えます。</p>
+
+<iframe src="//player.vimeo.com/video/74124094" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+
+
+<p> <p><a href="http://vimeo.com/74124094">OF Showreel</a> from <a href="http://vimeo.com/of">openFrameworks</a> on <a href="https://vimeo.com">Vimeo</a>.</p></p>
+
+<h2>Arduinoとは？</h2>
+
+<p>マイコンチップを搭載したハードウェアです。PCの専用ソフト<code>Arduino IDE</code>から Arduino へプログラムを書き込むことで回路を制御することができます。<br/>
+言語は Arduino 言語というものですがC++/Cをベースとしており、馴染みのある記法なので難しいことはありません。</p>
+
+<p>高度な電子工作とプログラミングを駆使すればこんなことも可能になります。</p>
+
+<iframe src="//player.vimeo.com/video/9928343" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+
+
+<p> <p><a href="http://vimeo.com/9928343">Super Mario Bros on an 8x8 LED matrix</a> from <a href="http://vimeo.com/chloester">Chloe Fan</a> on <a href="https://vimeo.com">Vimeo</a>.</p></p>
+
+<p>今回の例として、回路のプッシュボタンを Arduino で送信、OpenFrameworks（v0.8.4使用）上で受信して表示を変更してみます。</p>
+
+<h2>Arduinoの回路を組み立てる</h2>
+
+<p>Arduino の回路は以下のように、シンプルにプッシュボタンの状態をデジタル2ピンに送信するだけです。</p>
+
+<p><img src="http://front-core.org/images/post/openframeworks-arduino-ltika/breadboard.jpg" alt="My image link text" /><br/>
+簡単に解説すると、プッシュボタンを押すと3.3Vが2ピンに通電します。<br/>
+押していない時はGND(グランド)へ繋ぐことで、0Vの状態にします。（OFFの状態）<br/>
+ちなみに抵抗器を付けているのは、電源と GND を無抵抗で繋げると壊れる恐れがあります。
+これをプルダウン抵抗といいます。</p>
+
+<h2>Arduinoにスケッチを書き込む</h2>
+
+<p>OpenFrameworks 上で Arduino とシリアル通信を行うには、<code>ofSerial</code>と<code>ofArduino</code>の2パターンがありますが、今回は<code>ofArduino</code>を使用してみます。<br/>
+（<code>ofArduino</code>の中身は結局<code>ofSerial</code>を実行しているのですが、 Arduino をより便利に使うメンバ関数が用意されています。なので<code>ofSerial</code>でも Arduino とシリアル通信を行うことが出来ます）</p>
+
+<p><code>ofArduno</code>を使用するには Firmata というプロトコルを使用する必要があります。Arduino IDE 上にすでに用意されています。<br/>
+[ファイル]->[スケッチの例]->[Firmata]->[SimpleDigitalFirmata]を選択してスケッチを呼び出し、それを書き込みます。</p>
+
+<p><img src="http://front-core.org/images/post/openframeworks-arduino-ltika/arduino-firmata.jpg" alt="My image link text" /></p>
+
+<h2>OpenFrameworks でプログラミング</h2>
+
+<p>OpenFrameworks 上では<code>ofAruino</code>を使用してシリアル通信を行います。</p>
+
+<figure class='code'><figcaption><span>ofApp.h</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cp">#pragma once</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &quot;ofMain.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">ofApp</span> <span class="o">:</span> <span class="k">public</span> <span class="n">ofBaseApp</span><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="n">setup</span><span class="p">();</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">update</span><span class="p">();</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">draw</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">setupArduino</span><span class="p">(</span><span class="k">const</span> <span class="kt">int</span> <span class="o">&amp;</span> <span class="n">version</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">updateArduino</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ofArduino</span> <span class="n">ard</span><span class="p">;</span> <span class="c1">//ofArduinoクラス</span>
+</span><span class='line'>    <span class="kt">bool</span> <span class="n">bSetupArduino</span><span class="p">;</span> <span class="c1">//Arduinoとの通信状態を格納</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">inputPin</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">//今回使用しているデジタルピン2ピン</span>
+</span><span class='line'>    <span class="n">ofImage</span> <span class="n">light</span><span class="p">;</span> <span class="c1">//LEDを光らせているように見せる画像 各自で作ってみてください</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>ofApp.cpp</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cp">#include &quot;ofApp.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//--------------------------------------------------------------</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">ofApp</span><span class="o">::</span><span class="n">setup</span><span class="p">(){</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ofSetFrameRate</span><span class="p">(</span><span class="mi">60</span><span class="p">);</span> <span class="c1">//フレームレート60fpsで描画</span>
+</span><span class='line'>    <span class="n">ofSetCircleResolution</span><span class="p">(</span><span class="mi">30</span><span class="p">);</span> <span class="c1">//円の品質設定</span>
+</span><span class='line'>    <span class="n">ofEnableAlphaBlending</span><span class="p">();</span> <span class="c1">//透過描画を有効化</span>
+</span><span class='line'>    <span class="n">ofBackground</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="c1">//背景を黒に設定</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">light</span><span class="p">.</span><span class="n">loadImage</span><span class="p">(</span><span class="s">&quot;light.png&quot;</span><span class="p">);</span> <span class="c1">//画像を読み込む</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ard</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;/dev/tty.usbmodem1411&quot;</span><span class="p">,</span><span class="mi">57600</span><span class="p">);</span> <span class="c1">//Arduinoが接続されているシリアルポートと転送レートを指定</span>
+</span><span class='line'>    <span class="n">ofAddListener</span><span class="p">(</span><span class="n">ard</span><span class="p">.</span><span class="n">EInitialized</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ofApp</span><span class="o">::</span><span class="n">setupArduino</span><span class="p">);</span> <span class="c1">//イベントリスナーを登録</span>
+</span><span class='line'>    <span class="n">bSetupArduino</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span> <span class="c1">//通信状態はfalseに設定</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//--------------------------------------------------------------</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">ofApp</span><span class="o">::</span><span class="n">update</span><span class="p">(){</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">updateArduino</span><span class="p">();</span> <span class="c1">//updateArduinoを実行</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//--------------------------------------------------------------</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">ofApp</span><span class="o">::</span><span class="n">draw</span><span class="p">(){</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//LEDの絵を描画</span>
+</span><span class='line'>    <span class="kt">float</span> <span class="n">offsetX</span> <span class="o">=</span> <span class="mi">210</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">float</span> <span class="n">offsetY</span> <span class="o">=</span> <span class="mi">200</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ofSetColor</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofCircle</span><span class="p">(</span><span class="mi">25</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">20</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">20</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofRect</span><span class="p">(</span><span class="mi">5</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">20</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">30</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofSetColor</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">150</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofTriangle</span><span class="p">(</span><span class="mi">15</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">30</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">25</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">30</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">15</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">40</span><span class="o">+</span><span class="n">offsetY</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofTriangle</span><span class="p">(</span><span class="mi">30</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">30</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">30</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">40</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">20</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">40</span><span class="o">+</span><span class="n">offsetY</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofRect</span><span class="p">(</span><span class="mi">30</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">30</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofRect</span><span class="p">(</span><span class="mi">10</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">30</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">20</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofRect</span><span class="p">(</span><span class="mi">35</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">30</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">20</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofSetColor</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofRect</span><span class="p">(</span><span class="mi">10</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">50</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">50</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofRect</span><span class="p">(</span><span class="mi">35</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">50</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">50</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofSetColor</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofRect</span><span class="p">(</span><span class="mi">0</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">45</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//arduinoと通信していたら</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">bSetupArduino</span><span class="p">){</span>
+</span><span class='line'>        <span class="c1">//指定したデジタルピンにインプットがあったら</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">ard</span><span class="p">.</span><span class="n">getDigital</span><span class="p">(</span><span class="n">inputPin</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">light</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">ofPoint</span><span class="p">(</span><span class="mi">185</span><span class="p">,</span> <span class="mi">165</span><span class="p">),</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span> <span class="c1">//画像を表示</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="n">ofApp</span><span class="o">::</span><span class="n">setupArduino</span><span class="p">(</span><span class="k">const</span> <span class="kt">int</span> <span class="o">&amp;</span> <span class="n">version</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ofRemoveListener</span><span class="p">(</span><span class="n">ard</span><span class="p">.</span><span class="n">EInitialized</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ofApp</span><span class="o">::</span><span class="n">setupArduino</span><span class="p">);</span> <span class="c1">//イベントリスナーを削除</span>
+</span><span class='line'>    <span class="n">ard</span><span class="p">.</span><span class="n">sendDigitalPinMode</span><span class="p">(</span><span class="n">inputPin</span><span class="p">,</span> <span class="n">ARD_INPUT</span><span class="p">);</span> <span class="c1">//指定したデジタルピンを有効化</span>
+</span><span class='line'>    <span class="n">bSetupArduino</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="c1">//接続状態をtrueに設定</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="n">ofApp</span><span class="o">::</span><span class="n">updateArduino</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ard</span><span class="p">.</span><span class="n">update</span><span class="p">();</span> <span class="c1">//Arduinoの状態を更新</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>LED（絵）を光らせよう！</h2>
+
+<p>XcodeからBuildしてみましょう！以下の様なLEDが表示されると思います。</p>
+
+<p><img src="http://front-core.org/images/post/openframeworks-arduino-ltika/led-off.png" alt="My image link text" /></p>
+
+<p>プッシュボタンを押すとLEDが・・・</p>
+
+<p><img src="http://front-core.org/images/post/openframeworks-arduino-ltika/led-on.png" alt="My image link text" /></p>
+
+<p>　 　　　　 |<br/>
+　 　＼　　__　　／<br/>
+　 　＿　（ｍ）　＿ﾋﾟｺｰﾝ<br/>
+　 　　　　|ミ|<br/>
+　 　 ／ 　｀´　 ＼<br/>
+　　　　　(&lsquo;A`)<br/>
+　　　　　ノヽノヽ<br/>
+　　　　　　　くく</p>
+
+<h2>次回予告</h2>
+
+<p>今回は回路にボタンだけ設置したシンプルなものでしたので、次回はセンサーを使って取得した値をOpenFrameworks上に描画してみようと思います！</p>
+
+<p>それでは！</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[OpenFrameworks+ArduinoでLチカ]]></title>
+    <link href="http://front-core.org/ja/blog/2015/01/27/openframeworks-arduino-ltika/"/>
+    <updated>2015-01-27T00:00:00+09:00</updated>
+    <id>http://front-core.org/ja/blog/2015/01/27/openframeworks-arduino-ltika</id>
+    <content type="html"><![CDATA[<p>昨今のクリエイティブ表現はモニタ上で行う以外にも、プロジェクションマッピング、AR、インスタレーションなど、現実世界に介入したエンターテイメントがどんどん普及しています。<br/>
+そういったメディア・アートの仕組みや作り方などを紹介していきたいと思います。</p>
+
+<!-- more -->
+
+
+<h2>OpenFrameworksとは？</h2>
+
+<p>簡単に言うと C++ のフレームワークなんですが、アート作品を簡単に作ることを目的に作られています。<br/>
+また、今回使う Arduino や、 Kinect 、 LeapMotion などのセンサーを組み込む事も容易であり、インタラクティブな制作が簡単に行えます。</p>
+
+<iframe src="//player.vimeo.com/video/74124094" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+
+
+<p> <p><a href="http://vimeo.com/74124094">OF Showreel</a> from <a href="http://vimeo.com/of">openFrameworks</a> on <a href="https://vimeo.com">Vimeo</a>.</p></p>
+
+<h2>Arduinoとは？</h2>
+
+<p>マイコンチップを搭載したハードウェアです。PCの専用ソフト<code>Arduino IDE</code>から Arduino へプログラムを書き込むことで回路を制御することができます。<br/>
+言語は Arduino 言語というものですがC++/Cをベースとしており、馴染みのある記法なので難しいことはありません。</p>
+
+<p>高度な電子工作とプログラミングを駆使すればこんなことも可能になります。</p>
+
+<iframe src="//player.vimeo.com/video/9928343" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+
+
+<p> <p><a href="http://vimeo.com/9928343">Super Mario Bros on an 8x8 LED matrix</a> from <a href="http://vimeo.com/chloester">Chloe Fan</a> on <a href="https://vimeo.com">Vimeo</a>.</p></p>
+
+<p>今回の例として、回路のプッシュボタンを Arduino で送信、OpenFrameworks（v0.8.4使用）上で受信して表示を変更してみます。</p>
+
+<h2>Arduinoの回路を組み立てる</h2>
+
+<p>Arduino の回路は以下のように、シンプルにプッシュボタンの状態をデジタル2ピンに送信するだけです。</p>
+
+<p><img src="http://front-core.org/images/post/openframeworks-arduino-ltika/breadboard.jpg" alt="My image link text" /><br/>
+簡単に解説すると、プッシュボタンを押すと3.3Vが2ピンに通電します。<br/>
+押していない時はGND(グランド)へ繋ぐことで、0Vの状態にします。（OFFの状態）<br/>
+ちなみに抵抗器を付けているのは、電源と GND を無抵抗で繋げると壊れる恐れがあります。
+これをプルダウン抵抗といいます。</p>
+
+<h2>Arduinoにスケッチを書き込む</h2>
+
+<p>OpenFrameworks 上で Arduino とシリアル通信を行うには、<code>ofSerial</code>と<code>ofArduino</code>の2パターンがありますが、今回は<code>ofArduino</code>を使用してみます。<br/>
+（<code>ofArduino</code>の中身は結局<code>ofSerial</code>を実行しているのですが、 Arduino をより便利に使うメンバ関数が用意されています。なので<code>ofSerial</code>でも Arduino とシリアル通信を行うことが出来ます）</p>
+
+<p><code>ofArduno</code>を使用するには Firmata というプロトコルを使用する必要があります。Arduino IDE 上にすでに用意されています。<br/>
+[ファイル]->[スケッチの例]->[Firmata]->[SimpleDigitalFirmata]を選択してスケッチを呼び出し、それを書き込みます。</p>
+
+<p><img src="http://front-core.org/images/post/openframeworks-arduino-ltika/arduino-firmata.jpg" alt="My image link text" /></p>
+
+<h2>OpenFrameworks でプログラミング</h2>
+
+<p>OpenFrameworks 上では<code>ofAruino</code>を使用してシリアル通信を行います。</p>
+
+<figure class='code'><figcaption><span>ofApp.h</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cp">#pragma once</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &quot;ofMain.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">ofApp</span> <span class="o">:</span> <span class="k">public</span> <span class="n">ofBaseApp</span><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="n">setup</span><span class="p">();</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">update</span><span class="p">();</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">draw</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">setupArduino</span><span class="p">(</span><span class="k">const</span> <span class="kt">int</span> <span class="o">&amp;</span> <span class="n">version</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">updateArduino</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ofArduino</span> <span class="n">ard</span><span class="p">;</span> <span class="c1">//ofArduinoクラス</span>
+</span><span class='line'>    <span class="kt">bool</span> <span class="n">bSetupArduino</span><span class="p">;</span> <span class="c1">//Arduinoとの通信状態を格納</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">inputPin</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">//今回使用しているデジタルピン2ピン</span>
+</span><span class='line'>    <span class="n">ofImage</span> <span class="n">light</span><span class="p">;</span> <span class="c1">//LEDを光らせているように見せる画像 各自で作ってみてください</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>ofApp.cpp</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cp">#include &quot;ofApp.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//--------------------------------------------------------------</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">ofApp</span><span class="o">::</span><span class="n">setup</span><span class="p">(){</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ofSetFrameRate</span><span class="p">(</span><span class="mi">60</span><span class="p">);</span> <span class="c1">//フレームレート60fpsで描画</span>
+</span><span class='line'>    <span class="n">ofSetCircleResolution</span><span class="p">(</span><span class="mi">30</span><span class="p">);</span> <span class="c1">//円の品質設定</span>
+</span><span class='line'>    <span class="n">ofEnableAlphaBlending</span><span class="p">();</span> <span class="c1">//透過描画を有効化</span>
+</span><span class='line'>    <span class="n">ofBackground</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="c1">//背景を黒に設定</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">light</span><span class="p">.</span><span class="n">loadImage</span><span class="p">(</span><span class="s">&quot;light.png&quot;</span><span class="p">);</span> <span class="c1">//画像を読み込む</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ard</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;/dev/tty.usbmodem1411&quot;</span><span class="p">,</span><span class="mi">57600</span><span class="p">);</span> <span class="c1">//Arduinoが接続されているシリアルポートと転送レートを指定</span>
+</span><span class='line'>    <span class="n">ofAddListener</span><span class="p">(</span><span class="n">ard</span><span class="p">.</span><span class="n">EInitialized</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ofApp</span><span class="o">::</span><span class="n">setupArduino</span><span class="p">);</span> <span class="c1">//イベントリスナーを登録</span>
+</span><span class='line'>    <span class="n">bSetupArduino</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span> <span class="c1">//通信状態はfalseに設定</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//--------------------------------------------------------------</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">ofApp</span><span class="o">::</span><span class="n">update</span><span class="p">(){</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">updateArduino</span><span class="p">();</span> <span class="c1">//updateArduinoを実行</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//--------------------------------------------------------------</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">ofApp</span><span class="o">::</span><span class="n">draw</span><span class="p">(){</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//LEDの絵を描画</span>
+</span><span class='line'>    <span class="kt">float</span> <span class="n">offsetX</span> <span class="o">=</span> <span class="mi">210</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">float</span> <span class="n">offsetY</span> <span class="o">=</span> <span class="mi">200</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ofSetColor</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofCircle</span><span class="p">(</span><span class="mi">25</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">20</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">20</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofRect</span><span class="p">(</span><span class="mi">5</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">20</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">30</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofSetColor</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">150</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofTriangle</span><span class="p">(</span><span class="mi">15</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">30</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">25</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">30</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">15</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">40</span><span class="o">+</span><span class="n">offsetY</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofTriangle</span><span class="p">(</span><span class="mi">30</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">30</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">30</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">40</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">20</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">40</span><span class="o">+</span><span class="n">offsetY</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofRect</span><span class="p">(</span><span class="mi">30</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">30</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofRect</span><span class="p">(</span><span class="mi">10</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">30</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">20</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofRect</span><span class="p">(</span><span class="mi">35</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">30</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">20</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofSetColor</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofRect</span><span class="p">(</span><span class="mi">10</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">50</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">50</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofRect</span><span class="p">(</span><span class="mi">35</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">50</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">50</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofSetColor</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">ofRect</span><span class="p">(</span><span class="mi">0</span><span class="o">+</span><span class="n">offsetX</span><span class="p">,</span> <span class="mi">45</span><span class="o">+</span><span class="n">offsetY</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//arduinoと通信していたら</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">bSetupArduino</span><span class="p">){</span>
+</span><span class='line'>        <span class="c1">//指定したデジタルピンにインプットがあったら</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">ard</span><span class="p">.</span><span class="n">getDigital</span><span class="p">(</span><span class="n">inputPin</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">light</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">ofPoint</span><span class="p">(</span><span class="mi">185</span><span class="p">,</span> <span class="mi">165</span><span class="p">),</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span> <span class="c1">//画像を表示</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="n">ofApp</span><span class="o">::</span><span class="n">setupArduino</span><span class="p">(</span><span class="k">const</span> <span class="kt">int</span> <span class="o">&amp;</span> <span class="n">version</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ofRemoveListener</span><span class="p">(</span><span class="n">ard</span><span class="p">.</span><span class="n">EInitialized</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ofApp</span><span class="o">::</span><span class="n">setupArduino</span><span class="p">);</span> <span class="c1">//イベントリスナーを削除</span>
+</span><span class='line'>    <span class="n">ard</span><span class="p">.</span><span class="n">sendDigitalPinMode</span><span class="p">(</span><span class="n">inputPin</span><span class="p">,</span> <span class="n">ARD_INPUT</span><span class="p">);</span> <span class="c1">//指定したデジタルピンを有効化</span>
+</span><span class='line'>    <span class="n">bSetupArduino</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="c1">//接続状態をtrueに設定</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="n">ofApp</span><span class="o">::</span><span class="n">updateArduino</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ard</span><span class="p">.</span><span class="n">update</span><span class="p">();</span> <span class="c1">//Arduinoの状態を更新</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>LED（絵）を光らせよう！</h2>
+
+<p>XcodeからBuildしてみましょう！以下の様なLEDが表示されると思います。</p>
+
+<p><img src="http://front-core.org/images/post/openframeworks-arduino-ltika/led-off.png" alt="My image link text" /></p>
+
+<p>プッシュボタンを押すとLEDが・・・</p>
+
+<p><img src="http://front-core.org/images/post/openframeworks-arduino-ltika/led-on.png" alt="My image link text" /></p>
+
+<p>　 　　　　 |<br/>
+　 　＼　　__　　／<br/>
+　 　＿　（ｍ）　＿ﾋﾟｺｰﾝ<br/>
+　 　　　　|ミ|<br/>
+　 　 ／ 　｀´　 ＼<br/>
+　　　　　(&lsquo;A`)<br/>
+　　　　　ノヽノヽ<br/>
+　　　　　　　くく</p>
+
+<h2>次回予告</h2>
+
+<p>今回は回路にボタンだけ設置したシンプルなものでしたので、次回はセンサーを使って取得した値をOpenFrameworks上に描画してみようと思います！</p>
+
+<p>それでは！</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[爆速の HTML5 クロス・プラットフォーム CocoonJS]]></title>
-    <link href="http://front-core.org/en/blog/2014/12/16/about-cocoonjs/"/>
+    <link href="http://front-core.org/ja/blog/2014/12/16/about-cocoonjs/"/>
     <updated>2014-12-16T00:00:00+09:00</updated>
-    <id>http://front-core.org/en/blog/2014/12/16/about-cocoonjs</id>
+    <id>http://front-core.org/ja/blog/2014/12/16/about-cocoonjs</id>
     <content type="html"><![CDATA[<p>CocoonJS は <a href="https://www.ludei.com/">Ludei</a> 社が提供する爆速の「HTML5 クロス・プラットフォーム」です。</p>
 
 <p>HTML5 クロス・プラットフォームは他にも色々ありますが、CocoonJS は PhoneGap に似ています。
@@ -200,9 +720,9 @@ CocoonJS Cloud サービスの管理画面から簡単にアップデートが�
   
   <entry>
     <title type="html"><![CDATA[爆速の HTML5 クロス・プラットフォーム CocoonJS]]></title>
-    <link href="http://front-core.org/ja/blog/2014/12/16/about-cocoonjs/"/>
+    <link href="http://front-core.org/en/blog/2014/12/16/about-cocoonjs/"/>
     <updated>2014-12-16T00:00:00+09:00</updated>
-    <id>http://front-core.org/ja/blog/2014/12/16/about-cocoonjs</id>
+    <id>http://front-core.org/en/blog/2014/12/16/about-cocoonjs</id>
     <content type="html"><![CDATA[<p>CocoonJS は <a href="https://www.ludei.com/">Ludei</a> 社が提供する爆速の「HTML5 クロス・プラットフォーム」です。</p>
 
 <p>HTML5 クロス・プラットフォームは他にも色々ありますが、CocoonJS は PhoneGap に似ています。
