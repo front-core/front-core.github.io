@@ -652,9 +652,12 @@ $main-sprite: get-sprite("sprite@2x");
         @include clearfix;
 
         > code {
-          padding: 1px 5px 1px;
-          //@include px-with-rem(padding-left, 5);
-          //@include px-with-rem(padding-right, 5);
+          // padding: 1px 5px 1px;
+          @include px-with-rem(padding-top, 1);
+          @include px-with-rem(padding-bottom, 1);
+          @include px-with-rem(padding-left, 5);
+          @include px-with-rem(padding-right, 5);
+          font-size: 85%;
           background: #f7f7f7;
           border: 1px solid #9B9B9B;
           @include border-radius(3px);
@@ -680,9 +683,24 @@ $main-sprite: get-sprite("sprite@2x");
 
       > figure {
         @include px-with-rem(margin-bottom, $gutter-height);
+        font-size: 85%;
+        overflow: hidden;
+
+        figcaption {
+          color: #fff;
+          line-height: 1.6;
+          text-align: center;
+          background: #222;
+          @include border-top-radius(3px);
+        }
 
         // Syntax highlight syles 
         @import "partials/main/syntax";
+
+        figcaption + .highlight {
+          border-top: none;
+          @include border-top-radius(0);
+        }
       }
       
       > blockquote {
