@@ -315,8 +315,9 @@ module.exports = function(grunt) {
   // Deploy task
   grunt.registerTask('deploy', 'Deploy to GitHub Page.', function(target) {
     var tasks = [
-//       'shell:deployToGitHubPage',
+      'build',
       'shell:rakeDeploy' // rakeDeploy の方が早い 
+      // 'shell:deployToGitHubPage',
     ];
 
     if (target === 'force') {
