@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "CocoonJS Launcher の使い方"
-date: 2014-1-5
+date: 2015-1-5
 comments: true
 categories: CocoonJS
 written-language: "ja"

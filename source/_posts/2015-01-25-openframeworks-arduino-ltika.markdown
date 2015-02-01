@@ -4,8 +4,11 @@ title: "OpenFrameworks+ArduinoでLチカ"
 date: 2015-01-27 00:00:00 +0900
 comments: true
 categories: [OpenFrameworks, Arduino]
+written-language: "ja"
 author: Yutaka Moriya
+published: true
 ---
+
 昨今のクリエイティブ表現はモニタ上で行う以外にも、プロジェクションマッピング、AR、インスタレーションなど、現実世界に介入したエンターテイメントがどんどん普及しています。  
 そういったメディア・アートの仕組みや作り方などを紹介していきたいと思います。  
 
