@@ -1,0 +1,31 @@
+---
+layout: default
+title: "カテゴリー：Heroku"
+category: heroku
+footer: false
+---
+
+<div class="blog-index category">
+  <header>
+    <h1 class="category-title">{% if site.titlecase %}{{ page.title | titlecase }}{% else %}{{ page.title }}{% endif %}</h1>
+  </header>
+  
+  {% assign index = true %}
+
+  {% for post in site.categories[page.category] %}
+    {% if post.language == page.language %}
+      {% assign content = post.content %}
+      <article>
+        {% include article.html %}
+      </article>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<aside class="sidebar">
+  {% if site.blog_index_asides.size %}
+    {% include_array blog_index_asides %}
+  {% else %}
+    {% include_array default_asides %}
+  {% endif %}
+</aside>
