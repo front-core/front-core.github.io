@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "リアルタイム通信して各デバイス上で音声を再生する(Node.js + Socket.IO + Web Audio API)"
+title: "リアルタイム通信して複数デバイス上で音声を再生する(Node.js + Socket.IO + Web Audio API)"
 date: 2015-02-07 21:22:59 +0900
 written-language: "ja"
 comments: true
@@ -9,7 +9,7 @@ author: Naoki Otsu
 author-url: https://twitter.com/melo15
 ---
 
-双方向(リアルタイム)通信して、各デバイス上で音声を再生するサンプルを作り、Herokuにデプロイしました。
+双方向(リアルタイム)通信して、複数デバイス上で音声を再生するサンプルを作り、Herokuにデプロイしました。
 実現するための方法を解説していきます。  
 
 <!-- more -->
@@ -26,7 +26,12 @@ author-url: https://twitter.com/melo15
 **ソースコード**  
 [https://github.com/front-core/nodejs-socketio-webaudio-sample](https://github.com/front-core/nodejs-socketio-webaudio-sample)  
 </span>
+<br>
 
+# 対応ブラウザ
+IE11以下,Android(Android Browser)を除くモダンブラウザ。  
+ただしAndroidでも、Chrome for Android40以降は対応。  
+※全端末で検証した訳ではない為、動作の保証はありません。   
 <br>
 
 # 使用した技術
@@ -47,7 +52,7 @@ expressは、URLのルーティング機能などWebサイトを構築する基�
 
 ## Socket.IO
 Node.js上で動作し、リアルタイム通信機能を提供しているフレームワークです。  
-ブラウザの対応状況をチェックして、最適な通信方法を選択してくれます。  
+ブラウザの対応状況をチェックして、最適な通信方法を選択してくれるのが特徴です。  
 スマートフォンもiOS,Androidに対応しています。  
 
 Socket.IOが対応している通信方式は次の6つとなります。  
@@ -60,13 +65,63 @@ Socket.IOが対応している通信方式は次の6つとなります。
 * Flashのソケット通信
 
 上記のように、広い通信方式に対応しているので、  
-基本的に、主要ブラウザ含めIE5.5といった古いブラウザでも利用可能となります。  
-特に、IE10,Firefox6,Chrome4,Safari5(iOS4.2以降),Opera12.10,Android4.4以降ではWebSocketに対応されているので、サーバーとの接続が軽減され、より高速な動作が可能となります。  
-また通信方式を特定して接続させることも可能です。  
+基本的に、主要ブラウザを含めIE5.5といった古いブラウザでも利用可能となります。   
+また通信方式を特定して接続させることも可能です。 
+  
+特にWebSocketは、サーバーとの接続が軽減されより高速な動作が可能となります。 
+以下がWebSocketに対応しているブラウザです。  
+IE9以前、Android4.3以前を除く、多くの現行ブラウザがWebSocketに対応しています。(2015/2/7現在)  
+<table width="100%" style="text-align: center; margin-bottom: 15px;">
+	<tr>
+		<td style="background-color:#efefef; text-align:center;" colspan="5">PC</td>
+	</tr>
+	<tr>
+		<td style="padding:5px; text-align: center;">Chrome16+</td>
+		<td style="padding:5px; text-align: center;">Firefox11+</td>
+		<td style="padding:5px; text-align: center;">Safari7+</td>
+		<td style="padding:5px; text-align: center;">Opera12.1+</td>
+		<td style="padding:5px; text-align: center;">IE10+</td>
+	</tr>
+</table>
+<table width="100%" style="text-align: center; margin-bottom: 15px;">
+	<tr>
+		<td style="background-color:#efefef; text-align:center;" colspan="3">スマートフォン</td>
+	</tr>
+	<tr>
+		<td style="padding:5px; text-align: center;">iOS Safari6.1+</td>
+		<td style="padding:5px; text-align: center;">Android Browser4.4+</td>
+		<td style="padding:5px; text-align: center;">Chrome for Android40+</td>
+	</tr>
+</table> 
 
 ## Web Audio API
 音声を再生、処理する為のJavaScript APIです。  
 音声の再生、ボリューム調整などに加えて、合成やフィルターなど複雑なエフェクトが可能となります。  
+
+以下がWebAudioAPIに対応しているブラウザです。  
+IE、Android Browserを除く、多くのブラウザがWebAudioAPIに対応しています。(2015/2/7現在)   
+<table width="100%" style="text-align: center; margin-bottom: 15px;">
+	<tr>
+		<td style="background-color:#efefef; text-align:center;" colspan="5">PC</td>
+	</tr>
+	<tr>
+		<td style="padding:5px; text-align: center;">Chrome10+</td>
+		<td style="padding:5px; text-align: center;">Firefox25+</td>
+		<td style="padding:5px; text-align: center;">Safari6+</td>
+		<td style="padding:5px; text-align: center;">Opera15+</td>
+		<td style="padding:5px; text-align: center;">IE 未サポート (<a href="https://status.modern.ie/webaudioapi">開発中</a>)</td>
+	</tr>
+</table>
+<table width="100%" style="text-align: center; margin-bottom: 15px;">
+	<tr>
+		<td style="background-color:#efefef; text-align:center;" colspan="3">スマートフォン</td>
+	</tr>
+	<tr>
+		<td style="padding:5px; text-align: center;">iOS Safari6.1+</td>
+		<td style="padding:5px; text-align: center;">Android Broser 未サポート</td>
+		<td style="padding:5px; text-align: center;">Chrome for Android40+</td>
+	</tr>
+</table>
 
 ## Heroku
 アプリケーションを稼働させるためのプラットフォームです。  
@@ -80,9 +135,8 @@ Node.js,Java,Ruby,PHP,Pythonなど様々な言語をサポートしていて、
 ### web.js(Node.js + Socket.IO)[サーバ側]
 
 **HTTPサーバを作りルーティング、Socket.IOを設定**  
-web.jsでは、Node.js(express)でHTTPサーバを作り、  
-静的ファイルの保管場所(css,js,音声ファイルなど誰でも閲覧可能なPublicな場所)を指定して、ルートにアクセスがあったらindex.htmlを表示するルーティングを設定しています。  
-またSocket.IOでは、クライアントから"from_client"がくるのを監視し、接続があったら"from_server"を返信する設定をしています。 
+web.jsでは、Node.js(express)でHTTPサーバを作り、静的ファイルの保管場所(css,js,音声ファイルなど誰でも閲覧可能なPublicな場所)を指定して、ルートにアクセスがあったらindex.htmlを表示するルーティングを設定しています。  
+またSocket.IOでは、クライアントから"from_client"がくるのを監視し、接続があったら"from_server"を返答する設定をしています。 
 ```js web.js https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/web.js source 
 // express + socket.io
 var express = require('express');
@@ -133,7 +187,7 @@ io.sockets.on("connection", function (socket) {
 index.htmlでは、まずSocket.IOを使えるようにsocket.io.jsを読み込みます。  
 自動で生成されるファイルなので準備する必要はありません。  
 指定したURLで、Socket.IOに接続させます。  
-```html index.html https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L115-L121 source
+```html index.html https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L135-L141 source
 <script src="/socket.io/socket.io.js"></script>
 <script>
 ;(function (window, undefined) {
@@ -149,7 +203,7 @@ index.htmlでは、まずSocket.IOを使えるようにsocket.io.jsを読み込�
 iPhone/Androidでは、最初の音声ロードだけはユーザーアクション(クリックなど)が必要な制約がある為、
 最初にスプラッシュ画像を準備し、タップされた時に音声データを再生可能な状態にセットします。  
 ※PCでは、この制約はありません。  
-```html index.html https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L230-L244 source
+```html index.html https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L250-L263 source
 // スプラッシュ画像を押した時に音声データをロード
 // iPhone/Androidで最初の音声ロードだけはユーザーアクションが必要な制約がある為(PCにはこの制約はなさそう)
 splashImage.addEventListener(eventNames.start, function(){
@@ -161,9 +215,8 @@ splashImage.addEventListener(eventNames.start, function(){
 	
 	// スプラッシュ画像をフェードアウト
 	this.className = 'fade-out';
-	this.addEventListener('webkitAnimationEnd', function(){
-		this.className = 'none';
-	});
+	this.addEventListener("webkitAnimationEnd", function(){ this.className = "none"; });
+	this.addEventListener("animationend", function(){ this.className = "none"; });
 });
 ```
 <br>
@@ -171,8 +224,8 @@ splashImage.addEventListener(eventNames.start, function(){
   
 **ボタンが押された時にサーバ側に通知**  
 ボタンが押されたらサーバに"from_client"を送信し、押したボタンidを送ります。  
-※どのボタンを押したかを全クライアントに通知させる為。  
-```html index.html https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L195-L196 source
+※どのボタンが押されたかを全クライアントに通知させる為。  
+```html index.html https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L215-L216 source
 // クライアントからサーバーにボタンidを送る
 socketio.emit("from_client", this.id);
 ```
@@ -181,8 +234,8 @@ socketio.emit("from_client", this.id);
   
 **サーバ側からの返答をチェックし、音声を再生**  
 サーバに"from_client"を送信すると、"from_server"を返答してもらうようにサーバ側で設定しているので、
-"from_server"がくるのを監視し、返信があったら受け取ったボタンidの音声を再生します。  
-```html index.html https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L246-L261 source
+"from_server"がくるのを監視し、返答があったら受け取ったボタンidの音声を再生します。  
+```html index.html https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L265-L279 source
 // サーバーから "from_server" が送られてくるのを監視
 socketio.on("from_server", function(id){
 	// サーバーから返されたid(buttonのid名)から音声を再生
@@ -237,23 +290,25 @@ HerokuでWebアプリを公開出来る事は知っていましたが、実際�
 ### 解決方法
 サイトを参考にサンプルサイトを公開していく事でだいぶ理解出来ました。  
 
-参考になった記事  
- - [初心者でも15分で公開できるHerokuのはじめかた](http://developers.mobage.jp/blog/how-to-use-for-beginners-heroku)  
- - [Node.jsをHerokuにデプロイ](http://qiita.com/yoh-nak/items/80e51197410c7f956ccd)  
- - [Heroku入門 | ドットインストール](http://dotinstall.com/lessons/basic_heroku)  
+参考になった記事
+  
+* [初心者でも15分で公開できるHerokuのはじめかた](http://developers.mobage.jp/blog/how-to-use-for-beginners-heroku)  
+* [Node.jsをHerokuにデプロイ](http://qiita.com/yoh-nak/items/80e51197410c7f956ccd)  
+* [Heroku入門 | ドットインストール](http://dotinstall.com/lessons/basic_heroku)  
+
 <br>
 
 # 課題
-## 各デバイス間での音の完全な一致が難しい
+## 複数デバイス間での音の完全な一致が難しい
 ローカルで試している時はほぼ一致させる事が出来ても、Web公開した環境だと少し遅れて再生されてしまっていました。  
 完全な一致が難しいまでも、出来るだけ一致する状態にしたいのですが、打ち手がよくわかっていません。  
 <br>
 
 # まとめ
-リアルタイム通信して各デバイス上で音声を再生する方法を解説していきました。  
-オンラインゲームや音楽アプリ、チャットなど様々な用途が考えられそうです。  
+リアルタイム通信して複数デバイス上で音声を再生する方法を解説していきました。  
+オンラインゲームや音楽アプリ、チャットなど様々な用途が考えられます。  
   
-非常に少ないコードで実現出来た反面、各デバイス間で音を完全に一致させる事など、課題もまだまだありそうです。  
+非常に少ないコードで実現出来た反面、複数デバイス間で音を完全に一致させる事など、課題もまだまだあります。  
 その辺りの課題が解決したら、また紹介させて頂きます。  
 
 
