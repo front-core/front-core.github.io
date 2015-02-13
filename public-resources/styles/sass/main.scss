@@ -687,11 +687,17 @@ $main-sprite: get-sprite("sprite@2x");
         overflow: hidden;
 
         figcaption {
+          position: relative;
           color: #fff;
           line-height: 1.6;
           text-align: center;
           background: #222;
           @include border-top-radius(3px);
+
+          > a {
+            position: absolute;
+            right: 10px;
+          }
         }
 
         // Syntax highlight syles 
