@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>
+      
+        
+          リアルタイム通信して複数デバイス上で音声を再生する(Node.js + Socket.IO + Web Audio API)
+         - 
+      FrontCore.org
+    </title>
+    
+    <meta name="author" content="FrontCore">
+
+    
+    <meta name="description" content="リアルタイム通信して複数デバイス上で音声を再生する(Node.js + Socket.IO + Web Audio API) (Japanese) by Naoki Otsu
+· February 7, 2015 posted in&nbsp;Nodejs, Express, Socketio &hellip;">
+    
+    
+
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimal-ui">
+
+    <link rel="icon" href="/images/favicon.46506898.png">
+    
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Frontcore.org">
+    <link rel="apple-touch-icon-precomposed" href="/images/apple-touch-icon-precomposed.71fb2c51.png">
+
+    
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    
+    
+    <link rel="canonical" href="http://front-core.org/en/blog/2015/02/07/nodejs-express-socketio-webaudio">
+    
+    <link href="/en/atom.xml" rel="alternate" title="FrontCore.org" type="application/atom+xml">
+    
+    
+
+    <link rel="stylesheet" href="/styles/main.c8ddc36b.css">
+
+    <script src="/scripts/vendor/modernizr.d1e46096.js"></script></head><body class="language-en">
+    
+    <div id="main-container">
+      <header id="header">
+        <div class="container">
+          <nav class="main-navigation" role="navigation">
+            <ul>
+              <li><a href="/en">Blog</a></li>
+              <li><a href="/en/blog/archives">Archives</a></li>
+              <li><a href="/en/about">About</a></li>
+              
+              
+              
+              
+            </ul>
+          </nav>
+          
+          <button class="navigation-toggle">Menu</button>
+          
+          <h1 role="banner">
+            <a class="logo" href="/en">Frontcore</a>
+          </h1>
+        </div>
+      </header>
+      
+      <div id="content">
+        <div class="container">
+          <div class="blog-post">
+  <article class="entry" role="article">
+    
+  <header>
+    
+      <h1 class="entry-title">
+        <span>リアルタイム通信して複数デバイス上で音声を再生する(Node.js + Socket.IO + Web Audio API)</span><span> (Japanese)</span></h1>
+    
+
+    
+      <div class="meta">
+        
+        
+  
+
+
+
+  
+
+
+
+  by <span class="author"><a href="https://twitter.com/melo15">Naoki Otsu</a></span>
+·
+  
+
+
+
+  February 7, 2015
+
+
+
+  
+
+
+        
+        
+        
+        
+        
+        
+        
+        <p>
+
+
+  <span class="categories">posted in&nbsp;<a class="category" href="/en/blog/categories/nodejs">Nodejs</a>, <a class="category" href="/en/blog/categories/express">Express</a>, <a class="category" href="/en/blog/categories/socketio">Socketio</a>, <a class="category" href="/en/blog/categories/webaudio">Webaudio</a>, <a class="category" href="/en/blog/categories/heroku">Heroku</a></span>
+</p>
+        
+      </div>
+    
+  </header>
+
+
+
+  <div class="entry-content full-article"><p>双方向(リアルタイム)通信して、複数デバイス上で音声を再生するサンプルを作り、Herokuにデプロイしました。
+実現するための方法を解説していきます。</p>
+
+
+
+
+<p>※ドラム音源を再生する<a href="https://github.com/front-core/web-audio-api-drums-sample">サンプル</a>に、リアルタイム通信機能を追加したものです。</p>
+
+<p><span style="display:block;background-color:#efefef;padding:20px">
+<strong>サンプル(Heroku)</strong><br>
+<a href="https://nodejs-socketio-webaudio.herokuapp.com/">https://nodejs-socketio-webaudio.herokuapp.com/</a><br>
+<br>
+<img src="/images/post/nodejs-express-socketio-webaudio/qr.f62ac598.png" alt="リアルタイム通信して音声再生サンプル"><br>
+※ドラムを叩いて複数デバイスでリアルタイム通信して音声を再生。<br>
+<br>
+<strong>ソースコード</strong><br>
+<a href="https://github.com/front-core/nodejs-socketio-webaudio-sample">https://github.com/front-core/nodejs-socketio-webaudio-sample</a><br>
+</span>
+<br></p>
+
+<h1>対応ブラウザ</h1>
+
+<p>IE11以下,Android(Android Browser)を除くモダンブラウザ。<br>
+ただしAndroidでも、Chrome for Android40以降は対応。<br>
+※全端末で検証した訳ではない為、動作の保証はありません。 <br>
+<br></p>
+
+<h1>使用した技術</h1>
+
+<p>今回のサンプルは、下記を使って実現しました。</p>
+
+<ul>
+<li><a href="http://nodejs.org/">Node.js</a>(<a href="http://expressjs.com/">express</a>)</li>
+<li><a href="http://socket.io/">Socket.IO</a></li>
+<li><a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">Web Audio API</a></li>
+<li><a href="https://www.heroku.com/">Heroku</a><br>
+<br></li>
+</ul>
+
+
+<h2>Node.js(express)</h2>
+
+<p>JavaScriptでサーバサイドのプログラムを実行出来るプラットフォームです。<br>
+非同期I/Oを扱う事が出来るのがメリットで、1台のサーバで数万〜数十万の接続も可能となります。</p>
+
+<p>また今回、Node.jsで最も利用されているフレームワークexpressを利用しました。<br>
+expressは、URLのルーティング機能などWebサイトを構築する基本機能が備わっています。</p>
+
+<h2>Socket.IO</h2>
+
+<p>Node.js上で動作し、リアルタイム通信機能を提供しているフレームワークです。<br>
+ブラウザの対応状況をチェックして、最適な通信方法を選択してくれるのが特徴です。<br>
+スマートフォンもiOS,Androidに対応しています。</p>
+
+<p>Socket.IOが対応している通信方式は次の6つとなります。</p>
+
+<ul>
+<li>WebSocket</li>
+<li>Ajaxポーリング</li>
+<li>Ajaxマルチパートストリーミング</li>
+<li>IFrame</li>
+<li>JSONPポーリング</li>
+<li>Flashのソケット通信</li>
+</ul>
+
+
+<p>上記のように、広い通信方式に対応しているので、<br>
+基本的に、主要ブラウザを含めIE5.5といった古いブラウザでも利用可能となります。 <br>
+また通信方式を特定して接続させることも可能です。</p>
+
+<p>特にWebSocketは、サーバーとの接続が軽減されより高速な動作が可能となります。
+以下がWebSocketに対応しているブラウザです。<br>
+IE9以前、Android4.3以前を除く、多くの現行ブラウザがWebSocketに対応しています。(2015/2/7現在)</p>
+
+<table width="100%" style="text-align:center;margin-bottom:15px">
+    <tr>
+        <td style="background-color:#efefef;text-align:center" colspan="5">PC</td>
+    </tr>
+    <tr>
+        <td style="padding:5px;text-align:center">Chrome16+</td>
+        <td style="padding:5px;text-align:center">Firefox11+</td>
+        <td style="padding:5px;text-align:center">Safari7+</td>
+        <td style="padding:5px;text-align:center">Opera12.1+</td>
+        <td style="padding:5px;text-align:center">IE10+</td>
+    </tr>
+</table>
+
+
+<table width="100%" style="text-align:center;margin-bottom:15px">
+    <tr>
+        <td style="background-color:#efefef;text-align:center" colspan="3">スマートフォン</td>
+    </tr>
+    <tr>
+        <td style="padding:5px;text-align:center">iOS Safari6.1+</td>
+        <td style="padding:5px;text-align:center">Android Browser4.4+</td>
+        <td style="padding:5px;text-align:center">Chrome for Android40+</td>
+    </tr>
+</table>
+
+
+<p></p>
+
+<h2>Web Audio API</h2>
+
+<p>音声を再生、処理する為のJavaScript APIです。<br>
+音声の再生、ボリューム調整などに加えて、合成やフィルターなど複雑なエフェクトが可能となります。</p>
+
+<p>以下がWebAudioAPIに対応しているブラウザです。<br>
+IE、Android Browserを除く、多くのブラウザがWebAudioAPIに対応しています。(2015/2/7現在)</p>
+
+<table width="100%" style="text-align:center;margin-bottom:15px">
+    <tr>
+        <td style="background-color:#efefef;text-align:center" colspan="5">PC</td>
+    </tr>
+    <tr>
+        <td style="padding:5px;text-align:center">Chrome10+</td>
+        <td style="padding:5px;text-align:center">Firefox25+</td>
+        <td style="padding:5px;text-align:center">Safari6+</td>
+        <td style="padding:5px;text-align:center">Opera15+</td>
+        <td style="padding:5px;text-align:center">IE 未サポート (<a href="https://status.modern.ie/webaudioapi">開発中</a>)</td>
+    </tr>
+</table>
+
+
+<table width="100%" style="text-align:center;margin-bottom:15px">
+    <tr>
+        <td style="background-color:#efefef;text-align:center" colspan="3">スマートフォン</td>
+    </tr>
+    <tr>
+        <td style="padding:5px;text-align:center">iOS Safari6.1+</td>
+        <td style="padding:5px;text-align:center">Android Broser 未サポート</td>
+        <td style="padding:5px;text-align:center">Chrome for Android40+</td>
+    </tr>
+</table>
+
+
+<h2>Heroku</h2>
+
+<p>アプリケーションを稼働させるためのプラットフォームです。<br>
+Node.js,Java,Ruby,PHP,Pythonなど様々な言語をサポートしていて、<br>
+基本的な機能を使っている限り無料でWebサイトを公開する事ができます。<br>
+<br></p>
+
+<h1>ソースの解説</h1>
+
+<h3>web.js(Node.js + Socket.IO)[サーバ側]</h3>
+
+<p><strong>HTTPサーバを作りルーティング、Socket.IOを設定</strong><br>
+web.jsでは、Node.js(express)でHTTPサーバを作り、静的ファイルの保管場所(css,js,音声ファイルなど誰でも閲覧可能なPublicな場所)を指定して、ルートにアクセスがあったらindex.htmlを表示するルーティングを設定しています。<br>
+またSocket.IOでは、クライアントから&#8221;from_client&#8221;がくるのを監視し、接続があったら&#8221;from_server&#8221;を返答する設定をしています。</p>
+
+<figure class="code"><figcaption><span>web.js</span><a href="https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/web.js">source </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="c1">// express + socket.io</span>
+</span><span class="line"><span class="kd">var</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;express&#39;</span><span class="p">);</span>
+</span><span class="line">  <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">(),</span>
+</span><span class="line">  <span class="nx">server</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">).</span><span class="nx">createServer</span><span class="p">(</span><span class="nx">app</span><span class="p">),</span>
+</span><span class="line">  <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">),</span>
+</span><span class="line">  <span class="nx">io</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;socket.io&#39;</span><span class="p">).</span><span class="nx">listen</span><span class="p">(</span><span class="nx">server</span><span class="p">);</span>
+</span><span class="line">
+</span><span class="line"><span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">8000</span><span class="p">);</span>
+</span><span class="line">
+</span><span class="line"><span class="c1">// 静的ファイルの場所を指定する(この配下で、CSS,JS,IMG,音声ファイルなどの静的ファイルが使用可能に)</span>
+</span><span class="line"><span class="c1">// 通常 &#39;/public&#39; などに静的ファイルを置くが /socket.io/socket.io.js が404になってしまった為 &#39;/&#39; に変更</span>
+</span><span class="line"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="kr">static</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)));</span>
+</span><span class="line">
+</span><span class="line"><span class="c1">// ルートにアクセスがあったらindex.htmlを表示する</span>
+</span><span class="line"><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">  <span class="nx">res</span><span class="p">.</span><span class="nx">sendFile</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/index.html&#39;</span><span class="p">);</span>
+</span><span class="line"><span class="p">});</span>
+</span><span class="line">
+</span><span class="line"><span class="c1">// Herokuは下記を入れないとSocket.ioが動かない情報がWebにあったが、なくても動くよう(WebSocketに対応されたからか)</span>
+</span><span class="line"><span class="c1">// io.configure(function () { </span>
+</span><span class="line"><span class="c1">//   io.set(&quot;transports&quot;, [&quot;xhr-polling&quot;]); </span>
+</span><span class="line"><span class="c1">//   io.set(&quot;polling duration&quot;, 10); </span>
+</span><span class="line"><span class="c1">// });</span>
+</span><span class="line">
+</span><span class="line"><span class="c1">// io.set(&#39;log level&#39;, 1); // デフォルトは自動で出るデバック情報を出さない(ローカルでデバックする際に使用)</span>
+</span><span class="line">
+</span><span class="line"><span class="c1">// クライアント(index.html)からの接続を監視</span>
+</span><span class="line"><span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;connection&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">  <span class="c1">// クライアントから &quot;from_client&quot; が送られてきたら</span>
+</span><span class="line">  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;from_client&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">      <span class="c1">// console.log(id);</span>
+</span><span class="line">      
+</span><span class="line">      <span class="c1">// 接続しているソケットのみにidを送信する</span>
+</span><span class="line">      <span class="c1">// socket.emit(&quot;from_server&quot;, id);</span>
+</span><span class="line">      
+</span><span class="line">      <span class="c1">// 接続しているソケット以外全てにidを送信する</span>
+</span><span class="line">      <span class="c1">//socket.broadcast.emit(&quot;from_server&quot;, id);</span>
+</span><span class="line">      
+</span><span class="line">      <span class="c1">// 接続しているソケット含めて全部にidを送信する(送ってきたクライアント含めて全てのクライアントに送信)</span>
+</span><span class="line">      <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s2">&quot;from_server&quot;</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+</span><span class="line">  <span class="p">});</span>
+</span><span class="line"><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<h3>index.html(Web Audio API + Socke.IO)[クライアント側]</h3>
+
+<p><strong>Socket.IOの読み込みと接続</strong><br>
+index.htmlでは、まずSocket.IOを使えるようにsocket.io.jsを読み込みます。<br>
+自動で生成されるファイルなので準備する必要はありません。<br>
+指定したURLで、Socket.IOに接続させます。</p>
+
+<figure class="code"><figcaption><span>index.html</span><a href="https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L135-L141">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;/socket.io/socket.io.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class="line"><span class="nt">&lt;script&gt;</span>
+</span><span class="line">;(function (window, undefined) {
+</span><span class="line">  
+</span><span class="line">  // socket.ioに接続する
+</span><span class="line">  // var socketio = io.connect(&#39;http://localhost:8000&#39;); // localで試す時
+</span><span class="line">  var socketio = io.connect(&#39;https://nodejs-socketio-webaudio.herokuapp.com/&#39;); // Herokuで試す時
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<p><strong>スプラッシュ画像を押して再生したい音声データをセット</strong><br>
+iPhone/Androidでは、最初の音声ロードだけはユーザーアクション(クリックなど)が必要な制約がある為、
+最初にスプラッシュ画像を準備し、タップされた時に音声データを再生可能な状態にセットします。<br>
+※PCでは、この制約はありません。</p>
+
+<figure class="code"><figcaption><span>index.html</span><a href="https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L250-L263">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line">// スプラッシュ画像を押した時に音声データをロード
+</span><span class="line">// iPhone/Androidで最初の音声ロードだけはユーザーアクションが必要な制約がある為(PCにはこの制約はなさそう)
+</span><span class="line">splashImage.addEventListener(eventNames.start, function(){
+</span><span class="line">  // 音声データをセット
+</span><span class="line">  drumObj.kick.set();
+</span><span class="line">  drumObj.cymbal.set();
+</span><span class="line">  drumObj.hat.set();
+</span><span class="line">  drumObj.snare.set();
+</span><span class="line">  
+</span><span class="line">  // スプラッシュ画像をフェードアウト
+</span><span class="line">  this.className = &#39;fade-out&#39;;
+</span><span class="line">  this.addEventListener(&quot;webkitAnimationEnd&quot;, function(){ this.className = &quot;none&quot;; });
+</span><span class="line">  this.addEventListener(&quot;animationend&quot;, function(){ this.className = &quot;none&quot;; });
+</span><span class="line">});
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<p><strong>ボタンが押された時にサーバ側に通知</strong><br>
+ボタンが押されたらサーバに&#8221;from_client&#8221;を送信し、押したボタンidを送ります。<br>
+※どのボタンが押されたかを全クライアントに通知させる為。</p>
+
+<figure class="code"><figcaption><span>index.html</span><a href="https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L215-L216">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line">// クライアントからサーバーにボタンidを送る
+</span><span class="line">socketio.emit(&quot;from_client&quot;, this.id);
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<p><strong>サーバ側からの返答をチェックし、音声を再生</strong><br>
+サーバに&#8221;from_client&#8221;を送信すると、&#8221;from_server&#8221;を返答してもらうようにサーバ側で設定しているので、
+&ldquo;from_server&#8221;がくるのを監視し、返答があったら受け取ったボタンidの音声を再生します。</p>
+
+<figure class="code"><figcaption><span>index.html</span><a href="https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L265-L279">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line">// サーバーから &quot;from_server&quot; が送られてくるのを監視
+</span><span class="line">socketio.on(&quot;from_server&quot;, function(id){
+</span><span class="line">  // サーバーから返されたid(buttonのid名)から音声を再生
+</span><span class="line">  // start()だけを複数回実行出来ない仕様のようなので、毎回createBufferSource()してから再生
+</span><span class="line">  drumObj[id].source = drumObj[id].context.createBufferSource();
+</span><span class="line">  drumObj[id].source.buffer = drumObj[id].buffer;
+</span><span class="line">  drumObj[id].source.connect(drumObj[id].context.destination);
+</span><span class="line">  drumObj[id].source.start(0);
+</span><span class="line">  
+</span><span class="line">  // ポップアップを表示
+</span><span class="line">  result.className = &quot;popup&quot;;
+</span><span class="line">  result.innerHTML = id + &#39;!&#39;;
+</span><span class="line">  result.addEventListener(&quot;webkitAnimationEnd&quot;, function(){
+</span><span class="line">      result.className = &quot;&quot;;
+</span><span class="line">  });
+</span><span class="line">});
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<h1>Herokuにデプロイ</h1>
+
+<p>Node.jsで作ったアプリケーションを、Herokuにデプロイする際は、こちらが参考になりました。</p>
+
+<ul>
+<li><a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs#introduction">Getting Started with Node.js on Heroku</a></li>
+<li><a href="http://tacamy.hatenablog.com/entry/2013/02/16/235127">Node.js + Express を Heroku で動かすまでの手順まとめ</a></li>
+</ul>
+
+
+<p>またHeroku上でNode.jsを実行する際は、package.jsonに下記の記述をします。<br>
+※もしくはProcfileを準備。</p>
+
+<figure class="code"><figcaption><span>package.json</span><a href="https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/package.json#L12-L14">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="s2">&quot;scripts&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class="line">  <span class="s2">&quot;start&quot;</span><span class="o">:</span> <span class="s2">&quot;node web.js&quot;</span>
+</span><span class="line"><span class="p">},</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<h1>ハマったところ</h1>
+
+<h2>モバイル端末で音がならなかった</h2>
+
+<p>PC上では音がなったが、なぜかiPhone上で音声再生ができなくハマりました..</p>
+
+<h3>解決方法</h3>
+
+<p>使っていたNode.js,Socket.IOのバージョンが古く対応してなかったようです。
+package.json記載のバージョンを下記にしたところ問題なく再生する事ができました。</p>
+
+<figure class="code"><figcaption><span>package.json</span><a href="https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/package.json#L6-L10">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="s2">&quot;socket.io&quot;</span><span class="o">:</span><span class="s2">&quot;1.3.3&quot;</span>
+</span><span class="line"><span class="s2">&quot;node&quot;</span><span class="o">:</span> <span class="s2">&quot;0.11.11&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<h2>Herokuをよく理解していなかった</h2>
+
+<p>HerokuでWebアプリを公開出来る事は知っていましたが、実際に試したりしていなかったので、その使い方でハマりました..</p>
+
+<h3>解決方法</h3>
+
+<p>サイトを参考にサンプルサイトを公開していく事でだいぶ理解出来ました。</p>
+
+<p>参考になった記事</p>
+
+<ul>
+<li><a href="http://developers.mobage.jp/blog/how-to-use-for-beginners-heroku">初心者でも15分で公開できるHerokuのはじめかた</a></li>
+<li><a href="http://qiita.com/yoh-nak/items/80e51197410c7f956ccd">Node.jsをHerokuにデプロイ</a></li>
+<li><a href="http://dotinstall.com/lessons/basic_heroku">Heroku入門 | ドットインストール</a></li>
+</ul>
+
+
+<p><br></p>
+
+<h1>課題</h1>
+
+<h2>複数デバイス間での音の完全な一致が難しい</h2>
+
+<p>ローカルで試している時はほぼ一致させる事が出来ても、Web公開した環境だと少し遅れて再生されてしまっていました。<br>
+完全な一致が難しいまでも、出来るだけ一致する状態にしたいのですが、打ち手がよくわかっていません。<br>
+<br></p>
+
+<h1>まとめ</h1>
+
+<p>リアルタイム通信して複数デバイス上で音声を再生する方法を解説していきました。<br>
+オンラインゲームや音楽アプリ、チャットなど様々な用途が考えられます。</p>
+
+<p>非常に少ないコードで実現出来た反面、複数デバイス間で音を完全に一致させる事など、課題もまだまだあります。<br>
+その辺りの課題が解決したら、また紹介させて頂きます。</p>
+</div>
+
+
+    <footer>
+      
+        <div class="sharing">
+  
+    <a href="//twitter.com/share" class="twitter-share-button" data-url="http://front-core.org/en/blog/2015/02/07/nodejs-express-socketio-webaudio/" data-via="frontcoreOrg" data-lang="en"></a>
+  
+  
+  
+    <div class="g-plusone" data-href="http://front-core.org/en/blog/2015/02/07/nodejs-express-socketio-webaudio/" data-size="medium"></div>
+  
+  
+  
+    <div class="fb-like" data-href="http://front-core.org/en/blog/2015/02/07/nodejs-express-socketio-webaudio/" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
+  
+</div>
+
+      
+
+      
+      
+        
+
+          
+            
+            
+          
+
+        
+      
+        
+      
+        
+
+          
+            
+
+            
+              
+              
+            
+          
+
+        
+      
+        
+      
+        
+      
+        
+
+          
+            
+
+            
+              
+              
+            
+          
+
+        
+      
+        
+
+          
+            
+
+            
+              
+              
+            
+          
+
+        
+      
+        
+      
+        
+
+          
+            
+
+            
+              
+              
+            
+          
+
+        
+      
+        
+      
+    </footer>
+  </article>
+
+  
+    <section class="comments">
+      <h1>Comments</h1>
+      <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+    </section>
+  
+  
+  <div class="pagination">
+    
+      <a class="basic-alignment left" href="/en/blog/2014/12/16/about-cocoonjs/" title="Previous Post: 爆速の HTML5 クロス・プラットフォーム CocoonJS">&laquo; <span>爆速の HTML5 クロス・プラットフォーム CocoonJS</span></a>
+    
+
+    
+  </div>
+
+</div>
+
+
+  <aside class="sidebar">
+    
+      <section class="recent-posts">
+  <h1>Recent Posts</h1>
+  
+  <ul>
+    
+    
+      <li class="post">
+        <a href="/en/blog/2015/02/07/nodejs-express-socketio-webaudio/"><span>リアルタイム通信して複数デバイス上で音声を再生する(Node.js + Socket.IO + Web Audio API)</span><span> (Japanese)</span></a>
+      </li>
+    
+      <li class="post">
+        <a href="/en/blog/2015/01/27/openframeworks-arduino-ltika/"><span>OpenFrameworks+ArduinoでLチカ</span><span> (Japanese)</span></a>
+      </li>
+    
+      <li class="post">
+        <a href="/en/blog/2015/01/05/web-audio-api-drums/"><span>ブラウザで楽器も作れる！Web Audio API でドラムを作成</span><span> (Japanese)</span></a>
+      </li>
+    
+      <li class="post">
+        <a href="/en/blog/2015/01/05/cocoonjs-launcher/"><span>CocoonJS Launcher の使い方</span><span> (Japanese)</span></a>
+      </li>
+    
+      <li class="post">
+        <a href="/en/blog/2014/12/16/about-cocoonjs/"><span>爆速の HTML5 クロス・プラットフォーム CocoonJS</span><span> (Japanese)</span></a>
+      </li>
+    
+  </ul>
+</section>
+<section class="categories">
+  <h1>Categories</h1>
+  
+  <ul>
+    
+      <li>
+        <a href="/en/blog/categories/cocoonjs">Cocoonjs</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/webaudio">Webaudio</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/openframeworks">Openframeworks</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/arduino">Arduino</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/nodejs">Nodejs</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/express">Express</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/socketio">Socketio</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/heroku">Heroku</a>
+      </li>
+    
+  </ul>
+</section>
+<section class="github">
+  <h1>GitHub Repositories</h1>
+  
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  
+  
+
+</section>
+
+<section class="follow-us">
+  <h1>Follow us</h1>
+  
+  <ul>
+    <li><a class="github" href="https://github.com/front-core">GitHub</a></li>
+    <li><a class="twitter" href="https://twitter.com/frontcoreOrg">Twitter</a></li>
+    <li><a class="rss" href="/en/atom.xml">RSS</a></li>
+  </ul>
+</section>
+
+
+<section class="language-switch">
+  <h1>Languages</h1>
+
+  <ul>
+    
+      <li><a href="/en/blog/2015/02/07/nodejs-express-socketio-webaudio/" disabled="disabled">English</a></li>
+      <li><a href="/ja/blog/2015/02/07/nodejs-express-socketio-webaudio/">Japanese</a></li>
+    
+  </ul>
+</section>
+
+    
+  </aside>
+
+
+        </div>
+      </div>
+      
+      <div id="sticky-footer-area"></div>
+
+      <div class="overlay"></div>
+    </div>
+    
+    <footer id="footer" role="contentinfo">
+      <div class="container">
+        <div class="share-buttons">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://front-core.org" data-lang="en" data-hashtags="front-core.org" data-text="FrontCore.org"></a>
+
+          <div class="g-plusone" data-href="http://front-core.org" data-size="medium"></div>
+
+          <div class="fb-like" data-href="http://front-core.org" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
+        </div>
+
+        <p class="copyright">
+          Copyright &copy; 2015 FrontCore
+        </p>
+
+        <p class="powered-by">
+          Powered by <a href="http://octopress.org">Octopress</a>
+        </p>
+      </div>
+    </footer>
+    
+    
+
+    <script src="/scripts/vendor.db02b173.js"></script><script src="/scripts/plugins.dfc4c65a.js"></script><script src="/scripts/main.2646bef6.js"></script><script type="text/javascript">var disqus_shortname="front-core",disqus_identifier="http://front-core.org/en/blog/2015/02/07/nodejs-express-socketio-webaudio/",disqus_url="http://front-core.org/en/blog/2015/02/07/nodejs-express-socketio-webaudio/",disqus_script="embed.js";!function(){var e=document.createElement("script");e.type="text/javascript",e.async=!0,e.src="//"+disqus_shortname+".disqus.com/"+disqus_script,(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(e)}();</script><div id="fb-root"></div>
+
+  
+    <script>!function(e,n,t){var a,c=e.getElementsByTagName(n)[0];e.getElementById(t)||(a=e.createElement(n),a.id=t,a.async=!0,a.src="//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1",c.parentNode.insertBefore(a,c))}(document,"script","facebook-jssdk");</script><script type="text/javascript">!function(){var e=document.createElement("script");e.type="text/javascript",e.async=!0,e.src="https://apis.google.com/js/plusone.js";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)}();</script><script type="text/javascript">!function(){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src="//platform.twitter.com/widgets.js",document.getElementsByTagName("head")[0].appendChild(t)}();</script><script type="text/javascript">jQuery(function(){github.showRepos({user:"front-core",count:5,skip_forks:!0,target:"#gh_repos"})});</script></body></html>

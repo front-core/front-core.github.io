@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>
+      
+        
+          ブラウザで楽器も作れる！Web Audio API でドラムを作成
+         - 
+      FrontCore.org
+    </title>
+    
+    <meta name="author" content="FrontCore">
+
+    
+    <meta name="description" content="ブラウザで楽器も作れる！Web Audio API でドラムを作成 (Japanese) by Keita Sakamoto
+· January 5, 2015 posted in&nbsp;Webaudio 今回は､ Web Audio API を紹介させて頂きます｡
+機能を簡潔に確認するため &hellip;">
+    
+    
+
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimal-ui">
+
+    <link rel="icon" href="/images/favicon.46506898.png">
+    
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Frontcore.org">
+    <link rel="apple-touch-icon-precomposed" href="/images/apple-touch-icon-precomposed.71fb2c51.png">
+
+    
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    
+    
+    <link rel="canonical" href="http://front-core.org/en/blog/2015/01/05/web-audio-api-drums">
+    
+    <link href="/en/atom.xml" rel="alternate" title="FrontCore.org" type="application/atom+xml">
+    
+    
+
+    <link rel="stylesheet" href="/styles/main.c8ddc36b.css">
+
+    <script src="/scripts/vendor/modernizr.d1e46096.js"></script></head><body class="language-en">
+    
+    <div id="main-container">
+      <header id="header">
+        <div class="container">
+          <nav class="main-navigation" role="navigation">
+            <ul>
+              <li><a href="/en">Blog</a></li>
+              <li><a href="/en/blog/archives">Archives</a></li>
+              <li><a href="/en/about">About</a></li>
+              
+              
+              
+              
+            </ul>
+          </nav>
+          
+          <button class="navigation-toggle">Menu</button>
+          
+          <h1 role="banner">
+            <a class="logo" href="/en">Frontcore</a>
+          </h1>
+        </div>
+      </header>
+      
+      <div id="content">
+        <div class="container">
+          <div class="blog-post">
+  <article class="entry" role="article">
+    
+  <header>
+    
+      <h1 class="entry-title">
+        <span>ブラウザで楽器も作れる！Web Audio API でドラムを作成</span><span> (Japanese)</span></h1>
+    
+
+    
+      <div class="meta">
+        
+        
+  
+
+
+
+  
+
+
+
+  by <span class="author"><a href="https://github.com/motio">Keita Sakamoto</a></span>
+·
+  
+
+
+
+  January 5, 2015
+
+
+
+  
+
+
+        
+        
+        
+        
+        
+        
+        
+        <p>
+
+
+  <span class="categories">posted in&nbsp;<a class="category" href="/en/blog/categories/webaudio">Webaudio</a></span>
+</p>
+        
+      </div>
+    
+  </header>
+
+
+
+  <div class="entry-content full-article"><p>今回は､ Web Audio API を紹介させて頂きます｡<br>
+機能を簡潔に確認するため、 シンプルなドラムを実際に作ってみました。</p>
+
+
+
+
+<h1>Web Audio API とは</h1>
+
+<p>Web Audio API とは､ 音声ファイルを単に再生するだけでなく、 処理・合成することができる、 Webアプリケーション向けの高度なJavaScript API です。<br>
+今回は､ オーディオファイルを再生するまでの紹介ですが､ JavaScript を使用して様々な音を作ることができます。</p>
+
+<h1>デモ</h1>
+
+<p>完成デモは<a href="https://web-audio-api-drums-sample.herokuapp.com/">こちら</a>です｡ぜひスマートフォンでご確認ください｡</p>
+
+<h2>QRコード</h2>
+
+<p><span class="block-center">
+<img src="/images/post/web-audio-api-drums/qr-go-to-site.ea802f5d.gif" width="150" alt="QRコード">
+</span></p>
+
+<h2>画面キャプチャ</h2>
+
+<p><span class="block-center">
+<img src="/images/post/web-audio-api-drums/capture-site.82c60155.png" width="320" alt="ドラムサンプル">
+</span></p>
+
+<h1>コード</h1>
+
+<p>html5rocksのチュートリアルを見ながら実装しています｡<br>
+より詳しい解説はこちらをご参照ください｡</p>
+
+<ul>
+<li><a href="http://www.html5rocks.com/ja/tutorials/webaudio/intro/">Web Audio API の基礎</a></li>
+</ul>
+
+
+<p>下記リンクも参考にさせて頂きました｡</p>
+
+<ul>
+<li><a href="http://qiita.com/fnobi/items/2f08a67800dec1d61f21">WebAudioAPIで遊べるようになった</a></li>
+<li><a href="http://qiita.com/sou/items/5688d4e7d3a37b4e2ff1">Mobile Safari, Chrome for Android での Web Audio API 覚え書き</a></li>
+</ul>
+
+
+<figure class="code"><figcaption><span>index.html</span><a href="https://github.com/front-core/web-audio-api-drums-sample/blob/master/index.html#L69-L160">link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+<span class="line-number">62</span>
+<span class="line-number">63</span>
+<span class="line-number">64</span>
+<span class="line-number">65</span>
+<span class="line-number">66</span>
+<span class="line-number">67</span>
+<span class="line-number">68</span>
+<span class="line-number">69</span>
+<span class="line-number">70</span>
+<span class="line-number">71</span>
+<span class="line-number">72</span>
+<span class="line-number">73</span>
+<span class="line-number">74</span>
+<span class="line-number">75</span>
+<span class="line-number">76</span>
+<span class="line-number">77</span>
+<span class="line-number">78</span>
+<span class="line-number">79</span>
+<span class="line-number">80</span>
+<span class="line-number">81</span>
+<span class="line-number">82</span>
+<span class="line-number">83</span>
+<span class="line-number">84</span>
+<span class="line-number">85</span>
+<span class="line-number">86</span>
+<span class="line-number">87</span>
+<span class="line-number">88</span>
+<span class="line-number">89</span>
+<span class="line-number">90</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="p">;(</span><span class="kd">function</span> <span class="p">(</span><span class="nb">window</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">  <span class="kd">var</span> <span class="nx">isTouchDevice</span> <span class="o">=</span> <span class="s1">&#39;ontouchend&#39;</span> <span class="k">in</span> <span class="nb">document</span><span class="p">;</span>
+</span><span class="line">  <span class="kd">var</span> <span class="nx">eventNames</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class="line">      <span class="nx">start</span><span class="o">:</span> <span class="nx">isTouchDevice</span> <span class="o">?</span> <span class="s1">&#39;touchstart&#39;</span> <span class="o">:</span> <span class="s1">&#39;mousedown&#39;</span><span class="p">,</span>
+</span><span class="line">      <span class="nx">move</span><span class="o">:</span>  <span class="nx">isTouchDevice</span> <span class="o">?</span> <span class="s1">&#39;touchmove&#39;</span>  <span class="o">:</span> <span class="s1">&#39;mousemove&#39;</span><span class="p">,</span>
+</span><span class="line">      <span class="nx">end</span><span class="o">:</span>   <span class="nx">isTouchDevice</span> <span class="o">?</span> <span class="s1">&#39;touchend&#39;</span>   <span class="o">:</span> <span class="s1">&#39;mouseup&#39;</span><span class="p">,</span>
+</span><span class="line">      <span class="nx">click</span><span class="o">:</span> <span class="s1">&#39;click&#39;</span>
+</span><span class="line">  <span class="p">};</span>
+</span><span class="line">  <span class="kd">function</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="nx">ele</span><span class="p">,</span> <span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">      <span class="c1">// WebKitのブラウザではプリフィックスをつける</span>
+</span><span class="line">      <span class="nb">window</span><span class="p">.</span><span class="nx">AudioContext</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">AudioContext</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">webkitAudioContext</span><span class="p">;</span>
+</span><span class="line">      <span class="k">try</span> <span class="p">{</span>
+</span><span class="line">          <span class="c1">// AudioContextはすべての音声の再生を管理しています</span>
+</span><span class="line">          <span class="c1">// インスタンス化してメソッドを使用します</span>
+</span><span class="line">          <span class="k">this</span><span class="p">.</span><span class="nx">context</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioContext</span><span class="p">;</span>
+</span><span class="line">      <span class="p">}</span>
+</span><span class="line">      <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">          <span class="c1">// Web Audio API 非対応のブラウザではalertを出します</span>
+</span><span class="line">          <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Web Audio API is not supported in this browser&#39;</span><span class="p">);</span>
+</span><span class="line">      <span class="p">}</span>
+</span><span class="line">      <span class="k">this</span><span class="p">.</span><span class="nx">ele</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="nx">ele</span><span class="p">);</span>
+</span><span class="line">      <span class="c1">// 引数からオーディオファイルのurlを受け取ります</span>
+</span><span class="line">      <span class="k">this</span><span class="p">.</span><span class="nx">url</span> <span class="o">=</span> <span class="nx">url</span><span class="p">;</span>
+</span><span class="line">      <span class="k">this</span><span class="p">.</span><span class="nx">buffer</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+</span><span class="line">  <span class="p">}</span>
+</span><span class="line">  <span class="nx">AudioBufferLoader</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class="line">      <span class="nx">loadBuffer</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">          <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class="line">          <span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+</span><span class="line">          <span class="nx">request</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+</span><span class="line">          <span class="c1">// arraybuffer は  XMLHttpRequest Level 2 の仕様です｡音声などのバイナリデータを処理します</span>
+</span><span class="line">          <span class="nx">request</span><span class="p">.</span><span class="nx">responseType</span> <span class="o">=</span> <span class="s1">&#39;arraybuffer&#39;</span><span class="p">;</span>
+</span><span class="line">          <span class="nx">request</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">              <span class="nx">_this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">decodeAudioData</span><span class="p">(</span>
+</span><span class="line">                  <span class="nx">request</span><span class="p">.</span><span class="nx">response</span><span class="p">,</span>
+</span><span class="line">                  <span class="kd">function</span><span class="p">(</span><span class="nx">buffer</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">                      <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nx">buffer</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">                          <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;error decodeing file data: &#39;</span> <span class="o">+</span> <span class="nx">url</span><span class="p">);</span>
+</span><span class="line">                          <span class="k">return</span><span class="p">;</span>
+</span><span class="line">                      <span class="p">}</span>
+</span><span class="line">                      <span class="nx">_this</span><span class="p">.</span><span class="nx">buffer</span> <span class="o">=</span> <span class="nx">buffer</span><span class="p">;</span>
+</span><span class="line">                      <span class="nx">_this</span><span class="p">.</span><span class="nx">events</span><span class="p">();</span>
+</span><span class="line">                  <span class="p">},</span>
+</span><span class="line">                  <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">                      <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">&#39;decodeAudioData error&#39;</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
+</span><span class="line">                  <span class="p">}</span>
+</span><span class="line">              <span class="p">);</span>
+</span><span class="line">          <span class="p">};</span>
+</span><span class="line">          <span class="nx">request</span><span class="p">.</span><span class="nx">onerror</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">              <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;AudioBufferLoader: XHR error&#39;</span><span class="p">);</span>
+</span><span class="line">          <span class="p">};</span>
+</span><span class="line">          <span class="nx">request</span><span class="p">.</span><span class="nx">send</span><span class="p">();</span>
+</span><span class="line">      <span class="p">},</span>
+</span><span class="line">      <span class="nx">events</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">          <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class="line">          <span class="kd">var</span> <span class="nx">context</span> <span class="o">=</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">context</span><span class="p">;</span>
+</span><span class="line">          <span class="nx">_this</span><span class="p">.</span><span class="nx">ele</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="nx">eventNames</span><span class="p">.</span><span class="nx">start</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">              <span class="k">this</span><span class="p">.</span><span class="nx">className</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span><span class="line">              <span class="c1">// source は再生の度に生成する必要があります</span>
+</span><span class="line">              <span class="kd">var</span> <span class="nx">source</span> <span class="o">=</span> <span class="nx">context</span><span class="p">.</span><span class="nx">createBufferSource</span><span class="p">();</span>
+</span><span class="line">              <span class="nx">source</span><span class="p">.</span><span class="nx">buffer</span> <span class="o">=</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">buffer</span><span class="p">;</span>
+</span><span class="line">              <span class="nx">source</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nx">destination</span><span class="p">);</span>
+</span><span class="line">              <span class="c1">// noteOn は古い書き方なので､start を使う</span>
+</span><span class="line">              <span class="c1">// ここで音が鳴ります</span>
+</span><span class="line">              <span class="nx">source</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class="line">              <span class="k">this</span><span class="p">.</span><span class="nx">className</span> <span class="o">=</span> <span class="s1">&#39;tap&#39;</span><span class="p">;</span>
+</span><span class="line">          <span class="p">});</span>
+</span><span class="line">          <span class="nx">_this</span><span class="p">.</span><span class="nx">ele</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="nx">eventNames</span><span class="p">.</span><span class="nx">end</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">              <span class="k">this</span><span class="p">.</span><span class="nx">className</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span><span class="line">          <span class="p">});</span>
+</span><span class="line">      <span class="p">},</span>
+</span><span class="line">      <span class="nx">load</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">          <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class="line">          <span class="nx">_this</span><span class="p">.</span><span class="nx">loadBuffer</span><span class="p">(</span><span class="nx">_this</span><span class="p">.</span><span class="nx">url</span><span class="p">);</span>
+</span><span class="line">      <span class="p">}</span>
+</span><span class="line">  <span class="p">};</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1">// 音声ファイルをロード</span>
+</span><span class="line">  <span class="kd">var</span> <span class="nx">kick</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="s1">&#39;kick&#39;</span><span class="p">,</span> <span class="s1">&#39;sound/kick.m4a&#39;</span><span class="p">);</span>
+</span><span class="line">  <span class="nx">kick</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
+</span><span class="line">
+</span><span class="line">  <span class="kd">var</span> <span class="nx">cymbal</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="s1">&#39;cymbal&#39;</span><span class="p">,</span> <span class="s1">&#39;sound/cymbal.m4a&#39;</span><span class="p">);</span>
+</span><span class="line">  <span class="nx">cymbal</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
+</span><span class="line">
+</span><span class="line">  <span class="kd">var</span> <span class="nx">hat</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="s1">&#39;hat&#39;</span><span class="p">,</span> <span class="s1">&#39;sound/hat.m4a&#39;</span><span class="p">);</span>
+</span><span class="line">  <span class="nx">hat</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
+</span><span class="line">
+</span><span class="line">  <span class="kd">var</span> <span class="nx">snare</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="s1">&#39;snare&#39;</span><span class="p">,</span> <span class="s1">&#39;sound/snare.m4a&#39;</span><span class="p">);</span>
+</span><span class="line">  <span class="nx">snare</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
+</span><span class="line"><span class="p">}(</span><span class="k">this</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>おわり</h1>
+
+<p>やっぱり音が鳴ると楽しいですね。</p>
+
+<p>chrome版のAngry Birds は､ Web Audio API を使用しているそうです｡<br>
+<a href="http://chrome.angrybirds.com/">Angry Birds for Chrome</a></p>
+
+<p>今回はドラムを作ってみましたが、 他の楽器も今後制作予定ですので、 また当ブログで実装方法を紹介できたらと思います。</p>
+</div>
+
+
+    <footer>
+      
+        <div class="sharing">
+  
+    <a href="//twitter.com/share" class="twitter-share-button" data-url="http://front-core.org/en/blog/2015/01/05/web-audio-api-drums/" data-via="frontcoreOrg" data-lang="en"></a>
+  
+  
+  
+    <div class="g-plusone" data-href="http://front-core.org/en/blog/2015/01/05/web-audio-api-drums/" data-size="medium"></div>
+  
+  
+  
+    <div class="fb-like" data-href="http://front-core.org/en/blog/2015/01/05/web-audio-api-drums/" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
+  
+</div>
+
+      
+
+      
+      
+        
+
+          
+            
+
+            
+          
+
+        
+      
+        
+      
+        
+
+          
+            
+
+            
+          
+
+        
+      
+        
+      
+        
+      
+        
+
+          
+            
+            
+          
+
+        
+      
+        
+
+          
+            
+
+            
+              
+              
+            
+          
+
+        
+      
+        
+      
+        
+
+          
+            
+
+            
+              
+              
+            
+          
+
+        
+      
+        
+      
+    </footer>
+  </article>
+
+  
+    <section class="comments">
+      <h1>Comments</h1>
+      <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+    </section>
+  
+  
+  <div class="pagination">
+    
+      <a class="basic-alignment left" href="/en/blog/2014/12/16/about-cocoonjs/" title="Previous Post: 爆速の HTML5 クロス・プラットフォーム CocoonJS">&laquo; <span> (Japanese)</span><span>爆速の HTML5 クロス・プラットフォーム CocoonJS</span></a>
+    
+
+    
+      <a class="basic-alignment right" href="/en/blog/2015/01/27/openframeworks-arduino-ltika/" title="Next Post: OpenFrameworks+ArduinoでLチカ"><span>OpenFrameworks+ArduinoでLチカ</span><span> (Japanese)</span> &raquo;</a>
+    
+  </div>
+
+</div>
+
+
+  <aside class="sidebar">
+    
+      <section class="recent-posts">
+  <h1>Recent Posts</h1>
+  
+  <ul>
+    
+    
+      <li class="post">
+        <a href="/en/blog/2015/02/07/nodejs-express-socketio-webaudio/"><span>リアルタイム通信して複数デバイス上で音声を再生する(Node.js + Socket.IO + Web Audio API)</span><span> (Japanese)</span></a>
+      </li>
+    
+      <li class="post">
+        <a href="/en/blog/2015/01/27/openframeworks-arduino-ltika/"><span>OpenFrameworks+ArduinoでLチカ</span><span> (Japanese)</span></a>
+      </li>
+    
+      <li class="post">
+        <a href="/en/blog/2015/01/05/web-audio-api-drums/"><span>ブラウザで楽器も作れる！Web Audio API でドラムを作成</span><span> (Japanese)</span></a>
+      </li>
+    
+      <li class="post">
+        <a href="/en/blog/2015/01/05/cocoonjs-launcher/"><span>CocoonJS Launcher の使い方</span><span> (Japanese)</span></a>
+      </li>
+    
+      <li class="post">
+        <a href="/en/blog/2014/12/16/about-cocoonjs/"><span>爆速の HTML5 クロス・プラットフォーム CocoonJS</span><span> (Japanese)</span></a>
+      </li>
+    
+  </ul>
+</section>
+<section class="categories">
+  <h1>Categories</h1>
+  
+  <ul>
+    
+      <li>
+        <a href="/en/blog/categories/cocoonjs">Cocoonjs</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/webaudio">Webaudio</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/openframeworks">Openframeworks</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/arduino">Arduino</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/nodejs">Nodejs</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/express">Express</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/socketio">Socketio</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/heroku">Heroku</a>
+      </li>
+    
+  </ul>
+</section>
+<section class="github">
+  <h1>GitHub Repositories</h1>
+  
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  
+  
+
+</section>
+
+<section class="follow-us">
+  <h1>Follow us</h1>
+  
+  <ul>
+    <li><a class="github" href="https://github.com/front-core">GitHub</a></li>
+    <li><a class="twitter" href="https://twitter.com/frontcoreOrg">Twitter</a></li>
+    <li><a class="rss" href="/en/atom.xml">RSS</a></li>
+  </ul>
+</section>
+
+
+<section class="language-switch">
+  <h1>Languages</h1>
+
+  <ul>
+    
+      <li><a href="/en/blog/2015/01/05/web-audio-api-drums/" disabled="disabled">English</a></li>
+      <li><a href="/ja/blog/2015/01/05/web-audio-api-drums/">Japanese</a></li>
+    
+  </ul>
+</section>
+
+    
+  </aside>
+
+
+        </div>
+      </div>
+      
+      <div id="sticky-footer-area"></div>
+
+      <div class="overlay"></div>
+    </div>
+    
+    <footer id="footer" role="contentinfo">
+      <div class="container">
+        <div class="share-buttons">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://front-core.org" data-lang="en" data-hashtags="front-core.org" data-text="FrontCore.org"></a>
+
+          <div class="g-plusone" data-href="http://front-core.org" data-size="medium"></div>
+
+          <div class="fb-like" data-href="http://front-core.org" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
+        </div>
+
+        <p class="copyright">
+          Copyright &copy; 2015 FrontCore
+        </p>
+
+        <p class="powered-by">
+          Powered by <a href="http://octopress.org">Octopress</a>
+        </p>
+      </div>
+    </footer>
+    
+    
+
+    <script src="/scripts/vendor.db02b173.js"></script><script src="/scripts/plugins.dfc4c65a.js"></script><script src="/scripts/main.2646bef6.js"></script><script type="text/javascript">var disqus_shortname="front-core",disqus_identifier="http://front-core.org/en/blog/2015/01/05/web-audio-api-drums/",disqus_url="http://front-core.org/en/blog/2015/01/05/web-audio-api-drums/",disqus_script="embed.js";!function(){var e=document.createElement("script");e.type="text/javascript",e.async=!0,e.src="//"+disqus_shortname+".disqus.com/"+disqus_script,(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(e)}();</script><div id="fb-root"></div>
+
+  
+    <script>!function(e,n,t){var a,c=e.getElementsByTagName(n)[0];e.getElementById(t)||(a=e.createElement(n),a.id=t,a.async=!0,a.src="//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1",c.parentNode.insertBefore(a,c))}(document,"script","facebook-jssdk");</script><script type="text/javascript">!function(){var e=document.createElement("script");e.type="text/javascript",e.async=!0,e.src="https://apis.google.com/js/plusone.js";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)}();</script><script type="text/javascript">!function(){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src="//platform.twitter.com/widgets.js",document.getElementsByTagName("head")[0].appendChild(t)}();</script><script type="text/javascript">jQuery(function(){github.showRepos({user:"front-core",count:5,skip_forks:!0,target:"#gh_repos"})});</script></body></html>

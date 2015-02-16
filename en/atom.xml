@@ -4,7 +4,7 @@
   <title><![CDATA[FrontCore.org]]></title>
   <link href="http://front-core.org/atom.xml" rel="self"/>
   <link href="http://front-core.org/"/>
-  <updated>2015-01-28T11:26:14+09:00</updated>
+  <updated>2015-02-16T20:49:06+09:00</updated>
   <id>http://front-core.org/</id>
   <author>
     <name><![CDATA[FrontCore]]></name>
@@ -12,6 +12,894 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[リアルタイム通信して複数デバイス上で音声を再生する(Node.js + Socket.IO + Web Audio API)]]></title>
+    <link href="http://front-core.org/en/blog/2015/02/07/nodejs-express-socketio-webaudio/"/>
+    <updated>2015-02-07T21:22:59+09:00</updated>
+    <id>http://front-core.org/en/blog/2015/02/07/nodejs-express-socketio-webaudio</id>
+    <content type="html"><![CDATA[<p>双方向(リアルタイム)通信して、複数デバイス上で音声を再生するサンプルを作り、Herokuにデプロイしました。
+実現するための方法を解説していきます。</p>
+
+<!-- more -->
+
+
+<p>※ドラム音源を再生する<a href="https://github.com/front-core/web-audio-api-drums-sample">サンプル</a>に、リアルタイム通信機能を追加したものです。</p>
+
+<p><span style="display: block; background-color: #efefef; padding: 20px;">
+<strong>サンプル(Heroku)</strong><br/>
+<a href="https://nodejs-socketio-webaudio.herokuapp.com/">https://nodejs-socketio-webaudio.herokuapp.com/</a><br/>
+<br>
+<img src="http://front-core.org/images/post/nodejs-express-socketio-webaudio/qr.png" alt="リアルタイム通信して音声再生サンプル" /><br/>
+※ドラムを叩いて複数デバイスでリアルタイム通信して音声を再生。<br/>
+<br>
+<strong>ソースコード</strong><br/>
+<a href="https://github.com/front-core/nodejs-socketio-webaudio-sample">https://github.com/front-core/nodejs-socketio-webaudio-sample</a><br/>
+</span>
+<br></p>
+
+<h1>対応ブラウザ</h1>
+
+<p>IE11以下,Android(Android Browser)を除くモダンブラウザ。<br/>
+ただしAndroidでも、Chrome for Android40以降は対応。<br/>
+※全端末で検証した訳ではない為、動作の保証はありません。 <br/>
+<br></p>
+
+<h1>使用した技術</h1>
+
+<p>今回のサンプルは、下記を使って実現しました。</p>
+
+<ul>
+<li><a href="http://nodejs.org/">Node.js</a>(<a href="http://expressjs.com/">express</a>)</li>
+<li><a href="http://socket.io/">Socket.IO</a></li>
+<li><a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">Web Audio API</a></li>
+<li><a href="https://www.heroku.com/">Heroku</a><br/>
+<br></li>
+</ul>
+
+
+<h2>Node.js(express)</h2>
+
+<p>JavaScriptでサーバサイドのプログラムを実行出来るプラットフォームです。<br/>
+非同期I/Oを扱う事が出来るのがメリットで、1台のサーバで数万〜数十万の接続も可能となります。</p>
+
+<p>また今回、Node.jsで最も利用されているフレームワークexpressを利用しました。<br/>
+expressは、URLのルーティング機能などWebサイトを構築する基本機能が備わっています。</p>
+
+<h2>Socket.IO</h2>
+
+<p>Node.js上で動作し、リアルタイム通信機能を提供しているフレームワークです。<br/>
+ブラウザの対応状況をチェックして、最適な通信方法を選択してくれるのが特徴です。<br/>
+スマートフォンもiOS,Androidに対応しています。</p>
+
+<p>Socket.IOが対応している通信方式は次の6つとなります。</p>
+
+<ul>
+<li>WebSocket</li>
+<li>Ajaxポーリング</li>
+<li>Ajaxマルチパートストリーミング</li>
+<li>IFrame</li>
+<li>JSONPポーリング</li>
+<li>Flashのソケット通信</li>
+</ul>
+
+
+<p>上記のように、広い通信方式に対応しているので、<br/>
+基本的に、主要ブラウザを含めIE5.5といった古いブラウザでも利用可能となります。 <br/>
+また通信方式を特定して接続させることも可能です。</p>
+
+<p>特にWebSocketは、サーバーとの接続が軽減されより高速な動作が可能となります。
+以下がWebSocketに対応しているブラウザです。<br/>
+IE9以前、Android4.3以前を除く、多くの現行ブラウザがWebSocketに対応しています。(2015/2/7現在)</p>
+
+<table width="100%" style="text-align: center; margin-bottom: 15px;">
+    <tr>
+        <td style="background-color:#efefef; text-align:center;" colspan="5">PC</td>
+    </tr>
+    <tr>
+        <td style="padding:5px; text-align: center;">Chrome16+</td>
+        <td style="padding:5px; text-align: center;">Firefox11+</td>
+        <td style="padding:5px; text-align: center;">Safari7+</td>
+        <td style="padding:5px; text-align: center;">Opera12.1+</td>
+        <td style="padding:5px; text-align: center;">IE10+</td>
+    </tr>
+</table>
+
+
+<table width="100%" style="text-align: center; margin-bottom: 15px;">
+    <tr>
+        <td style="background-color:#efefef; text-align:center;" colspan="3">スマートフォン</td>
+    </tr>
+    <tr>
+        <td style="padding:5px; text-align: center;">iOS Safari6.1+</td>
+        <td style="padding:5px; text-align: center;">Android Browser4.4+</td>
+        <td style="padding:5px; text-align: center;">Chrome for Android40+</td>
+    </tr>
+</table>
+
+
+<p></p>
+
+<h2>Web Audio API</h2>
+
+<p>音声を再生、処理する為のJavaScript APIです。<br/>
+音声の再生、ボリューム調整などに加えて、合成やフィルターなど複雑なエフェクトが可能となります。</p>
+
+<p>以下がWebAudioAPIに対応しているブラウザです。<br/>
+IE、Android Browserを除く、多くのブラウザがWebAudioAPIに対応しています。(2015/2/7現在)</p>
+
+<table width="100%" style="text-align: center; margin-bottom: 15px;">
+    <tr>
+        <td style="background-color:#efefef; text-align:center;" colspan="5">PC</td>
+    </tr>
+    <tr>
+        <td style="padding:5px; text-align: center;">Chrome10+</td>
+        <td style="padding:5px; text-align: center;">Firefox25+</td>
+        <td style="padding:5px; text-align: center;">Safari6+</td>
+        <td style="padding:5px; text-align: center;">Opera15+</td>
+        <td style="padding:5px; text-align: center;">IE 未サポート (<a href="https://status.modern.ie/webaudioapi">開発中</a>)</td>
+    </tr>
+</table>
+
+
+<table width="100%" style="text-align: center; margin-bottom: 15px;">
+    <tr>
+        <td style="background-color:#efefef; text-align:center;" colspan="3">スマートフォン</td>
+    </tr>
+    <tr>
+        <td style="padding:5px; text-align: center;">iOS Safari6.1+</td>
+        <td style="padding:5px; text-align: center;">Android Broser 未サポート</td>
+        <td style="padding:5px; text-align: center;">Chrome for Android40+</td>
+    </tr>
+</table>
+
+
+<h2>Heroku</h2>
+
+<p>アプリケーションを稼働させるためのプラットフォームです。<br/>
+Node.js,Java,Ruby,PHP,Pythonなど様々な言語をサポートしていて、<br/>
+基本的な機能を使っている限り無料でWebサイトを公開する事ができます。<br/>
+<br></p>
+
+<h1>ソースの解説</h1>
+
+<h3>web.js(Node.js + Socket.IO)[サーバ側]</h3>
+
+<p><strong>HTTPサーバを作りルーティング、Socket.IOを設定</strong><br/>
+web.jsでは、Node.js(express)でHTTPサーバを作り、静的ファイルの保管場所(css,js,音声ファイルなど誰でも閲覧可能なPublicな場所)を指定して、ルートにアクセスがあったらindex.htmlを表示するルーティングを設定しています。<br/>
+またSocket.IOでは、クライアントから&#8221;from_client&#8221;がくるのを監視し、接続があったら&#8221;from_server&#8221;を返答する設定をしています。</p>
+
+<figure class='code'><figcaption><span>web.js</span><a href='https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/web.js'>source </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// express + socket.io</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;express&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">(),</span>
+</span><span class='line'>  <span class="nx">server</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">).</span><span class="nx">createServer</span><span class="p">(</span><span class="nx">app</span><span class="p">),</span>
+</span><span class='line'>  <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">),</span>
+</span><span class='line'>  <span class="nx">io</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;socket.io&#39;</span><span class="p">).</span><span class="nx">listen</span><span class="p">(</span><span class="nx">server</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">8000</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 静的ファイルの場所を指定する(この配下で、CSS,JS,IMG,音声ファイルなどの静的ファイルが使用可能に)</span>
+</span><span class='line'><span class="c1">// 通常 &#39;/public&#39; などに静的ファイルを置くが /socket.io/socket.io.js が404になってしまった為 &#39;/&#39; に変更</span>
+</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="kr">static</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)));</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// ルートにアクセスがあったらindex.htmlを表示する</span>
+</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">sendFile</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/index.html&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Herokuは下記を入れないとSocket.ioが動かない情報がWebにあったが、なくても動くよう(WebSocketに対応されたからか)</span>
+</span><span class='line'><span class="c1">// io.configure(function () { </span>
+</span><span class='line'><span class="c1">//   io.set(&quot;transports&quot;, [&quot;xhr-polling&quot;]); </span>
+</span><span class='line'><span class="c1">//   io.set(&quot;polling duration&quot;, 10); </span>
+</span><span class='line'><span class="c1">// });</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// io.set(&#39;log level&#39;, 1); // デフォルトは自動で出るデバック情報を出さない(ローカルでデバックする際に使用)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// クライアント(index.html)からの接続を監視</span>
+</span><span class='line'><span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;connection&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// クライアントから &quot;from_client&quot; が送られてきたら</span>
+</span><span class='line'>  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;from_client&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// console.log(id);</span>
+</span><span class='line'>      
+</span><span class='line'>      <span class="c1">// 接続しているソケットのみにidを送信する</span>
+</span><span class='line'>      <span class="c1">// socket.emit(&quot;from_server&quot;, id);</span>
+</span><span class='line'>      
+</span><span class='line'>      <span class="c1">// 接続しているソケット以外全てにidを送信する</span>
+</span><span class='line'>      <span class="c1">//socket.broadcast.emit(&quot;from_server&quot;, id);</span>
+</span><span class='line'>      
+</span><span class='line'>      <span class="c1">// 接続しているソケット含めて全部にidを送信する(送ってきたクライアント含めて全てのクライアントに送信)</span>
+</span><span class='line'>      <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s2">&quot;from_server&quot;</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<h3>index.html(Web Audio API + Socke.IO)[クライアント側]</h3>
+
+<p><strong>Socket.IOの読み込みと接続</strong><br/>
+index.htmlでは、まずSocket.IOを使えるようにsocket.io.jsを読み込みます。<br/>
+自動で生成されるファイルなので準備する必要はありません。<br/>
+指定したURLで、Socket.IOに接続させます。</p>
+
+<figure class='code'><figcaption><span>index.html</span><a href='https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L135-L141'>source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;/socket.io/socket.io.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'><span class="nt">&lt;script&gt;</span>
+</span><span class='line'>;(function (window, undefined) {
+</span><span class='line'>  
+</span><span class='line'>  // socket.ioに接続する
+</span><span class='line'>  // var socketio = io.connect(&#39;http://localhost:8000&#39;); // localで試す時
+</span><span class='line'>  var socketio = io.connect(&#39;https://nodejs-socketio-webaudio.herokuapp.com/&#39;); // Herokuで試す時
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<p><strong>スプラッシュ画像を押して再生したい音声データをセット</strong><br/>
+iPhone/Androidでは、最初の音声ロードだけはユーザーアクション(クリックなど)が必要な制約がある為、
+最初にスプラッシュ画像を準備し、タップされた時に音声データを再生可能な状態にセットします。<br/>
+※PCでは、この制約はありません。</p>
+
+<figure class='code'><figcaption><span>index.html</span><a href='https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L250-L263'>source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>// スプラッシュ画像を押した時に音声データをロード
+</span><span class='line'>// iPhone/Androidで最初の音声ロードだけはユーザーアクションが必要な制約がある為(PCにはこの制約はなさそう)
+</span><span class='line'>splashImage.addEventListener(eventNames.start, function(){
+</span><span class='line'>  // 音声データをセット
+</span><span class='line'>  drumObj.kick.set();
+</span><span class='line'>  drumObj.cymbal.set();
+</span><span class='line'>  drumObj.hat.set();
+</span><span class='line'>  drumObj.snare.set();
+</span><span class='line'>  
+</span><span class='line'>  // スプラッシュ画像をフェードアウト
+</span><span class='line'>  this.className = &#39;fade-out&#39;;
+</span><span class='line'>  this.addEventListener(&quot;webkitAnimationEnd&quot;, function(){ this.className = &quot;none&quot;; });
+</span><span class='line'>  this.addEventListener(&quot;animationend&quot;, function(){ this.className = &quot;none&quot;; });
+</span><span class='line'>});
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<p><strong>ボタンが押された時にサーバ側に通知</strong><br/>
+ボタンが押されたらサーバに&#8221;from_client&#8221;を送信し、押したボタンidを送ります。<br/>
+※どのボタンが押されたかを全クライアントに通知させる為。</p>
+
+<figure class='code'><figcaption><span>index.html</span><a href='https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L215-L216'>source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>// クライアントからサーバーにボタンidを送る
+</span><span class='line'>socketio.emit(&quot;from_client&quot;, this.id);
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<p><strong>サーバ側からの返答をチェックし、音声を再生</strong><br/>
+サーバに&#8221;from_client&#8221;を送信すると、&#8221;from_server&#8221;を返答してもらうようにサーバ側で設定しているので、
+&ldquo;from_server&#8221;がくるのを監視し、返答があったら受け取ったボタンidの音声を再生します。</p>
+
+<figure class='code'><figcaption><span>index.html</span><a href='https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L265-L279'>source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>// サーバーから &quot;from_server&quot; が送られてくるのを監視
+</span><span class='line'>socketio.on(&quot;from_server&quot;, function(id){
+</span><span class='line'>  // サーバーから返されたid(buttonのid名)から音声を再生
+</span><span class='line'>  // start()だけを複数回実行出来ない仕様のようなので、毎回createBufferSource()してから再生
+</span><span class='line'>  drumObj[id].source = drumObj[id].context.createBufferSource();
+</span><span class='line'>  drumObj[id].source.buffer = drumObj[id].buffer;
+</span><span class='line'>  drumObj[id].source.connect(drumObj[id].context.destination);
+</span><span class='line'>  drumObj[id].source.start(0);
+</span><span class='line'>  
+</span><span class='line'>  // ポップアップを表示
+</span><span class='line'>  result.className = &quot;popup&quot;;
+</span><span class='line'>  result.innerHTML = id + &#39;!&#39;;
+</span><span class='line'>  result.addEventListener(&quot;webkitAnimationEnd&quot;, function(){
+</span><span class='line'>      result.className = &quot;&quot;;
+</span><span class='line'>  });
+</span><span class='line'>});
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<h1>Herokuにデプロイ</h1>
+
+<p>Node.jsで作ったアプリケーションを、Herokuにデプロイする際は、こちらが参考になりました。</p>
+
+<ul>
+<li><a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs#introduction">Getting Started with Node.js on Heroku</a></li>
+<li><a href="http://tacamy.hatenablog.com/entry/2013/02/16/235127">Node.js + Express を Heroku で動かすまでの手順まとめ</a></li>
+</ul>
+
+
+<p>またHeroku上でNode.jsを実行する際は、package.jsonに下記の記述をします。<br/>
+※もしくはProcfileを準備。</p>
+
+<figure class='code'><figcaption><span>package.json</span><a href='https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/package.json#L12-L14'>source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="s2">&quot;scripts&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;start&quot;</span><span class="o">:</span> <span class="s2">&quot;node web.js&quot;</span>
+</span><span class='line'><span class="p">},</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<h1>ハマったところ</h1>
+
+<h2>モバイル端末で音がならなかった</h2>
+
+<p>PC上では音がなったが、なぜかiPhone上で音声再生ができなくハマりました..</p>
+
+<h3>解決方法</h3>
+
+<p>使っていたNode.js,Socket.IOのバージョンが古く対応してなかったようです。
+package.json記載のバージョンを下記にしたところ問題なく再生する事ができました。</p>
+
+<figure class='code'><figcaption><span>package.json</span><a href='https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/package.json#L6-L10'>source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="s2">&quot;socket.io&quot;</span><span class="o">:</span><span class="s2">&quot;1.3.3&quot;</span>
+</span><span class='line'><span class="s2">&quot;node&quot;</span><span class="o">:</span> <span class="s2">&quot;0.11.11&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<h2>Herokuをよく理解していなかった</h2>
+
+<p>HerokuでWebアプリを公開出来る事は知っていましたが、実際に試したりしていなかったので、その使い方でハマりました..</p>
+
+<h3>解決方法</h3>
+
+<p>サイトを参考にサンプルサイトを公開していく事でだいぶ理解出来ました。</p>
+
+<p>参考になった記事</p>
+
+<ul>
+<li><a href="http://developers.mobage.jp/blog/how-to-use-for-beginners-heroku">初心者でも15分で公開できるHerokuのはじめかた</a></li>
+<li><a href="http://qiita.com/yoh-nak/items/80e51197410c7f956ccd">Node.jsをHerokuにデプロイ</a></li>
+<li><a href="http://dotinstall.com/lessons/basic_heroku">Heroku入門 | ドットインストール</a></li>
+</ul>
+
+
+<p><br></p>
+
+<h1>課題</h1>
+
+<h2>複数デバイス間での音の完全な一致が難しい</h2>
+
+<p>ローカルで試している時はほぼ一致させる事が出来ても、Web公開した環境だと少し遅れて再生されてしまっていました。<br/>
+完全な一致が難しいまでも、出来るだけ一致する状態にしたいのですが、打ち手がよくわかっていません。<br/>
+<br></p>
+
+<h1>まとめ</h1>
+
+<p>リアルタイム通信して複数デバイス上で音声を再生する方法を解説していきました。<br/>
+オンラインゲームや音楽アプリ、チャットなど様々な用途が考えられます。</p>
+
+<p>非常に少ないコードで実現出来た反面、複数デバイス間で音を完全に一致させる事など、課題もまだまだあります。<br/>
+その辺りの課題が解決したら、また紹介させて頂きます。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[リアルタイム通信して複数デバイス上で音声を再生する(Node.js + Socket.IO + Web Audio API)]]></title>
+    <link href="http://front-core.org/ja/blog/2015/02/07/nodejs-express-socketio-webaudio/"/>
+    <updated>2015-02-07T21:22:59+09:00</updated>
+    <id>http://front-core.org/ja/blog/2015/02/07/nodejs-express-socketio-webaudio</id>
+    <content type="html"><![CDATA[<p>双方向(リアルタイム)通信して、複数デバイス上で音声を再生するサンプルを作り、Herokuにデプロイしました。
+実現するための方法を解説していきます。</p>
+
+<!-- more -->
+
+
+<p>※ドラム音源を再生する<a href="https://github.com/front-core/web-audio-api-drums-sample">サンプル</a>に、リアルタイム通信機能を追加したものです。</p>
+
+<p><span style="display: block; background-color: #efefef; padding: 20px;">
+<strong>サンプル(Heroku)</strong><br/>
+<a href="https://nodejs-socketio-webaudio.herokuapp.com/">https://nodejs-socketio-webaudio.herokuapp.com/</a><br/>
+<br>
+<img src="http://front-core.org/images/post/nodejs-express-socketio-webaudio/qr.png" alt="リアルタイム通信して音声再生サンプル" /><br/>
+※ドラムを叩いて複数デバイスでリアルタイム通信して音声を再生。<br/>
+<br>
+<strong>ソースコード</strong><br/>
+<a href="https://github.com/front-core/nodejs-socketio-webaudio-sample">https://github.com/front-core/nodejs-socketio-webaudio-sample</a><br/>
+</span>
+<br></p>
+
+<h1>対応ブラウザ</h1>
+
+<p>IE11以下,Android(Android Browser)を除くモダンブラウザ。<br/>
+ただしAndroidでも、Chrome for Android40以降は対応。<br/>
+※全端末で検証した訳ではない為、動作の保証はありません。 <br/>
+<br></p>
+
+<h1>使用した技術</h1>
+
+<p>今回のサンプルは、下記を使って実現しました。</p>
+
+<ul>
+<li><a href="http://nodejs.org/">Node.js</a>(<a href="http://expressjs.com/">express</a>)</li>
+<li><a href="http://socket.io/">Socket.IO</a></li>
+<li><a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">Web Audio API</a></li>
+<li><a href="https://www.heroku.com/">Heroku</a><br/>
+<br></li>
+</ul>
+
+
+<h2>Node.js(express)</h2>
+
+<p>JavaScriptでサーバサイドのプログラムを実行出来るプラットフォームです。<br/>
+非同期I/Oを扱う事が出来るのがメリットで、1台のサーバで数万〜数十万の接続も可能となります。</p>
+
+<p>また今回、Node.jsで最も利用されているフレームワークexpressを利用しました。<br/>
+expressは、URLのルーティング機能などWebサイトを構築する基本機能が備わっています。</p>
+
+<h2>Socket.IO</h2>
+
+<p>Node.js上で動作し、リアルタイム通信機能を提供しているフレームワークです。<br/>
+ブラウザの対応状況をチェックして、最適な通信方法を選択してくれるのが特徴です。<br/>
+スマートフォンもiOS,Androidに対応しています。</p>
+
+<p>Socket.IOが対応している通信方式は次の6つとなります。</p>
+
+<ul>
+<li>WebSocket</li>
+<li>Ajaxポーリング</li>
+<li>Ajaxマルチパートストリーミング</li>
+<li>IFrame</li>
+<li>JSONPポーリング</li>
+<li>Flashのソケット通信</li>
+</ul>
+
+
+<p>上記のように、広い通信方式に対応しているので、<br/>
+基本的に、主要ブラウザを含めIE5.5といった古いブラウザでも利用可能となります。 <br/>
+また通信方式を特定して接続させることも可能です。</p>
+
+<p>特にWebSocketは、サーバーとの接続が軽減されより高速な動作が可能となります。
+以下がWebSocketに対応しているブラウザです。<br/>
+IE9以前、Android4.3以前を除く、多くの現行ブラウザがWebSocketに対応しています。(2015/2/7現在)</p>
+
+<table width="100%" style="text-align: center; margin-bottom: 15px;">
+    <tr>
+        <td style="background-color:#efefef; text-align:center;" colspan="5">PC</td>
+    </tr>
+    <tr>
+        <td style="padding:5px; text-align: center;">Chrome16+</td>
+        <td style="padding:5px; text-align: center;">Firefox11+</td>
+        <td style="padding:5px; text-align: center;">Safari7+</td>
+        <td style="padding:5px; text-align: center;">Opera12.1+</td>
+        <td style="padding:5px; text-align: center;">IE10+</td>
+    </tr>
+</table>
+
+
+<table width="100%" style="text-align: center; margin-bottom: 15px;">
+    <tr>
+        <td style="background-color:#efefef; text-align:center;" colspan="3">スマートフォン</td>
+    </tr>
+    <tr>
+        <td style="padding:5px; text-align: center;">iOS Safari6.1+</td>
+        <td style="padding:5px; text-align: center;">Android Browser4.4+</td>
+        <td style="padding:5px; text-align: center;">Chrome for Android40+</td>
+    </tr>
+</table>
+
+
+<p></p>
+
+<h2>Web Audio API</h2>
+
+<p>音声を再生、処理する為のJavaScript APIです。<br/>
+音声の再生、ボリューム調整などに加えて、合成やフィルターなど複雑なエフェクトが可能となります。</p>
+
+<p>以下がWebAudioAPIに対応しているブラウザです。<br/>
+IE、Android Browserを除く、多くのブラウザがWebAudioAPIに対応しています。(2015/2/7現在)</p>
+
+<table width="100%" style="text-align: center; margin-bottom: 15px;">
+    <tr>
+        <td style="background-color:#efefef; text-align:center;" colspan="5">PC</td>
+    </tr>
+    <tr>
+        <td style="padding:5px; text-align: center;">Chrome10+</td>
+        <td style="padding:5px; text-align: center;">Firefox25+</td>
+        <td style="padding:5px; text-align: center;">Safari6+</td>
+        <td style="padding:5px; text-align: center;">Opera15+</td>
+        <td style="padding:5px; text-align: center;">IE 未サポート (<a href="https://status.modern.ie/webaudioapi">開発中</a>)</td>
+    </tr>
+</table>
+
+
+<table width="100%" style="text-align: center; margin-bottom: 15px;">
+    <tr>
+        <td style="background-color:#efefef; text-align:center;" colspan="3">スマートフォン</td>
+    </tr>
+    <tr>
+        <td style="padding:5px; text-align: center;">iOS Safari6.1+</td>
+        <td style="padding:5px; text-align: center;">Android Broser 未サポート</td>
+        <td style="padding:5px; text-align: center;">Chrome for Android40+</td>
+    </tr>
+</table>
+
+
+<h2>Heroku</h2>
+
+<p>アプリケーションを稼働させるためのプラットフォームです。<br/>
+Node.js,Java,Ruby,PHP,Pythonなど様々な言語をサポートしていて、<br/>
+基本的な機能を使っている限り無料でWebサイトを公開する事ができます。<br/>
+<br></p>
+
+<h1>ソースの解説</h1>
+
+<h3>web.js(Node.js + Socket.IO)[サーバ側]</h3>
+
+<p><strong>HTTPサーバを作りルーティング、Socket.IOを設定</strong><br/>
+web.jsでは、Node.js(express)でHTTPサーバを作り、静的ファイルの保管場所(css,js,音声ファイルなど誰でも閲覧可能なPublicな場所)を指定して、ルートにアクセスがあったらindex.htmlを表示するルーティングを設定しています。<br/>
+またSocket.IOでは、クライアントから&#8221;from_client&#8221;がくるのを監視し、接続があったら&#8221;from_server&#8221;を返答する設定をしています。</p>
+
+<figure class='code'><figcaption><span>web.js</span><a href='https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/web.js'>source </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// express + socket.io</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;express&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">(),</span>
+</span><span class='line'>  <span class="nx">server</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">).</span><span class="nx">createServer</span><span class="p">(</span><span class="nx">app</span><span class="p">),</span>
+</span><span class='line'>  <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">),</span>
+</span><span class='line'>  <span class="nx">io</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;socket.io&#39;</span><span class="p">).</span><span class="nx">listen</span><span class="p">(</span><span class="nx">server</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">8000</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 静的ファイルの場所を指定する(この配下で、CSS,JS,IMG,音声ファイルなどの静的ファイルが使用可能に)</span>
+</span><span class='line'><span class="c1">// 通常 &#39;/public&#39; などに静的ファイルを置くが /socket.io/socket.io.js が404になってしまった為 &#39;/&#39; に変更</span>
+</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="kr">static</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)));</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// ルートにアクセスがあったらindex.htmlを表示する</span>
+</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">sendFile</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/index.html&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Herokuは下記を入れないとSocket.ioが動かない情報がWebにあったが、なくても動くよう(WebSocketに対応されたからか)</span>
+</span><span class='line'><span class="c1">// io.configure(function () { </span>
+</span><span class='line'><span class="c1">//   io.set(&quot;transports&quot;, [&quot;xhr-polling&quot;]); </span>
+</span><span class='line'><span class="c1">//   io.set(&quot;polling duration&quot;, 10); </span>
+</span><span class='line'><span class="c1">// });</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// io.set(&#39;log level&#39;, 1); // デフォルトは自動で出るデバック情報を出さない(ローカルでデバックする際に使用)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// クライアント(index.html)からの接続を監視</span>
+</span><span class='line'><span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;connection&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// クライアントから &quot;from_client&quot; が送られてきたら</span>
+</span><span class='line'>  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;from_client&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// console.log(id);</span>
+</span><span class='line'>      
+</span><span class='line'>      <span class="c1">// 接続しているソケットのみにidを送信する</span>
+</span><span class='line'>      <span class="c1">// socket.emit(&quot;from_server&quot;, id);</span>
+</span><span class='line'>      
+</span><span class='line'>      <span class="c1">// 接続しているソケット以外全てにidを送信する</span>
+</span><span class='line'>      <span class="c1">//socket.broadcast.emit(&quot;from_server&quot;, id);</span>
+</span><span class='line'>      
+</span><span class='line'>      <span class="c1">// 接続しているソケット含めて全部にidを送信する(送ってきたクライアント含めて全てのクライアントに送信)</span>
+</span><span class='line'>      <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s2">&quot;from_server&quot;</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<h3>index.html(Web Audio API + Socke.IO)[クライアント側]</h3>
+
+<p><strong>Socket.IOの読み込みと接続</strong><br/>
+index.htmlでは、まずSocket.IOを使えるようにsocket.io.jsを読み込みます。<br/>
+自動で生成されるファイルなので準備する必要はありません。<br/>
+指定したURLで、Socket.IOに接続させます。</p>
+
+<figure class='code'><figcaption><span>index.html</span><a href='https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L135-L141'>source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;/socket.io/socket.io.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'><span class="nt">&lt;script&gt;</span>
+</span><span class='line'>;(function (window, undefined) {
+</span><span class='line'>  
+</span><span class='line'>  // socket.ioに接続する
+</span><span class='line'>  // var socketio = io.connect(&#39;http://localhost:8000&#39;); // localで試す時
+</span><span class='line'>  var socketio = io.connect(&#39;https://nodejs-socketio-webaudio.herokuapp.com/&#39;); // Herokuで試す時
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<p><strong>スプラッシュ画像を押して再生したい音声データをセット</strong><br/>
+iPhone/Androidでは、最初の音声ロードだけはユーザーアクション(クリックなど)が必要な制約がある為、
+最初にスプラッシュ画像を準備し、タップされた時に音声データを再生可能な状態にセットします。<br/>
+※PCでは、この制約はありません。</p>
+
+<figure class='code'><figcaption><span>index.html</span><a href='https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L250-L263'>source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>// スプラッシュ画像を押した時に音声データをロード
+</span><span class='line'>// iPhone/Androidで最初の音声ロードだけはユーザーアクションが必要な制約がある為(PCにはこの制約はなさそう)
+</span><span class='line'>splashImage.addEventListener(eventNames.start, function(){
+</span><span class='line'>  // 音声データをセット
+</span><span class='line'>  drumObj.kick.set();
+</span><span class='line'>  drumObj.cymbal.set();
+</span><span class='line'>  drumObj.hat.set();
+</span><span class='line'>  drumObj.snare.set();
+</span><span class='line'>  
+</span><span class='line'>  // スプラッシュ画像をフェードアウト
+</span><span class='line'>  this.className = &#39;fade-out&#39;;
+</span><span class='line'>  this.addEventListener(&quot;webkitAnimationEnd&quot;, function(){ this.className = &quot;none&quot;; });
+</span><span class='line'>  this.addEventListener(&quot;animationend&quot;, function(){ this.className = &quot;none&quot;; });
+</span><span class='line'>});
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<p><strong>ボタンが押された時にサーバ側に通知</strong><br/>
+ボタンが押されたらサーバに&#8221;from_client&#8221;を送信し、押したボタンidを送ります。<br/>
+※どのボタンが押されたかを全クライアントに通知させる為。</p>
+
+<figure class='code'><figcaption><span>index.html</span><a href='https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L215-L216'>source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>// クライアントからサーバーにボタンidを送る
+</span><span class='line'>socketio.emit(&quot;from_client&quot;, this.id);
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<p><strong>サーバ側からの返答をチェックし、音声を再生</strong><br/>
+サーバに&#8221;from_client&#8221;を送信すると、&#8221;from_server&#8221;を返答してもらうようにサーバ側で設定しているので、
+&ldquo;from_server&#8221;がくるのを監視し、返答があったら受け取ったボタンidの音声を再生します。</p>
+
+<figure class='code'><figcaption><span>index.html</span><a href='https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/index.html#L265-L279'>source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>// サーバーから &quot;from_server&quot; が送られてくるのを監視
+</span><span class='line'>socketio.on(&quot;from_server&quot;, function(id){
+</span><span class='line'>  // サーバーから返されたid(buttonのid名)から音声を再生
+</span><span class='line'>  // start()だけを複数回実行出来ない仕様のようなので、毎回createBufferSource()してから再生
+</span><span class='line'>  drumObj[id].source = drumObj[id].context.createBufferSource();
+</span><span class='line'>  drumObj[id].source.buffer = drumObj[id].buffer;
+</span><span class='line'>  drumObj[id].source.connect(drumObj[id].context.destination);
+</span><span class='line'>  drumObj[id].source.start(0);
+</span><span class='line'>  
+</span><span class='line'>  // ポップアップを表示
+</span><span class='line'>  result.className = &quot;popup&quot;;
+</span><span class='line'>  result.innerHTML = id + &#39;!&#39;;
+</span><span class='line'>  result.addEventListener(&quot;webkitAnimationEnd&quot;, function(){
+</span><span class='line'>      result.className = &quot;&quot;;
+</span><span class='line'>  });
+</span><span class='line'>});
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<h1>Herokuにデプロイ</h1>
+
+<p>Node.jsで作ったアプリケーションを、Herokuにデプロイする際は、こちらが参考になりました。</p>
+
+<ul>
+<li><a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs#introduction">Getting Started with Node.js on Heroku</a></li>
+<li><a href="http://tacamy.hatenablog.com/entry/2013/02/16/235127">Node.js + Express を Heroku で動かすまでの手順まとめ</a></li>
+</ul>
+
+
+<p>またHeroku上でNode.jsを実行する際は、package.jsonに下記の記述をします。<br/>
+※もしくはProcfileを準備。</p>
+
+<figure class='code'><figcaption><span>package.json</span><a href='https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/package.json#L12-L14'>source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="s2">&quot;scripts&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;start&quot;</span><span class="o">:</span> <span class="s2">&quot;node web.js&quot;</span>
+</span><span class='line'><span class="p">},</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<h1>ハマったところ</h1>
+
+<h2>モバイル端末で音がならなかった</h2>
+
+<p>PC上では音がなったが、なぜかiPhone上で音声再生ができなくハマりました..</p>
+
+<h3>解決方法</h3>
+
+<p>使っていたNode.js,Socket.IOのバージョンが古く対応してなかったようです。
+package.json記載のバージョンを下記にしたところ問題なく再生する事ができました。</p>
+
+<figure class='code'><figcaption><span>package.json</span><a href='https://github.com/front-core/nodejs-socketio-webaudio-sample/blob/master/package.json#L6-L10'>source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="s2">&quot;socket.io&quot;</span><span class="o">:</span><span class="s2">&quot;1.3.3&quot;</span>
+</span><span class='line'><span class="s2">&quot;node&quot;</span><span class="o">:</span> <span class="s2">&quot;0.11.11&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<h2>Herokuをよく理解していなかった</h2>
+
+<p>HerokuでWebアプリを公開出来る事は知っていましたが、実際に試したりしていなかったので、その使い方でハマりました..</p>
+
+<h3>解決方法</h3>
+
+<p>サイトを参考にサンプルサイトを公開していく事でだいぶ理解出来ました。</p>
+
+<p>参考になった記事</p>
+
+<ul>
+<li><a href="http://developers.mobage.jp/blog/how-to-use-for-beginners-heroku">初心者でも15分で公開できるHerokuのはじめかた</a></li>
+<li><a href="http://qiita.com/yoh-nak/items/80e51197410c7f956ccd">Node.jsをHerokuにデプロイ</a></li>
+<li><a href="http://dotinstall.com/lessons/basic_heroku">Heroku入門 | ドットインストール</a></li>
+</ul>
+
+
+<p><br></p>
+
+<h1>課題</h1>
+
+<h2>複数デバイス間での音の完全な一致が難しい</h2>
+
+<p>ローカルで試している時はほぼ一致させる事が出来ても、Web公開した環境だと少し遅れて再生されてしまっていました。<br/>
+完全な一致が難しいまでも、出来るだけ一致する状態にしたいのですが、打ち手がよくわかっていません。<br/>
+<br></p>
+
+<h1>まとめ</h1>
+
+<p>リアルタイム通信して複数デバイス上で音声を再生する方法を解説していきました。<br/>
+オンラインゲームや音楽アプリ、チャットなど様々な用途が考えられます。</p>
+
+<p>非常に少ないコードで実現出来た反面、複数デバイス間で音を完全に一致させる事など、課題もまだまだあります。<br/>
+その辺りの課題が解決したら、また紹介させて頂きます。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[OpenFrameworks+ArduinoでLチカ]]></title>
@@ -534,187 +1422,1322 @@
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[爆速の HTML5 クロス・プラットフォーム CocoonJS]]></title>
-    <link href="http://front-core.org/ja/blog/2014/12/16/about-cocoonjs/"/>
-    <updated>2014-12-16T00:00:00+09:00</updated>
-    <id>http://front-core.org/ja/blog/2014/12/16/about-cocoonjs</id>
-    <content type="html"><![CDATA[<p>CocoonJS は <a href="https://www.ludei.com/">Ludei</a> 社が提供する爆速の「HTML5 クロス・プラットフォーム」です。</p>
-
-<p>HTML5 クロス・プラットフォームは他にも色々ありますが、CocoonJS は PhoneGap に似ています。
-HTML / CSS / JS をネイティブコードに変換するのでは無く、そのまま実行環境で動かす仕組みです。</p>
+    <title type="html"><![CDATA[ブラウザで楽器も作れる！Web Audio API でドラムを作成]]></title>
+    <link href="http://front-core.org/ja/blog/2015/01/05/web-audio-api-drums/"/>
+    <updated>2015-01-05T00:00:00+09:00</updated>
+    <id>http://front-core.org/ja/blog/2015/01/05/web-audio-api-drums</id>
+    <content type="html"><![CDATA[<p>今回は､ Web Audio API を紹介させて頂きます｡<br/>
+機能を簡潔に確認するため、 シンプルなドラムを実際に作ってみました。</p>
 
 <!-- more -->
 
 
-<h1>CocoonJS vs PhoneGap</h1>
+<h1>Web Audio API とは</h1>
 
-<p>HTML / CSS / JS をそのまま使える点では同じですが、
-PhoneGap がシステムの WebView を使うのに対し、CocoonJS は独自の実行環境を持っています。</p>
+<p>Web Audio API とは､ 音声ファイルを単に再生するだけでなく、 処理・合成することができる、 Webアプリケーション向けの高度なJavaScript API です。<br/>
+今回は､ オーディオファイルを再生するまでの紹介ですが､ JavaScript を使用して様々な音を作ることができます。</p>
 
-<p>システム WebView はとにかくパフォーマンスが悪く、OS や機種依存により挙動が違うなどの問題がありますが、
-CocoonJS は独自の実行環境で動作するため OS や機種依存の問題を解消し、
-システム WebView に比べて圧倒的に早いです。</p>
+<h1>デモ</h1>
+
+<p>完成デモは<a href="https://web-audio-api-drums-sample.herokuapp.com/">こちら</a>です｡ぜひスマートフォンでご確認ください｡</p>
+
+<h2>QRコード</h2>
 
 <p><span class="block-center">
-<a href="https://www.ludei.com/landing/cocoonjs-phonegap/"><img src="http://front-core.org/images/post/about-cocoonjs/cocoonjs-vs-phonegap.png" alt="CocoonJS vs PhoneGap" /></a>
-<span style="float:right">（Comparing CocoonJS and PhoneGap  - <a href="https://www.ludei.com/">Ludei</a> サイトより）</span>
+<img src="http://front-core.org/images/post/web-audio-api-drums/qr-go-to-site.gif" width="150" alt="QRコード" />
 </span></p>
 
-<h1>CocoonJS が素敵な理由</h1>
+<h2>画面キャプチャ</h2>
 
-<p>CocoonJS が素敵な理由をいくつか挙げてみます。</p>
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/web-audio-api-drums/capture-site.png" width="320" alt="ドラムサンプル" />
+</span></p>
 
-<!--（参照：[About CocoonJS](https://www.ludei.com/cocoonjs/)）-->
+<h1>コード</h1>
 
+<p>html5rocksのチュートリアルを見ながら実装しています｡<br/>
+より詳しい解説はこちらをご参照ください｡</p>
 
 <ul>
-<li>爆速の HTML5 実行環境</li>
-<li>今までの WEB 開発フレームワークやライブラリーをそのまま使える</li>
-<li>簡単に実機でテストやデバッグができる</li>
-<li>様々のプラットフォームに簡単に配布できる</li>
-<li>アプリ運用に関わる便利なツールや拡張機能が備わっている</li>
+<li><a href="http://www.html5rocks.com/ja/tutorials/webaudio/intro/">Web Audio API の基礎</a></li>
 </ul>
 
 
-<h2>爆速の HTML5 実行環境</h2>
-
-<p>CocoonJS では現在異なる３つの実行環境を提供しており、用途に合わせて最適な実行環境を選ぶ事ができます。</p>
+<p>下記リンクも参考にさせて頂きました｡</p>
 
 <ul>
-<li><a href="http://support.ludei.com/hc/en-us/articles/202321098">Canvas+</a></li>
-<li><a href="http://support.ludei.com/hc/en-us/articles/201952993">WebView+</a></li>
-<li><a href="http://support.ludei.com/hc/en-us/articles/202321108-Apache-Cordova-Promo">Apache Cordova</a></li>
+<li><a href="http://qiita.com/fnobi/items/2f08a67800dec1d61f21">WebAudioAPIで遊べるようになった</a></li>
+<li><a href="http://qiita.com/sou/items/5688d4e7d3a37b4e2ff1">Mobile Safari, Chrome for Android での Web Audio API 覚え書き</a></li>
 </ul>
 
 
-<h3>Canvas+</h3>
+<figure class='code'><figcaption><span>index.html</span><a href='https://github.com/front-core/web-audio-api-drums-sample/blob/master/index.html#L69-L160'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">;(</span><span class="kd">function</span> <span class="p">(</span><span class="nb">window</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">isTouchDevice</span> <span class="o">=</span> <span class="s1">&#39;ontouchend&#39;</span> <span class="k">in</span> <span class="nb">document</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">eventNames</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">start</span><span class="o">:</span> <span class="nx">isTouchDevice</span> <span class="o">?</span> <span class="s1">&#39;touchstart&#39;</span> <span class="o">:</span> <span class="s1">&#39;mousedown&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">move</span><span class="o">:</span>  <span class="nx">isTouchDevice</span> <span class="o">?</span> <span class="s1">&#39;touchmove&#39;</span>  <span class="o">:</span> <span class="s1">&#39;mousemove&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">end</span><span class="o">:</span>   <span class="nx">isTouchDevice</span> <span class="o">?</span> <span class="s1">&#39;touchend&#39;</span>   <span class="o">:</span> <span class="s1">&#39;mouseup&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">click</span><span class="o">:</span> <span class="s1">&#39;click&#39;</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'>  <span class="kd">function</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="nx">ele</span><span class="p">,</span> <span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// WebKitのブラウザではプリフィックスをつける</span>
+</span><span class='line'>      <span class="nb">window</span><span class="p">.</span><span class="nx">AudioContext</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">AudioContext</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">webkitAudioContext</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">try</span> <span class="p">{</span>
+</span><span class='line'>          <span class="c1">// AudioContextはすべての音声の再生を管理しています</span>
+</span><span class='line'>          <span class="c1">// インスタンス化してメソッドを使用します</span>
+</span><span class='line'>          <span class="k">this</span><span class="p">.</span><span class="nx">context</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioContext</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="c1">// Web Audio API 非対応のブラウザではalertを出します</span>
+</span><span class='line'>          <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Web Audio API is not supported in this browser&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">ele</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="nx">ele</span><span class="p">);</span>
+</span><span class='line'>      <span class="c1">// 引数からオーディオファイルのurlを受け取ります</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">url</span> <span class="o">=</span> <span class="nx">url</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">buffer</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="nx">AudioBufferLoader</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">loadBuffer</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+</span><span class='line'>          <span class="nx">request</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+</span><span class='line'>          <span class="c1">// arraybuffer は  XMLHttpRequest Level 2 の仕様です｡音声などのバイナリデータを処理します</span>
+</span><span class='line'>          <span class="nx">request</span><span class="p">.</span><span class="nx">responseType</span> <span class="o">=</span> <span class="s1">&#39;arraybuffer&#39;</span><span class="p">;</span>
+</span><span class='line'>          <span class="nx">request</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>              <span class="nx">_this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">decodeAudioData</span><span class="p">(</span>
+</span><span class='line'>                  <span class="nx">request</span><span class="p">.</span><span class="nx">response</span><span class="p">,</span>
+</span><span class='line'>                  <span class="kd">function</span><span class="p">(</span><span class="nx">buffer</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                      <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nx">buffer</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                          <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;error decodeing file data: &#39;</span> <span class="o">+</span> <span class="nx">url</span><span class="p">);</span>
+</span><span class='line'>                          <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>                      <span class="p">}</span>
+</span><span class='line'>                      <span class="nx">_this</span><span class="p">.</span><span class="nx">buffer</span> <span class="o">=</span> <span class="nx">buffer</span><span class="p">;</span>
+</span><span class='line'>                      <span class="nx">_this</span><span class="p">.</span><span class="nx">events</span><span class="p">();</span>
+</span><span class='line'>                  <span class="p">},</span>
+</span><span class='line'>                  <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                      <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">&#39;decodeAudioData error&#39;</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
+</span><span class='line'>                  <span class="p">}</span>
+</span><span class='line'>              <span class="p">);</span>
+</span><span class='line'>          <span class="p">};</span>
+</span><span class='line'>          <span class="nx">request</span><span class="p">.</span><span class="nx">onerror</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>              <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;AudioBufferLoader: XHR error&#39;</span><span class="p">);</span>
+</span><span class='line'>          <span class="p">};</span>
+</span><span class='line'>          <span class="nx">request</span><span class="p">.</span><span class="nx">send</span><span class="p">();</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">events</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">context</span> <span class="o">=</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">context</span><span class="p">;</span>
+</span><span class='line'>          <span class="nx">_this</span><span class="p">.</span><span class="nx">ele</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="nx">eventNames</span><span class="p">.</span><span class="nx">start</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">this</span><span class="p">.</span><span class="nx">className</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'>              <span class="c1">// source は再生の度に生成する必要があります</span>
+</span><span class='line'>              <span class="kd">var</span> <span class="nx">source</span> <span class="o">=</span> <span class="nx">context</span><span class="p">.</span><span class="nx">createBufferSource</span><span class="p">();</span>
+</span><span class='line'>              <span class="nx">source</span><span class="p">.</span><span class="nx">buffer</span> <span class="o">=</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">buffer</span><span class="p">;</span>
+</span><span class='line'>              <span class="nx">source</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nx">destination</span><span class="p">);</span>
+</span><span class='line'>              <span class="c1">// noteOn は古い書き方なので､start を使う</span>
+</span><span class='line'>              <span class="c1">// ここで音が鳴ります</span>
+</span><span class='line'>              <span class="nx">source</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>              <span class="k">this</span><span class="p">.</span><span class="nx">className</span> <span class="o">=</span> <span class="s1">&#39;tap&#39;</span><span class="p">;</span>
+</span><span class='line'>          <span class="p">});</span>
+</span><span class='line'>          <span class="nx">_this</span><span class="p">.</span><span class="nx">ele</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="nx">eventNames</span><span class="p">.</span><span class="nx">end</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">this</span><span class="p">.</span><span class="nx">className</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'>          <span class="p">});</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">load</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>          <span class="nx">_this</span><span class="p">.</span><span class="nx">loadBuffer</span><span class="p">(</span><span class="nx">_this</span><span class="p">.</span><span class="nx">url</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// 音声ファイルをロード</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">kick</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="s1">&#39;kick&#39;</span><span class="p">,</span> <span class="s1">&#39;sound/kick.m4a&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">kick</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">cymbal</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="s1">&#39;cymbal&#39;</span><span class="p">,</span> <span class="s1">&#39;sound/cymbal.m4a&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">cymbal</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">hat</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="s1">&#39;hat&#39;</span><span class="p">,</span> <span class="s1">&#39;sound/hat.m4a&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">hat</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">snare</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="s1">&#39;snare&#39;</span><span class="p">,</span> <span class="s1">&#39;sound/snare.m4a&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">snare</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
+</span><span class='line'><span class="p">}(</span><span class="k">this</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>おわり</h1>
+
+<p>やっぱり音が鳴ると楽しいですね。</p>
+
+<p>chrome版のAngry Birds は､ Web Audio API を使用しているそうです｡<br/>
+<a href="http://chrome.angrybirds.com/">Angry Birds for Chrome</a></p>
+
+<p>今回はドラムを作ってみましたが、 他の楽器も今後制作予定ですので、 また当ブログで実装方法を紹介できたらと思います。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ブラウザで楽器も作れる！Web Audio API でドラムを作成]]></title>
+    <link href="http://front-core.org/en/blog/2015/01/05/web-audio-api-drums/"/>
+    <updated>2015-01-05T00:00:00+09:00</updated>
+    <id>http://front-core.org/en/blog/2015/01/05/web-audio-api-drums</id>
+    <content type="html"><![CDATA[<p>今回は､ Web Audio API を紹介させて頂きます｡<br/>
+機能を簡潔に確認するため、 シンプルなドラムを実際に作ってみました。</p>
+
+<!-- more -->
+
+
+<h1>Web Audio API とは</h1>
+
+<p>Web Audio API とは､ 音声ファイルを単に再生するだけでなく、 処理・合成することができる、 Webアプリケーション向けの高度なJavaScript API です。<br/>
+今回は､ オーディオファイルを再生するまでの紹介ですが､ JavaScript を使用して様々な音を作ることができます。</p>
+
+<h1>デモ</h1>
+
+<p>完成デモは<a href="https://web-audio-api-drums-sample.herokuapp.com/">こちら</a>です｡ぜひスマートフォンでご確認ください｡</p>
+
+<h2>QRコード</h2>
 
 <p><span class="block-center">
-<a href="http://support.ludei.com/hc/en-us/articles/202321098"><img src="http://front-core.org/images/post/about-cocoonjs/canvas-plus-promo.png" alt="Canvas+" /></a>
+<img src="http://front-core.org/images/post/web-audio-api-drums/qr-go-to-site.gif" width="150" alt="QRコード" />
 </span></p>
 
-<p>HTML5 Canvas アプリやゲームに最適な実行環境です。
-Canvas 描画に特化された Canvas+ の JavaScript 実行速度は、他のブラウザーやシステム WebView に比べて 10倍は早いと言われています。</p>
-
-<p>iOS 5, Android 2.3 以上であれば WebGL もサポートされるので更に爆速です！</p>
-
-<h3>WebView+</h3>
+<h2>画面キャプチャ</h2>
 
 <p><span class="block-center">
-<a href="http://support.ludei.com/hc/en-us/articles/201952993"><img src="http://front-core.org/images/post/about-cocoonjs/webview-plus-promo.png" alt="WebView+" /></a>
+<img src="http://front-core.org/images/post/web-audio-api-drums/capture-site.png" width="320" alt="ドラムサンプル" />
 </span></p>
 
-<p>Chromium で作られた独自の WebView として、主に Android 向けに開発された実行環境です。
-Chromium を元にしているのでシステム WebView より端然早く、機種や OS バージョン毎の差異を気にしなくて済みます。
-(Android 4 以上)</p>
+<h1>コード</h1>
 
-<p>iOS 8 以前の iOS では WebView+ はサポートされてませんでしたが、
-iOS 8 からは WKWebView を基盤にした WebView+ がサポートされる様になりました。</p>
+<p>html5rocksのチュートリアルを見ながら実装しています｡<br/>
+より詳しい解説はこちらをご参照ください｡</p>
 
-<h3>Apache Cordova</h3>
+<ul>
+<li><a href="http://www.html5rocks.com/ja/tutorials/webaudio/intro/">Web Audio API の基礎</a></li>
+</ul>
+
+
+<p>下記リンクも参考にさせて頂きました｡</p>
+
+<ul>
+<li><a href="http://qiita.com/fnobi/items/2f08a67800dec1d61f21">WebAudioAPIで遊べるようになった</a></li>
+<li><a href="http://qiita.com/sou/items/5688d4e7d3a37b4e2ff1">Mobile Safari, Chrome for Android での Web Audio API 覚え書き</a></li>
+</ul>
+
+
+<figure class='code'><figcaption><span>index.html</span><a href='https://github.com/front-core/web-audio-api-drums-sample/blob/master/index.html#L69-L160'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">;(</span><span class="kd">function</span> <span class="p">(</span><span class="nb">window</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">isTouchDevice</span> <span class="o">=</span> <span class="s1">&#39;ontouchend&#39;</span> <span class="k">in</span> <span class="nb">document</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">eventNames</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">start</span><span class="o">:</span> <span class="nx">isTouchDevice</span> <span class="o">?</span> <span class="s1">&#39;touchstart&#39;</span> <span class="o">:</span> <span class="s1">&#39;mousedown&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">move</span><span class="o">:</span>  <span class="nx">isTouchDevice</span> <span class="o">?</span> <span class="s1">&#39;touchmove&#39;</span>  <span class="o">:</span> <span class="s1">&#39;mousemove&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">end</span><span class="o">:</span>   <span class="nx">isTouchDevice</span> <span class="o">?</span> <span class="s1">&#39;touchend&#39;</span>   <span class="o">:</span> <span class="s1">&#39;mouseup&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">click</span><span class="o">:</span> <span class="s1">&#39;click&#39;</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'>  <span class="kd">function</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="nx">ele</span><span class="p">,</span> <span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// WebKitのブラウザではプリフィックスをつける</span>
+</span><span class='line'>      <span class="nb">window</span><span class="p">.</span><span class="nx">AudioContext</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">AudioContext</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">webkitAudioContext</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">try</span> <span class="p">{</span>
+</span><span class='line'>          <span class="c1">// AudioContextはすべての音声の再生を管理しています</span>
+</span><span class='line'>          <span class="c1">// インスタンス化してメソッドを使用します</span>
+</span><span class='line'>          <span class="k">this</span><span class="p">.</span><span class="nx">context</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioContext</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="c1">// Web Audio API 非対応のブラウザではalertを出します</span>
+</span><span class='line'>          <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Web Audio API is not supported in this browser&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">ele</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="nx">ele</span><span class="p">);</span>
+</span><span class='line'>      <span class="c1">// 引数からオーディオファイルのurlを受け取ります</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">url</span> <span class="o">=</span> <span class="nx">url</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">buffer</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="nx">AudioBufferLoader</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">loadBuffer</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+</span><span class='line'>          <span class="nx">request</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+</span><span class='line'>          <span class="c1">// arraybuffer は  XMLHttpRequest Level 2 の仕様です｡音声などのバイナリデータを処理します</span>
+</span><span class='line'>          <span class="nx">request</span><span class="p">.</span><span class="nx">responseType</span> <span class="o">=</span> <span class="s1">&#39;arraybuffer&#39;</span><span class="p">;</span>
+</span><span class='line'>          <span class="nx">request</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>              <span class="nx">_this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">decodeAudioData</span><span class="p">(</span>
+</span><span class='line'>                  <span class="nx">request</span><span class="p">.</span><span class="nx">response</span><span class="p">,</span>
+</span><span class='line'>                  <span class="kd">function</span><span class="p">(</span><span class="nx">buffer</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                      <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nx">buffer</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                          <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;error decodeing file data: &#39;</span> <span class="o">+</span> <span class="nx">url</span><span class="p">);</span>
+</span><span class='line'>                          <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>                      <span class="p">}</span>
+</span><span class='line'>                      <span class="nx">_this</span><span class="p">.</span><span class="nx">buffer</span> <span class="o">=</span> <span class="nx">buffer</span><span class="p">;</span>
+</span><span class='line'>                      <span class="nx">_this</span><span class="p">.</span><span class="nx">events</span><span class="p">();</span>
+</span><span class='line'>                  <span class="p">},</span>
+</span><span class='line'>                  <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                      <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">&#39;decodeAudioData error&#39;</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
+</span><span class='line'>                  <span class="p">}</span>
+</span><span class='line'>              <span class="p">);</span>
+</span><span class='line'>          <span class="p">};</span>
+</span><span class='line'>          <span class="nx">request</span><span class="p">.</span><span class="nx">onerror</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>              <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;AudioBufferLoader: XHR error&#39;</span><span class="p">);</span>
+</span><span class='line'>          <span class="p">};</span>
+</span><span class='line'>          <span class="nx">request</span><span class="p">.</span><span class="nx">send</span><span class="p">();</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">events</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">context</span> <span class="o">=</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">context</span><span class="p">;</span>
+</span><span class='line'>          <span class="nx">_this</span><span class="p">.</span><span class="nx">ele</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="nx">eventNames</span><span class="p">.</span><span class="nx">start</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">this</span><span class="p">.</span><span class="nx">className</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'>              <span class="c1">// source は再生の度に生成する必要があります</span>
+</span><span class='line'>              <span class="kd">var</span> <span class="nx">source</span> <span class="o">=</span> <span class="nx">context</span><span class="p">.</span><span class="nx">createBufferSource</span><span class="p">();</span>
+</span><span class='line'>              <span class="nx">source</span><span class="p">.</span><span class="nx">buffer</span> <span class="o">=</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">buffer</span><span class="p">;</span>
+</span><span class='line'>              <span class="nx">source</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nx">destination</span><span class="p">);</span>
+</span><span class='line'>              <span class="c1">// noteOn は古い書き方なので､start を使う</span>
+</span><span class='line'>              <span class="c1">// ここで音が鳴ります</span>
+</span><span class='line'>              <span class="nx">source</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>              <span class="k">this</span><span class="p">.</span><span class="nx">className</span> <span class="o">=</span> <span class="s1">&#39;tap&#39;</span><span class="p">;</span>
+</span><span class='line'>          <span class="p">});</span>
+</span><span class='line'>          <span class="nx">_this</span><span class="p">.</span><span class="nx">ele</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="nx">eventNames</span><span class="p">.</span><span class="nx">end</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">this</span><span class="p">.</span><span class="nx">className</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'>          <span class="p">});</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">load</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>          <span class="nx">_this</span><span class="p">.</span><span class="nx">loadBuffer</span><span class="p">(</span><span class="nx">_this</span><span class="p">.</span><span class="nx">url</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// 音声ファイルをロード</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">kick</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="s1">&#39;kick&#39;</span><span class="p">,</span> <span class="s1">&#39;sound/kick.m4a&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">kick</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">cymbal</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="s1">&#39;cymbal&#39;</span><span class="p">,</span> <span class="s1">&#39;sound/cymbal.m4a&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">cymbal</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">hat</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="s1">&#39;hat&#39;</span><span class="p">,</span> <span class="s1">&#39;sound/hat.m4a&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">hat</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">snare</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioBufferLoader</span><span class="p">(</span><span class="s1">&#39;snare&#39;</span><span class="p">,</span> <span class="s1">&#39;sound/snare.m4a&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">snare</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
+</span><span class='line'><span class="p">}(</span><span class="k">this</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>おわり</h1>
+
+<p>やっぱり音が鳴ると楽しいですね。</p>
+
+<p>chrome版のAngry Birds は､ Web Audio API を使用しているそうです｡<br/>
+<a href="http://chrome.angrybirds.com/">Angry Birds for Chrome</a></p>
+
+<p>今回はドラムを作ってみましたが、 他の楽器も今後制作予定ですので、 また当ブログで実装方法を紹介できたらと思います。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[CocoonJS Launcher の使い方]]></title>
+    <link href="http://front-core.org/en/blog/2015/01/05/cocoonjs-launcher/"/>
+    <updated>2015-01-05T00:00:00+09:00</updated>
+    <id>http://front-core.org/en/blog/2015/01/05/cocoonjs-launcher</id>
+    <content type="html"><![CDATA[<p>CocoonJS Launcher は CocoonJS 用に開発してアプリやゲームを、簡単に実機でテスト・デバッグできるアプリです。
+現在 iOS 版と Android 版があります。</p>
 
 <p><span class="block-center">
-<a href="http://support.ludei.com/hc/en-us/articles/202321108-Apache-Cordova-Promo"><img src="http://front-core.org/images/post/about-cocoonjs/apache-cordova-promo.png" alt="Apache Cordova" /></a>
+&nbsp;
+<a href="https://itunes.apple.com/en/app/cocoonjs-by-ludei/id519623307?mt=8"><img src="http://front-core.org/images/post/cocoonjs-launcher/app-store.png" height="60" width="172" alt="CocoonJS Launcher - iOS 版" /></a>
+&nbsp;
+<a href="https://play.google.com/store/apps/details?id=com.ideateca.cocoonjslauncher&amp;hl=en"><img src="http://front-core.org/images/post/cocoonjs-launcher/google-play.png" height="60" width="172" alt="CocoonJS Launcher - Android 版" /></a>
+&nbsp;
 </span></p>
 
-<p>上記の「CocoonJS vs PhoneGap」比較テーブルの一番下に「Cordova extensions」と書いている様に、
-CocoonJS は Apache Cordova を正式にサポートしていて、Cordova の無数のプラグインと CocoonJS を組み合わせる事が可能です。</p>
+<!-- more -->
 
-<p>現在 Cordova に対応した CocoonJS 実行環境は WebView+ のみで、Canvas+ は対応予定になっています。</p>
+
+<h1>メインメニュー</h1>
+
+<p>CocoonJS Launcher アプリを立ち上げると、スプラッシュスクリーンの後にメインメニュー画面が表示されます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/main-menu.png" width="320" alt="メインメニュー" />
+</span></p>
+
+<h1>DEMOS</h1>
+
+<p>メインメニューで DEMOS を選択すると、 CocoonJS の素敵なところを体験できるデモ一覧が表示されます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demos.png" width="320" alt="DEMOS" />
+</span></p>
+
+<h2>使い方</h2>
+
+<p>一覧からデモを選択すると、デモの説明と実行環境の選択ボタンが表示されます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-selected-screen.png" width="320" alt="デモ選択画面" />
+</span></p>
+
+<p>選択できる実行環境は CANVAS+ / WEBVIEW+ / WEBVIEW の３種類があります。
+CANVAS+ / WEBVIEW+ は CocoonJS の実行環境、WEBVIEW はシステム WebView です。（参照：<a href="http://front-core.org/ja/blog/2014/12/16/about-cocoonjs/">爆速の HTML5 クロス・プラットフォーム CocoonJS</a>）</p>
+
+<p>iOS 8 未満の iOS では WEBVIEW+ は表示されません。
+またデモに対応しない実行環境はグレーアウトされ選択できません。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/runtime-gray-out.png" width="320" alt="デモ選択画面（非対応実行環境のグレーアウト）" />
+</span></p>
+
+<p>実行環境を１つ選択すると、ソースコードがダウンロードされた後、デモ実行画面に切り替わります。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-running-screen.png" width="569" alt="デモ実行画面" />
+</span></p>
+
+<p>CANVAS+ を選択した場合は画面の端っこに表示される「FPS(frames per second)」から動作パフォーマンスを確認できます。</p>
+
+<p>描画パフォーマンスは CANVAS+ が断然早いです！
+違う実行環境を選択してパフォーマンスを比較してみてください。</p>
+
+<p>実行中のデモを終了したい場合は「FPS」表示をタップしてデバッグコンソールにアクセスし、「Actions」をタップして表示されるメニューから「Exit」を選択すると終了します。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-actions.png" width="569" alt="Actions メニュー" />
+</span></p>
+
+<h2>デモ一覧</h2>
+
+<p>ここでは iOS 版 v2.1.1.1 に載っているデモをいくつか紹介します。</p>
+
+<h3>Ads</h3>
+
+<p>CocoonJS 拡張機能の「アプリ内広告」を使ったデモです。バナー広告とフルスクリーン広告の表示を確認できます。</p>
+
+<p><span class="block-center">↓バナー広告↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-ads-1.png" width="569" alt="Ads デモ - バーナー広告" /></span></p>
+
+<p><span class="block-center">↓フルスクリーン広告↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-ads-2.png" width="569" alt="Ads デモ - フルスクリーン広告" /></span></p>
+
+<h3>Box2D</h3>
+
+<p>CocoonJS には Box2D がネイティヴで実装されており、JS から box2dweb API を通じて制御する事ができます。
+このデモではネイティヴパフォーマンスで動く 2D 物理演算処理のシミュレーションを確認できます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-box2d.png" width="569" alt="Box2D デモ" />
+</span></p>
+
+<ul>
+<li>＋ ボタン： 小惑星（らしい）が20個ずつ落ちて来きます。</li>
+<li>ー ボタン： 逆に20個ずつ消えます。</li>
+</ul>
+
 
 <!--
-最近のアナウンスで CocoonJS でも Cordoba プラグインを使える様になっています。
-最近 CocoonJS は Apache Cordova を正式にサポートする事を発表しました。
-これにより Cordova の無数のプラグインと CocoonJS の WebView+ を組み合わせる事が可能です。
-（参照：[Apache Cordova Promo](http://support.ludei.com/hc/en-us/articles/202321108-Apache-Cordova-Promo)）
+### Facebook 
+
+Facebook login and friend images
+
+![Facebook デモ](/images/post/cocoonjs-launcher/demo-facebook.png)
+
+### Google Play Games 
+
+Google Play Games demo
 -->
 
 
-<h2>今までの WEB 開発フレームワークやライブラリーをそのまま使える</h2>
+<h3>Keyboard</h3>
 
-<p>CocoonJS では HTML/CSS/JS がそのまま実行されるので、既存の WEB 開発フレームワークやライブラリーをそのまま使えます。</p>
+<p>CocoonJS 実行環境の CANVAS+ / WEBVIEW+ から OS のネイティヴキーボードを呼び出す事ができます。</p>
 
-<p>以下は例として一部の有名なフレームワークやライブラリーを挙げていますが、
-あくまでも例なのでここに乗っていないライブラリーもほとんどそのまま使えます。（three.js など）</p>
+<p><span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-keyboard.png" width="569" alt="Keyboard デモ" /></span></p>
 
-<p><a href="https://www.ludei.com/cocoonjs/#development"><img src="http://front-core.org/images/post/about-cocoonjs/software.png" alt="使えるライブラリーの例" /></a>
-<span style="float:right">（使えるライブラリーの例  - <a href="https://www.ludei.com/">Ludei</a> サイトより）</span></p>
+<p><span class="block-center">↓URL入力の例↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-keyboard-url.png" width="569" alt="Keyboard デモ - URL入力" /></span></p>
 
-<h2>簡単に実機でテストやデバッグができる</h2>
+<h3>Location</h3>
 
-<p>CocoonJS 用に開発してアプリやゲームを、実際に実機でのテスト・デバッグが簡単に行える専用のアプリ「CocoonJS Launcher」が提供されています。</p>
+<p>CocoonJS では端末の位置情報システムにアクセスする事ができます。このデモでは現在の経緯度や高度などの位置情報を確認できます。</p>
 
 <p><span class="block-center">
-<a href="http://support.ludei.com/hc/en-us/articles/201048463-CocoonJS-launcher-user-guide"><img src="http://front-core.org/images/post/about-cocoonjs/cocoonjs-launcher.png" alt="CocoonJS Launcher" /></a>
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-location.png" width="569" alt="Location デモ" />
+</span></p>
+
+<h3>Multichannel Sound</h3>
+
+<p>CocoonJS はモバイルブラウザの HTML5 オーディオ要素に関する制約をすべて解消してくれます。
+このデモではマルチチャンネルのオーディオ再生を確認できます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multichannel-sound.png" width="569" alt="Multichannel Sound デモ" />
+</span></p>
+
+<h3>Multiplayer</h3>
+
+<p>CocoonJS の「マルチプレイヤー」サポート機能のデモです。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multiplayer.png" width="569" alt="Multiplayer デモ" />
 </span></p>
 
 <ul>
-<li><a href="https://play.google.com/store/apps/details?id=com.ideateca.cocoonjslauncher&amp;hl=en">CocoonJS Launcher - Android 版</a></li>
-<li><a href="https://itunes.apple.com/en/app/cocoonjs-by-ludei/id519623307?mt=8">CocoonJS Launcher - iOS 版</a></li>
+<li><p><strong>Multiplayer Match:</strong> CocoonJS 拡張機能の「iOS ゲームセンター連携」を使ったマルチプレイヤーマッチのデモ（現在 iOS ゲームセンターのみ対応）</p></li>
+<li><p><strong>Local Match:</strong> １つの端末でターン制によるマルチプレイができる様にする「Loopback モード」のデモ</p></li>
 </ul>
 
 
-<p>CocoonJS Launcher を使えば自分が作成したコードを面倒な手順無しで簡単に実機確認ができます。</p>
+<p><span class="block-center">↓Multiplayer Match↓</span>
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multiplayer-match.png" width="569" alt="Multiplayer デモ" />
+</span></p>
 
-<p>ソースコードをZIPファイルに圧縮して端末のファイルシステムに転送して実行、
-またはローカルホストや外部サイトのURLを指定して実行する事も可能です。</p>
+<p><span class="block-center">↓Local Match↓</span>
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multiplayer-local-match.png" width="569" alt="Multiplayer デモ" />
+</span></p>
 
 <!--
-CocoonJS Launcher はデバッグ用のコンソール出力やプロファイリング機能も持っています。
-Android の場合は Chrome DevTool(WebView+), Eclipse(Canvas+) によるリモートデバッグも可能です。
+### Notifications 
+
+Push and Local notifications
 -->
 
 
-<h2>様々のプラットフォームに簡単に配布できる</h2>
+<h3>Rate</h3>
 
-<p>CocoonJS Cloud と言うサービスも提供しており、
-iOS, Android をはじめ様々なプラットフォーム向けに配布可能なアプリを Cloud サービスから簡単にコンパイルできます。</p>
+<p>CocoonJS の「レーティング」サポート機能のデモです。
+これにより CocoonJS で開発したアプリから App Store や Google Play のレビューページに簡単に遷移する事ができます。</p>
 
 <p><span class="block-center">
-<a href="https://www.ludei.com/cocoonjs/#cross-platform"><img src="http://front-core.org/images/post/about-cocoonjs/cocoonjs-cloud.png" alt="CocoonJS Cloud" /></a>
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-rate.png" width="569" alt="Rate デモ" />
 </span></p>
 
-<p>配布した後は分析やマネタイズに必要な各種設定をダッシュボードで管理できる便利なサービスです。</p>
+<p><span class="block-center">↓ストアのレビューページ↓</span>
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-rate-store-screen.png" width="569" alt="Rate デモ" />
+</span></p>
 
-<h2>アプリ運用に関わる便利なツールや拡張機能が備わっている</h2>
+<h3>Sumon</h3>
 
-<h3>拡張機能</h3>
-
-<p>CocoonJS には JavaScript から制御できる様々なネイティブ拡張機能が用意されています。</p>
+<p>実際にストアで配信中の CocoonJS で作られた「Sumon」と言うゲームのサンプルです。</p>
 
 <ul>
-<li>アプリ内広告</li>
-<li>アプリ内課金</li>
-<li>Google プレイゲーム連携</li>
-<li>iOS ゲームセンター連携</li>
-<li>Facebook 連携</li>
-<li>プッシュ通知</li>
-<li>デバイスアクセス（カメラ、モーションセンサー &hellip;）</li>
-<li>ゲームパッド対応</li>
-<li>マルチチャンネルのサウンド再生</li>
-<li>などなど（参照：<a href="http://support.ludei.com/hc/en-us/articles/201821276-Plugins-overview-3-0-0-">Plugins overview - Ludei Support</a>）</li>
+<li><a href="https://itunes.apple.com/app/id470147794">Sumon - iOS 版</a></li>
+<li><a href="https://play.google.com/store/apps/details?id=com.ideateca.sumon&amp;hl=en">Sumon - Android 版</a></li>
 </ul>
 
 
-<h3>分析サービス</h3>
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-sumon.png" width="569" alt="Sumon デモ" />
+</span></p>
 
-<p><span class="block-center"><a href="https://www.ludei.com/cocoonjs/#business"><img src="http://front-core.org/images/post/about-cocoonjs/analytics.png" alt="Analytics" /></a></span></p>
+<!--
+### Vibration 
 
-<p>CocoonJS は独自の分析サービスを提供しており、
-CocoonJS Cloud サービスのダッシュボードからアクセスできます。</p>
+Test for the device vibration capability
+-->
 
-<h3>ライブ・アップデート</h3>
 
-<p><span class="block-center"><a href="https://www.ludei.com/cocoonjs/#business"><img src="http://front-core.org/images/post/about-cocoonjs/updates.png" alt="CocoonJS Cloud" /></a></span></p>
+<h3>WebGL</h3>
 
-<p>CocoonJS で開発したアプリのコンテンツは、アプリを再配布しなくても
-CocoonJS Cloud サービスの管理画面から簡単にアップデートができます。</p>
+<p>CocoonJS の売りは何よりも WebGL 対応による爆速の描画パフォーマンスです。
+それを裏付けるように、WebGL のデモが沢山載っています。</p>
+
+<!--
+* 3D horse - A poligonal 3D horse running in place
+* Ludei Logo - Ludei logo with falling drops of water
+* NeHe cube - Textured 3D Cube rotating in mid-air
+* PlayCanvas Doom3 Gangnam - Demo created using PlayCanvas. Three monsters from Doom3 dancing to the sound of Gangnam Style まさかのカンナム・スタイル！
+* Striped Tunnel - An endless dizzying striped tunnel
+* Three.js Cubemap - Three heads illuminated with a cubemap
+* Watery texture - A texture distorted to look like rippling water
+-->
+
+
+<p><span class="block-center">↓走る 3D 馬↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-3d-horse.png" width="569" alt="WebGL - 3D horse デモ" /></span></p>
+
+<p><span class="block-center">↓Ludei社の 3D ロゴ↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-ludei-logo.png" width="569" alt="WebGL - Ludei Logo デモ" /></span></p>
+
+<p><span class="block-center">↓ぬるぬる回転する 3D キューブ↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-nehe-cube.png" width="569" alt="WebGL - NeHe cube デモ" /></span></p>
+
+<p><span class="block-center">↓まさかのカンナムスタイル↓</span>
+<span class="block-center">（Doom3 のモンスター達がカンナムスタイルを踊る）</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-playcanvas-doom3-gangnam.png" width="569" alt="WebGL - PlayCanvas Doom3 Gangnam デモ" /></span></p>
+
+<p><span class="block-center">↓シェーダベースのねじれトンネル↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-striped-tunnel.png" width="569" alt="WebGL - Striped Tunnel デモ" /></span></p>
+
+<p><span class="block-center">↓シェーダベースの水波↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-watery-texture.png" width="569" alt="WebGL - Watery texture デモ" /></span></p>
+
+<!--
+### WebView 
+
+WebView support in Canvas+
+-->
+
+
+<h2>その他のデモ</h2>
+
+<p>CocoonJS Launcher には載っていないデモもあります。
+すべてのデモ一覧は<a href="http://cocoonjsservice.ludei.com/cocoonjslaunchersvr/demo-list/">こちら</a>のページで確認できます。</p>
+
+<p><span class="block-center" style="border: 1px solid #9b9b9b">
+<a href="https://cocoonjsservice.ludei.com/cocoonjslaunchersvr/demo-list/"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-list.png" alt="デモ一覧" /></a>
+</span>
+<span class="block-center">（TRY OUT THE DEMOS - <a href="https://www.ludei.com/">Ludei</a> サイトより）</span></p>
+
+<p>デモ一覧ではソースコードをダウンロードできるので、「DEMOS」に乗っていなくても後述の「YOUR APP」で動かす事ができます。</p>
+
+<h1>YOUR APP</h1>
+
+<p>YOUR APP では自作コードや外部デモコードを直接 CocoonJS Launcher で動かす事ができます。
+やり方は ZIP ファイルを転送して実行する方法と URL を指定して実行する方法の２通りあります。</p>
+
+<h2>ログイン</h2>
+
+<p>YOUR APP を使うためには、まず CocoonJS Cloud サービスへの登録が必要です。</p>
+
+<p><a href="https://sso.ludei.com/signup">https://sso.ludei.com/signup</a></p>
+
+<p>登録が完了したら、登録したメールアドレスとパスワードでログインできます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-login.png" width="320" alt="ログイン画面" />
+</span></p>
+
+<h2>ZIP ファイル転送して実行</h2>
+
+<p>ZIP ファイルで転送して置くと、オフラインでも CocoonJS Launcher で自分のコードを実行する事ができます。
+注意点として index.html は ZIP フォルダーのルートパスにおく必要があります。</p>
+
+<h3>iOS の場合</h3>
+
+<ol>
+<li>iOS デバイスを PC に繋ぎ、iTunes を立ち上げます。</li>
+<li><p>デバイスを選択して、APP のファイル共有画面を開きます。
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/itune-file-share-1.png" alt="iTune ファイル共有" />
+</span></p></li>
+<li><p>CocoonJS を選択して、転送するファイルをドラッグまたは「追加&hellip;」ボタンで追加します。
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/itune-file-share-2.png" alt="iTune ファイル共有" />
+</span></p></li>
+<li><p>YOUR APP の DOCUMENTS に追加された ZIP ファイルが表示されます。</p></li>
+<li>実行したい ZIP ファイルを選択して、実行環境を選択すると実行画面に切り替わります。
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-documents.png" width="320" alt="ログイン画面" />
+</span></li>
+</ol>
+
+
+<h3>Android の場合</h3>
+
+<p>Android の場合は SD カードに ZIP ファイルを転送します。</p>
+
+<p>SD カードへのファイル転送には色んな方法がありますが、ここでは Android SDK を使う場合のファイル転送コマンドを記載します。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>adb push &lt;ZIPファイルのパス&gt; /sdcard/</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ファイル転送が完了したら、同じく YOUR APP の DOCUMENTS に追加された ZIP ファイルが表示されます。</p>
+
+<h2>URL を指定して実行</h2>
+
+<p>HTML ページの URL を指定するとウェブサーバー上のコードを直接実行できます。（index.html は省略可）</p>
+
+<p>また、<a href="https://cocoonjsservice.ludei.com/cocoonjslaunchersvr/demo-list/">デモ一覧</a>の
+ダウンロードリンクのように ZIP ファイルの URL を指定すると、その ZIP ファイルがダウンロードされ実行されます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-url.png" width="320" alt="ログイン画面" />
+</span></p>
+
+<h1>デバッグツール</h1>
+
+<p>デモ・アプリ実行画面の「FPS」表示をタップするとデバッグコンソールにアクセスできます。</p>
+
+<h2>ログ出力</h2>
+
+<p>デバッグコンソールには CocoonJS 既定のログと JavaScript の <code>console</code> 出力が表示されます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console.png" width="320" alt="デバッグコンソール" />
+</span></p>
+
+<p>下端の All / Console / Warnings / Errors タブでログの種類毎にフィルタリングして表示する事ができます。</p>
+
+<ul>
+<li>All: すべてのログ</li>
+<li>Console: デバッグ・情報ログ（console.debug, console.log, console.info）</li>
+<li>Warnings: 警告ログ（console.warn）</li>
+<li>Errors: エラーログ（console.error）</li>
+</ul>
+
+
+<h2>Actions メニュー</h2>
+
+<p>「Actions」をタップすると以下のメニューが表示されます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-actions-menu.png" width="320" alt="Actions メニュー" />
+</span></p>
+
+<ul>
+<li>Exit:  実行中のデモ・アプリを終了します。</li>
+<li>Reload: 実行中のデモ・アプリを再読み込みします。</li>
+<li>Profile: 実行パフォーマンスを計測して、プロファイルデータを出力します。</li>
+<li>MemoryLog: デバッグコンソールに現在のメモリログを出力します。</li>
+</ul>
+
+
+<p><span class="block-center">↓Profile 開始↓</span>
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-profile-start.png" width="320" alt="Actions メニュー" />
+</span></p>
+
+<p><span class="block-center">↓MemoryLog 出力↓</span>
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-memory-log.png" width="320" alt="Actions メニュー" />
+</span></p>
+
+<h1>設定</h1>
+
+<p>CocoonJS Launcher の設定画面では、デモ・アプリを実行する際のカスタマイズ可能ないくつかのオプションが用意されています。</p>
+
+<h2>設定ボタンの場所</h2>
+
+<p>設定画面は「DEMOS」ではデモ選択画面の右上「・・・」から、「YOUR APP」では下端の「SETTINGS」ボタンからアクセスできます。</p>
+
+<p><span class="block-center">↓DEMOS↓</span>
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demos-settings-button.png" width="320" alt="DEMOS の設定ボタン" />
+</span></p>
+
+<p><span class="block-center">↓YOUR APP↓</span>
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-settings-button.png" width="320" alt="YOUR APP の設定ボタン" />
+</span></p>
+
+<h2>設定画面</h2>
+
+<p>主に以下のオプションが変更可能です。</p>
+
+<ul>
+<li>Orientation mode: デモ・アプリの実行中の端末向きを設定できます。</li>
+<li>Debug enabled: デバッグ機能をアクティブ/非アクティブできます。</li>
+<li>Debug position: デバッグボタン（FPS 表示）の位置を変更できます。</li>
+</ul>
+
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/settings.png" width="320" alt="設定画面" />
+</span></p>
+
+<p>設定可能なオプションは OS によって異なる場合があります。</p>
 
 <h1>まとめ</h1>
 
-<p>CocoonJS は日本国内ではまだあまり知られておらず、日本語ドキュメントや関連ブログ記事も少ないです。（ほぼ無い）</p>
+<p>CocoonJS はこの CocoonJS Launcher により実機テストやデバッグが簡単にできるので、他のネイティブアプリ開発ツールに比べて開発速度が早いです。</p>
 
-<p>今回は CocoonJS の概要だけずらっと並べただけですが、使い方など詳しい内容はそれぞれ別の記事でまとめて行きます。</p>
+<p>ぜひ CocoonJS Launcher をダウンロードして、CocoonJS のすばらしいデモを体験してみてください。</p>
+
+<p>次回からは実際に CocoonJS で動くコードの実装方法をまとめて行きます。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[CocoonJS Launcher の使い方]]></title>
+    <link href="http://front-core.org/ja/blog/2015/01/05/cocoonjs-launcher/"/>
+    <updated>2015-01-05T00:00:00+09:00</updated>
+    <id>http://front-core.org/ja/blog/2015/01/05/cocoonjs-launcher</id>
+    <content type="html"><![CDATA[<p>CocoonJS Launcher は CocoonJS 用に開発してアプリやゲームを、簡単に実機でテスト・デバッグできるアプリです。
+現在 iOS 版と Android 版があります。</p>
+
+<p><span class="block-center">
+&nbsp;
+<a href="https://itunes.apple.com/en/app/cocoonjs-by-ludei/id519623307?mt=8"><img src="http://front-core.org/images/post/cocoonjs-launcher/app-store.png" height="60" width="172" alt="CocoonJS Launcher - iOS 版" /></a>
+&nbsp;
+<a href="https://play.google.com/store/apps/details?id=com.ideateca.cocoonjslauncher&amp;hl=en"><img src="http://front-core.org/images/post/cocoonjs-launcher/google-play.png" height="60" width="172" alt="CocoonJS Launcher - Android 版" /></a>
+&nbsp;
+</span></p>
+
+<!-- more -->
+
+
+<h1>メインメニュー</h1>
+
+<p>CocoonJS Launcher アプリを立ち上げると、スプラッシュスクリーンの後にメインメニュー画面が表示されます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/main-menu.png" width="320" alt="メインメニュー" />
+</span></p>
+
+<h1>DEMOS</h1>
+
+<p>メインメニューで DEMOS を選択すると、 CocoonJS の素敵なところを体験できるデモ一覧が表示されます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demos.png" width="320" alt="DEMOS" />
+</span></p>
+
+<h2>使い方</h2>
+
+<p>一覧からデモを選択すると、デモの説明と実行環境の選択ボタンが表示されます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-selected-screen.png" width="320" alt="デモ選択画面" />
+</span></p>
+
+<p>選択できる実行環境は CANVAS+ / WEBVIEW+ / WEBVIEW の３種類があります。
+CANVAS+ / WEBVIEW+ は CocoonJS の実行環境、WEBVIEW はシステム WebView です。（参照：<a href="http://front-core.org/ja/blog/2014/12/16/about-cocoonjs/">爆速の HTML5 クロス・プラットフォーム CocoonJS</a>）</p>
+
+<p>iOS 8 未満の iOS では WEBVIEW+ は表示されません。
+またデモに対応しない実行環境はグレーアウトされ選択できません。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/runtime-gray-out.png" width="320" alt="デモ選択画面（非対応実行環境のグレーアウト）" />
+</span></p>
+
+<p>実行環境を１つ選択すると、ソースコードがダウンロードされた後、デモ実行画面に切り替わります。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-running-screen.png" width="569" alt="デモ実行画面" />
+</span></p>
+
+<p>CANVAS+ を選択した場合は画面の端っこに表示される「FPS(frames per second)」から動作パフォーマンスを確認できます。</p>
+
+<p>描画パフォーマンスは CANVAS+ が断然早いです！
+違う実行環境を選択してパフォーマンスを比較してみてください。</p>
+
+<p>実行中のデモを終了したい場合は「FPS」表示をタップしてデバッグコンソールにアクセスし、「Actions」をタップして表示されるメニューから「Exit」を選択すると終了します。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-actions.png" width="569" alt="Actions メニュー" />
+</span></p>
+
+<h2>デモ一覧</h2>
+
+<p>ここでは iOS 版 v2.1.1.1 に載っているデモをいくつか紹介します。</p>
+
+<h3>Ads</h3>
+
+<p>CocoonJS 拡張機能の「アプリ内広告」を使ったデモです。バナー広告とフルスクリーン広告の表示を確認できます。</p>
+
+<p><span class="block-center">↓バナー広告↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-ads-1.png" width="569" alt="Ads デモ - バーナー広告" /></span></p>
+
+<p><span class="block-center">↓フルスクリーン広告↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-ads-2.png" width="569" alt="Ads デモ - フルスクリーン広告" /></span></p>
+
+<h3>Box2D</h3>
+
+<p>CocoonJS には Box2D がネイティヴで実装されており、JS から box2dweb API を通じて制御する事ができます。
+このデモではネイティヴパフォーマンスで動く 2D 物理演算処理のシミュレーションを確認できます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-box2d.png" width="569" alt="Box2D デモ" />
+</span></p>
+
+<ul>
+<li>＋ ボタン： 小惑星（らしい）が20個ずつ落ちて来きます。</li>
+<li>ー ボタン： 逆に20個ずつ消えます。</li>
+</ul>
+
+
+<!--
+### Facebook 
+
+Facebook login and friend images
+
+![Facebook デモ](/images/post/cocoonjs-launcher/demo-facebook.png)
+
+### Google Play Games 
+
+Google Play Games demo
+-->
+
+
+<h3>Keyboard</h3>
+
+<p>CocoonJS 実行環境の CANVAS+ / WEBVIEW+ から OS のネイティヴキーボードを呼び出す事ができます。</p>
+
+<p><span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-keyboard.png" width="569" alt="Keyboard デモ" /></span></p>
+
+<p><span class="block-center">↓URL入力の例↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-keyboard-url.png" width="569" alt="Keyboard デモ - URL入力" /></span></p>
+
+<h3>Location</h3>
+
+<p>CocoonJS では端末の位置情報システムにアクセスする事ができます。このデモでは現在の経緯度や高度などの位置情報を確認できます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-location.png" width="569" alt="Location デモ" />
+</span></p>
+
+<h3>Multichannel Sound</h3>
+
+<p>CocoonJS はモバイルブラウザの HTML5 オーディオ要素に関する制約をすべて解消してくれます。
+このデモではマルチチャンネルのオーディオ再生を確認できます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multichannel-sound.png" width="569" alt="Multichannel Sound デモ" />
+</span></p>
+
+<h3>Multiplayer</h3>
+
+<p>CocoonJS の「マルチプレイヤー」サポート機能のデモです。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multiplayer.png" width="569" alt="Multiplayer デモ" />
+</span></p>
+
+<ul>
+<li><p><strong>Multiplayer Match:</strong> CocoonJS 拡張機能の「iOS ゲームセンター連携」を使ったマルチプレイヤーマッチのデモ（現在 iOS ゲームセンターのみ対応）</p></li>
+<li><p><strong>Local Match:</strong> １つの端末でターン制によるマルチプレイができる様にする「Loopback モード」のデモ</p></li>
+</ul>
+
+
+<p><span class="block-center">↓Multiplayer Match↓</span>
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multiplayer-match.png" width="569" alt="Multiplayer デモ" />
+</span></p>
+
+<p><span class="block-center">↓Local Match↓</span>
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multiplayer-local-match.png" width="569" alt="Multiplayer デモ" />
+</span></p>
+
+<!--
+### Notifications 
+
+Push and Local notifications
+-->
+
+
+<h3>Rate</h3>
+
+<p>CocoonJS の「レーティング」サポート機能のデモです。
+これにより CocoonJS で開発したアプリから App Store や Google Play のレビューページに簡単に遷移する事ができます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-rate.png" width="569" alt="Rate デモ" />
+</span></p>
+
+<p><span class="block-center">↓ストアのレビューページ↓</span>
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-rate-store-screen.png" width="569" alt="Rate デモ" />
+</span></p>
+
+<h3>Sumon</h3>
+
+<p>実際にストアで配信中の CocoonJS で作られた「Sumon」と言うゲームのサンプルです。</p>
+
+<ul>
+<li><a href="https://itunes.apple.com/app/id470147794">Sumon - iOS 版</a></li>
+<li><a href="https://play.google.com/store/apps/details?id=com.ideateca.sumon&amp;hl=en">Sumon - Android 版</a></li>
+</ul>
+
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-sumon.png" width="569" alt="Sumon デモ" />
+</span></p>
+
+<!--
+### Vibration 
+
+Test for the device vibration capability
+-->
+
+
+<h3>WebGL</h3>
+
+<p>CocoonJS の売りは何よりも WebGL 対応による爆速の描画パフォーマンスです。
+それを裏付けるように、WebGL のデモが沢山載っています。</p>
+
+<!--
+* 3D horse - A poligonal 3D horse running in place
+* Ludei Logo - Ludei logo with falling drops of water
+* NeHe cube - Textured 3D Cube rotating in mid-air
+* PlayCanvas Doom3 Gangnam - Demo created using PlayCanvas. Three monsters from Doom3 dancing to the sound of Gangnam Style まさかのカンナム・スタイル！
+* Striped Tunnel - An endless dizzying striped tunnel
+* Three.js Cubemap - Three heads illuminated with a cubemap
+* Watery texture - A texture distorted to look like rippling water
+-->
+
+
+<p><span class="block-center">↓走る 3D 馬↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-3d-horse.png" width="569" alt="WebGL - 3D horse デモ" /></span></p>
+
+<p><span class="block-center">↓Ludei社の 3D ロゴ↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-ludei-logo.png" width="569" alt="WebGL - Ludei Logo デモ" /></span></p>
+
+<p><span class="block-center">↓ぬるぬる回転する 3D キューブ↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-nehe-cube.png" width="569" alt="WebGL - NeHe cube デモ" /></span></p>
+
+<p><span class="block-center">↓まさかのカンナムスタイル↓</span>
+<span class="block-center">（Doom3 のモンスター達がカンナムスタイルを踊る）</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-playcanvas-doom3-gangnam.png" width="569" alt="WebGL - PlayCanvas Doom3 Gangnam デモ" /></span></p>
+
+<p><span class="block-center">↓シェーダベースのねじれトンネル↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-striped-tunnel.png" width="569" alt="WebGL - Striped Tunnel デモ" /></span></p>
+
+<p><span class="block-center">↓シェーダベースの水波↓</span>
+<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-watery-texture.png" width="569" alt="WebGL - Watery texture デモ" /></span></p>
+
+<!--
+### WebView 
+
+WebView support in Canvas+
+-->
+
+
+<h2>その他のデモ</h2>
+
+<p>CocoonJS Launcher には載っていないデモもあります。
+すべてのデモ一覧は<a href="http://cocoonjsservice.ludei.com/cocoonjslaunchersvr/demo-list/">こちら</a>のページで確認できます。</p>
+
+<p><span class="block-center" style="border: 1px solid #9b9b9b">
+<a href="https://cocoonjsservice.ludei.com/cocoonjslaunchersvr/demo-list/"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-list.png" alt="デモ一覧" /></a>
+</span>
+<span class="block-center">（TRY OUT THE DEMOS - <a href="https://www.ludei.com/">Ludei</a> サイトより）</span></p>
+
+<p>デモ一覧ではソースコードをダウンロードできるので、「DEMOS」に乗っていなくても後述の「YOUR APP」で動かす事ができます。</p>
+
+<h1>YOUR APP</h1>
+
+<p>YOUR APP では自作コードや外部デモコードを直接 CocoonJS Launcher で動かす事ができます。
+やり方は ZIP ファイルを転送して実行する方法と URL を指定して実行する方法の２通りあります。</p>
+
+<h2>ログイン</h2>
+
+<p>YOUR APP を使うためには、まず CocoonJS Cloud サービスへの登録が必要です。</p>
+
+<p><a href="https://sso.ludei.com/signup">https://sso.ludei.com/signup</a></p>
+
+<p>登録が完了したら、登録したメールアドレスとパスワードでログインできます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-login.png" width="320" alt="ログイン画面" />
+</span></p>
+
+<h2>ZIP ファイル転送して実行</h2>
+
+<p>ZIP ファイルで転送して置くと、オフラインでも CocoonJS Launcher で自分のコードを実行する事ができます。
+注意点として index.html は ZIP フォルダーのルートパスにおく必要があります。</p>
+
+<h3>iOS の場合</h3>
+
+<ol>
+<li>iOS デバイスを PC に繋ぎ、iTunes を立ち上げます。</li>
+<li><p>デバイスを選択して、APP のファイル共有画面を開きます。
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/itune-file-share-1.png" alt="iTune ファイル共有" />
+</span></p></li>
+<li><p>CocoonJS を選択して、転送するファイルをドラッグまたは「追加&hellip;」ボタンで追加します。
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/itune-file-share-2.png" alt="iTune ファイル共有" />
+</span></p></li>
+<li><p>YOUR APP の DOCUMENTS に追加された ZIP ファイルが表示されます。</p></li>
+<li>実行したい ZIP ファイルを選択して、実行環境を選択すると実行画面に切り替わります。
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-documents.png" width="320" alt="ログイン画面" />
+</span></li>
+</ol>
+
+
+<h3>Android の場合</h3>
+
+<p>Android の場合は SD カードに ZIP ファイルを転送します。</p>
+
+<p>SD カードへのファイル転送には色んな方法がありますが、ここでは Android SDK を使う場合のファイル転送コマンドを記載します。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>adb push &lt;ZIPファイルのパス&gt; /sdcard/</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ファイル転送が完了したら、同じく YOUR APP の DOCUMENTS に追加された ZIP ファイルが表示されます。</p>
+
+<h2>URL を指定して実行</h2>
+
+<p>HTML ページの URL を指定するとウェブサーバー上のコードを直接実行できます。（index.html は省略可）</p>
+
+<p>また、<a href="https://cocoonjsservice.ludei.com/cocoonjslaunchersvr/demo-list/">デモ一覧</a>の
+ダウンロードリンクのように ZIP ファイルの URL を指定すると、その ZIP ファイルがダウンロードされ実行されます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-url.png" width="320" alt="ログイン画面" />
+</span></p>
+
+<h1>デバッグツール</h1>
+
+<p>デモ・アプリ実行画面の「FPS」表示をタップするとデバッグコンソールにアクセスできます。</p>
+
+<h2>ログ出力</h2>
+
+<p>デバッグコンソールには CocoonJS 既定のログと JavaScript の <code>console</code> 出力が表示されます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console.png" width="320" alt="デバッグコンソール" />
+</span></p>
+
+<p>下端の All / Console / Warnings / Errors タブでログの種類毎にフィルタリングして表示する事ができます。</p>
+
+<ul>
+<li>All: すべてのログ</li>
+<li>Console: デバッグ・情報ログ（console.debug, console.log, console.info）</li>
+<li>Warnings: 警告ログ（console.warn）</li>
+<li>Errors: エラーログ（console.error）</li>
+</ul>
+
+
+<h2>Actions メニュー</h2>
+
+<p>「Actions」をタップすると以下のメニューが表示されます。</p>
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-actions-menu.png" width="320" alt="Actions メニュー" />
+</span></p>
+
+<ul>
+<li>Exit:  実行中のデモ・アプリを終了します。</li>
+<li>Reload: 実行中のデモ・アプリを再読み込みします。</li>
+<li>Profile: 実行パフォーマンスを計測して、プロファイルデータを出力します。</li>
+<li>MemoryLog: デバッグコンソールに現在のメモリログを出力します。</li>
+</ul>
+
+
+<p><span class="block-center">↓Profile 開始↓</span>
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-profile-start.png" width="320" alt="Actions メニュー" />
+</span></p>
+
+<p><span class="block-center">↓MemoryLog 出力↓</span>
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-memory-log.png" width="320" alt="Actions メニュー" />
+</span></p>
+
+<h1>設定</h1>
+
+<p>CocoonJS Launcher の設定画面では、デモ・アプリを実行する際のカスタマイズ可能ないくつかのオプションが用意されています。</p>
+
+<h2>設定ボタンの場所</h2>
+
+<p>設定画面は「DEMOS」ではデモ選択画面の右上「・・・」から、「YOUR APP」では下端の「SETTINGS」ボタンからアクセスできます。</p>
+
+<p><span class="block-center">↓DEMOS↓</span>
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/demos-settings-button.png" width="320" alt="DEMOS の設定ボタン" />
+</span></p>
+
+<p><span class="block-center">↓YOUR APP↓</span>
+<span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-settings-button.png" width="320" alt="YOUR APP の設定ボタン" />
+</span></p>
+
+<h2>設定画面</h2>
+
+<p>主に以下のオプションが変更可能です。</p>
+
+<ul>
+<li>Orientation mode: デモ・アプリの実行中の端末向きを設定できます。</li>
+<li>Debug enabled: デバッグ機能をアクティブ/非アクティブできます。</li>
+<li>Debug position: デバッグボタン（FPS 表示）の位置を変更できます。</li>
+</ul>
+
+
+<p><span class="block-center">
+<img src="http://front-core.org/images/post/cocoonjs-launcher/settings.png" width="320" alt="設定画面" />
+</span></p>
+
+<p>設定可能なオプションは OS によって異なる場合があります。</p>
+
+<h1>まとめ</h1>
+
+<p>CocoonJS はこの CocoonJS Launcher により実機テストやデバッグが簡単にできるので、他のネイティブアプリ開発ツールに比べて開発速度が早いです。</p>
+
+<p>ぜひ CocoonJS Launcher をダウンロードして、CocoonJS のすばらしいデモを体験してみてください。</p>
+
+<p>次回からは実際に CocoonJS で動くコードの実装方法をまとめて行きます。</p>
 ]]></content>
   </entry>
   
@@ -904,834 +2927,187 @@ CocoonJS Cloud サービスの管理画面から簡単にアップデートが�
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[CocoonJS Launcher の使い方]]></title>
-    <link href="http://front-core.org/en/blog/2014/01/05/cocoonjs-launcher/"/>
-    <updated>2014-01-05T00:00:00+09:00</updated>
-    <id>http://front-core.org/en/blog/2014/01/05/cocoonjs-launcher</id>
-    <content type="html"><![CDATA[<p>CocoonJS Launcher は CocoonJS 用に開発してアプリやゲームを、簡単に実機でテスト・デバッグできるアプリです。
-現在 iOS 版と Android 版があります。</p>
+    <title type="html"><![CDATA[爆速の HTML5 クロス・プラットフォーム CocoonJS]]></title>
+    <link href="http://front-core.org/ja/blog/2014/12/16/about-cocoonjs/"/>
+    <updated>2014-12-16T00:00:00+09:00</updated>
+    <id>http://front-core.org/ja/blog/2014/12/16/about-cocoonjs</id>
+    <content type="html"><![CDATA[<p>CocoonJS は <a href="https://www.ludei.com/">Ludei</a> 社が提供する爆速の「HTML5 クロス・プラットフォーム」です。</p>
 
-<p><span class="block-center">
-&nbsp;
-<a href="https://itunes.apple.com/en/app/cocoonjs-by-ludei/id519623307?mt=8"><img src="http://front-core.org/images/post/cocoonjs-launcher/app-store.png" height="60" width="172" alt="CocoonJS Launcher - iOS 版" /></a>
-&nbsp;
-<a href="https://play.google.com/store/apps/details?id=com.ideateca.cocoonjslauncher&amp;hl=en"><img src="http://front-core.org/images/post/cocoonjs-launcher/google-play.png" height="60" width="172" alt="CocoonJS Launcher - Android 版" /></a>
-&nbsp;
-</span></p>
+<p>HTML5 クロス・プラットフォームは他にも色々ありますが、CocoonJS は PhoneGap に似ています。
+HTML / CSS / JS をネイティブコードに変換するのでは無く、そのまま実行環境で動かす仕組みです。</p>
 
 <!-- more -->
 
 
-<h1>メインメニュー</h1>
+<h1>CocoonJS vs PhoneGap</h1>
 
-<p>CocoonJS Launcher アプリを立ち上げると、スプラッシュスクリーンの後にメインメニュー画面が表示されます。</p>
+<p>HTML / CSS / JS をそのまま使える点では同じですが、
+PhoneGap がシステムの WebView を使うのに対し、CocoonJS は独自の実行環境を持っています。</p>
 
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/main-menu.png" width="320" alt="メインメニュー" />
-</span></p>
-
-<h1>DEMOS</h1>
-
-<p>メインメニューで DEMOS を選択すると、 CocoonJS の素敵なところを体験できるデモ一覧が表示されます。</p>
+<p>システム WebView はとにかくパフォーマンスが悪く、OS や機種依存により挙動が違うなどの問題がありますが、
+CocoonJS は独自の実行環境で動作するため OS や機種依存の問題を解消し、
+システム WebView に比べて圧倒的に早いです。</p>
 
 <p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demos.png" width="320" alt="DEMOS" />
+<a href="https://www.ludei.com/landing/cocoonjs-phonegap/"><img src="http://front-core.org/images/post/about-cocoonjs/cocoonjs-vs-phonegap.png" alt="CocoonJS vs PhoneGap" /></a>
+<span style="float:right">（Comparing CocoonJS and PhoneGap  - <a href="https://www.ludei.com/">Ludei</a> サイトより）</span>
 </span></p>
 
-<h2>使い方</h2>
+<h1>CocoonJS が素敵な理由</h1>
 
-<p>一覧からデモを選択すると、デモの説明と実行環境の選択ボタンが表示されます。</p>
+<p>CocoonJS が素敵な理由をいくつか挙げてみます。</p>
 
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-selected-screen.png" width="320" alt="デモ選択画面" />
-</span></p>
+<!--（参照：[About CocoonJS](https://www.ludei.com/cocoonjs/)）-->
 
-<p>選択できる実行環境は CANVAS+ / WEBVIEW+ / WEBVIEW の３種類があります。
-CANVAS+ / WEBVIEW+ は CocoonJS の実行環境、WEBVIEW はシステム WebView です。（参照：<a href="http://front-core.org/ja/blog/2014/12/16/about-cocoonjs/">爆速の HTML5 クロス・プラットフォーム CocoonJS</a>）</p>
-
-<p>iOS 8 未満の iOS では WEBVIEW+ は表示されません。
-またデモに対応しない実行環境はグレーアウトされ選択できません。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/runtime-gray-out.png" width="320" alt="デモ選択画面（非対応実行環境のグレーアウト）" />
-</span></p>
-
-<p>実行環境を１つ選択すると、ソースコードがダウンロードされた後、デモ実行画面に切り替わります。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-running-screen.png" width="569" alt="デモ実行画面" />
-</span></p>
-
-<p>CANVAS+ を選択した場合は画面の端っこに表示される「FPS(frames per second)」から動作パフォーマンスを確認できます。</p>
-
-<p>描画パフォーマンスは CANVAS+ が断然早いです！
-違う実行環境を選択してパフォーマンスを比較してみてください。</p>
-
-<p>実行中のデモを終了したい場合は「FPS」表示をタップしてデバッグコンソールにアクセスし、「Actions」をタップして表示されるメニューから「Exit」を選択すると終了します。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-actions.png" width="569" alt="Actions メニュー" />
-</span></p>
-
-<h2>デモ一覧</h2>
-
-<p>ここでは iOS 版 v2.1.1.1 に載っているデモをいくつか紹介します。</p>
-
-<h3>Ads</h3>
-
-<p>CocoonJS 拡張機能の「アプリ内広告」を使ったデモです。バナー広告とフルスクリーン広告の表示を確認できます。</p>
-
-<p><span class="block-center">↓バナー広告↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-ads-1.png" width="569" alt="Ads デモ - バーナー広告" /></span></p>
-
-<p><span class="block-center">↓フルスクリーン広告↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-ads-2.png" width="569" alt="Ads デモ - フルスクリーン広告" /></span></p>
-
-<h3>Box2D</h3>
-
-<p>CocoonJS には Box2D がネイティヴで実装されており、JS から box2dweb API を通じて制御する事ができます。
-このデモではネイティヴパフォーマンスで動く 2D 物理演算処理のシミュレーションを確認できます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-box2d.png" width="569" alt="Box2D デモ" />
-</span></p>
 
 <ul>
-<li>＋ ボタン： 小惑星（らしい）が20個ずつ落ちて来きます。</li>
-<li>ー ボタン： 逆に20個ずつ消えます。</li>
+<li>爆速の HTML5 実行環境</li>
+<li>今までの WEB 開発フレームワークやライブラリーをそのまま使える</li>
+<li>簡単に実機でテストやデバッグができる</li>
+<li>様々のプラットフォームに簡単に配布できる</li>
+<li>アプリ運用に関わる便利なツールや拡張機能が備わっている</li>
 </ul>
 
 
+<h2>爆速の HTML5 実行環境</h2>
+
+<p>CocoonJS では現在異なる３つの実行環境を提供しており、用途に合わせて最適な実行環境を選ぶ事ができます。</p>
+
+<ul>
+<li><a href="http://support.ludei.com/hc/en-us/articles/202321098">Canvas+</a></li>
+<li><a href="http://support.ludei.com/hc/en-us/articles/201952993">WebView+</a></li>
+<li><a href="http://support.ludei.com/hc/en-us/articles/202321108-Apache-Cordova-Promo">Apache Cordova</a></li>
+</ul>
+
+
+<h3>Canvas+</h3>
+
+<p><span class="block-center">
+<a href="http://support.ludei.com/hc/en-us/articles/202321098"><img src="http://front-core.org/images/post/about-cocoonjs/canvas-plus-promo.png" alt="Canvas+" /></a>
+</span></p>
+
+<p>HTML5 Canvas アプリやゲームに最適な実行環境です。
+Canvas 描画に特化された Canvas+ の JavaScript 実行速度は、他のブラウザーやシステム WebView に比べて 10倍は早いと言われています。</p>
+
+<p>iOS 5, Android 2.3 以上であれば WebGL もサポートされるので更に爆速です！</p>
+
+<h3>WebView+</h3>
+
+<p><span class="block-center">
+<a href="http://support.ludei.com/hc/en-us/articles/201952993"><img src="http://front-core.org/images/post/about-cocoonjs/webview-plus-promo.png" alt="WebView+" /></a>
+</span></p>
+
+<p>Chromium で作られた独自の WebView として、主に Android 向けに開発された実行環境です。
+Chromium を元にしているのでシステム WebView より端然早く、機種や OS バージョン毎の差異を気にしなくて済みます。
+(Android 4 以上)</p>
+
+<p>iOS 8 以前の iOS では WebView+ はサポートされてませんでしたが、
+iOS 8 からは WKWebView を基盤にした WebView+ がサポートされる様になりました。</p>
+
+<h3>Apache Cordova</h3>
+
+<p><span class="block-center">
+<a href="http://support.ludei.com/hc/en-us/articles/202321108-Apache-Cordova-Promo"><img src="http://front-core.org/images/post/about-cocoonjs/apache-cordova-promo.png" alt="Apache Cordova" /></a>
+</span></p>
+
+<p>上記の「CocoonJS vs PhoneGap」比較テーブルの一番下に「Cordova extensions」と書いている様に、
+CocoonJS は Apache Cordova を正式にサポートしていて、Cordova の無数のプラグインと CocoonJS を組み合わせる事が可能です。</p>
+
+<p>現在 Cordova に対応した CocoonJS 実行環境は WebView+ のみで、Canvas+ は対応予定になっています。</p>
+
 <!--
-### Facebook 
-
-Facebook login and friend images
-
-![Facebook デモ](/images/post/cocoonjs-launcher/demo-facebook.png)
-
-### Google Play Games 
-
-Google Play Games demo
+最近のアナウンスで CocoonJS でも Cordoba プラグインを使える様になっています。
+最近 CocoonJS は Apache Cordova を正式にサポートする事を発表しました。
+これにより Cordova の無数のプラグインと CocoonJS の WebView+ を組み合わせる事が可能です。
+（参照：[Apache Cordova Promo](http://support.ludei.com/hc/en-us/articles/202321108-Apache-Cordova-Promo)）
 -->
 
 
-<h3>Keyboard</h3>
+<h2>今までの WEB 開発フレームワークやライブラリーをそのまま使える</h2>
 
-<p>CocoonJS 実行環境の CANVAS+ / WEBVIEW+ から OS のネイティヴキーボードを呼び出す事ができます。</p>
+<p>CocoonJS では HTML/CSS/JS がそのまま実行されるので、既存の WEB 開発フレームワークやライブラリーをそのまま使えます。</p>
 
-<p><span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-keyboard.png" width="569" alt="Keyboard デモ" /></span></p>
+<p>以下は例として一部の有名なフレームワークやライブラリーを挙げていますが、
+あくまでも例なのでここに乗っていないライブラリーもほとんどそのまま使えます。（three.js など）</p>
 
-<p><span class="block-center">↓URL入力の例↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-keyboard-url.png" width="569" alt="Keyboard デモ - URL入力" /></span></p>
+<p><a href="https://www.ludei.com/cocoonjs/#development"><img src="http://front-core.org/images/post/about-cocoonjs/software.png" alt="使えるライブラリーの例" /></a>
+<span style="float:right">（使えるライブラリーの例  - <a href="https://www.ludei.com/">Ludei</a> サイトより）</span></p>
 
-<h3>Location</h3>
+<h2>簡単に実機でテストやデバッグができる</h2>
 
-<p>CocoonJS では端末の位置情報システムにアクセスする事ができます。このデモでは現在の経緯度や高度などの位置情報を確認できます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-location.png" width="569" alt="Location デモ" />
-</span></p>
-
-<h3>Multichannel Sound</h3>
-
-<p>CocoonJS はモバイルブラウザの HTML5 オーディオ要素に関する制約をすべて解消してくれます。
-このデモではマルチチャンネルのオーディオ再生を確認できます。</p>
+<p>CocoonJS 用に開発してアプリやゲームを、実際に実機でのテスト・デバッグが簡単に行える専用のアプリ「CocoonJS Launcher」が提供されています。</p>
 
 <p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multichannel-sound.png" width="569" alt="Multichannel Sound デモ" />
-</span></p>
-
-<h3>Multiplayer</h3>
-
-<p>CocoonJS の「マルチプレイヤー」サポート機能のデモです。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multiplayer.png" width="569" alt="Multiplayer デモ" />
+<a href="http://support.ludei.com/hc/en-us/articles/201048463-CocoonJS-launcher-user-guide"><img src="http://front-core.org/images/post/about-cocoonjs/cocoonjs-launcher.png" alt="CocoonJS Launcher" /></a>
 </span></p>
 
 <ul>
-<li><p><strong>Multiplayer Match:</strong> CocoonJS 拡張機能の「iOS ゲームセンター連携」を使ったマルチプレイヤーマッチのデモ（現在 iOS ゲームセンターのみ対応）</p></li>
-<li><p><strong>Local Match:</strong> １つの端末でターン制によるマルチプレイができる様にする「Loopback モード」のデモ</p></li>
+<li><a href="https://play.google.com/store/apps/details?id=com.ideateca.cocoonjslauncher&amp;hl=en">CocoonJS Launcher - Android 版</a></li>
+<li><a href="https://itunes.apple.com/en/app/cocoonjs-by-ludei/id519623307?mt=8">CocoonJS Launcher - iOS 版</a></li>
 </ul>
 
 
-<p><span class="block-center">↓Multiplayer Match↓</span>
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multiplayer-match.png" width="569" alt="Multiplayer デモ" />
-</span></p>
+<p>CocoonJS Launcher を使えば自分が作成したコードを面倒な手順無しで簡単に実機確認ができます。</p>
 
-<p><span class="block-center">↓Local Match↓</span>
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multiplayer-local-match.png" width="569" alt="Multiplayer デモ" />
-</span></p>
+<p>ソースコードをZIPファイルに圧縮して端末のファイルシステムに転送して実行、
+またはローカルホストや外部サイトのURLを指定して実行する事も可能です。</p>
 
 <!--
-### Notifications 
-
-Push and Local notifications
+CocoonJS Launcher はデバッグ用のコンソール出力やプロファイリング機能も持っています。
+Android の場合は Chrome DevTool(WebView+), Eclipse(Canvas+) によるリモートデバッグも可能です。
 -->
 
 
-<h3>Rate</h3>
+<h2>様々のプラットフォームに簡単に配布できる</h2>
 
-<p>CocoonJS の「レーティング」サポート機能のデモです。
-これにより CocoonJS で開発したアプリから App Store や Google Play のレビューページに簡単に遷移する事ができます。</p>
+<p>CocoonJS Cloud と言うサービスも提供しており、
+iOS, Android をはじめ様々なプラットフォーム向けに配布可能なアプリを Cloud サービスから簡単にコンパイルできます。</p>
 
 <p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-rate.png" width="569" alt="Rate デモ" />
+<a href="https://www.ludei.com/cocoonjs/#cross-platform"><img src="http://front-core.org/images/post/about-cocoonjs/cocoonjs-cloud.png" alt="CocoonJS Cloud" /></a>
 </span></p>
 
-<p><span class="block-center">↓ストアのレビューページ↓</span>
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-rate-store-screen.png" width="569" alt="Rate デモ" />
-</span></p>
+<p>配布した後は分析やマネタイズに必要な各種設定をダッシュボードで管理できる便利なサービスです。</p>
 
-<h3>Sumon</h3>
+<h2>アプリ運用に関わる便利なツールや拡張機能が備わっている</h2>
 
-<p>実際にストアで配信中の CocoonJS で作られた「Sumon」と言うゲームのサンプルです。</p>
+<h3>拡張機能</h3>
+
+<p>CocoonJS には JavaScript から制御できる様々なネイティブ拡張機能が用意されています。</p>
 
 <ul>
-<li><a href="https://itunes.apple.com/app/id470147794">Sumon - iOS 版</a></li>
-<li><a href="https://play.google.com/store/apps/details?id=com.ideateca.sumon&amp;hl=en">Sumon - Android 版</a></li>
+<li>アプリ内広告</li>
+<li>アプリ内課金</li>
+<li>Google プレイゲーム連携</li>
+<li>iOS ゲームセンター連携</li>
+<li>Facebook 連携</li>
+<li>プッシュ通知</li>
+<li>デバイスアクセス（カメラ、モーションセンサー &hellip;）</li>
+<li>ゲームパッド対応</li>
+<li>マルチチャンネルのサウンド再生</li>
+<li>などなど（参照：<a href="http://support.ludei.com/hc/en-us/articles/201821276-Plugins-overview-3-0-0-">Plugins overview - Ludei Support</a>）</li>
 </ul>
 
 
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-sumon.png" width="569" alt="Sumon デモ" />
-</span></p>
+<h3>分析サービス</h3>
 
-<!--
-### Vibration 
+<p><span class="block-center"><a href="https://www.ludei.com/cocoonjs/#business"><img src="http://front-core.org/images/post/about-cocoonjs/analytics.png" alt="Analytics" /></a></span></p>
 
-Test for the device vibration capability
--->
+<p>CocoonJS は独自の分析サービスを提供しており、
+CocoonJS Cloud サービスのダッシュボードからアクセスできます。</p>
 
+<h3>ライブ・アップデート</h3>
 
-<h3>WebGL</h3>
+<p><span class="block-center"><a href="https://www.ludei.com/cocoonjs/#business"><img src="http://front-core.org/images/post/about-cocoonjs/updates.png" alt="CocoonJS Cloud" /></a></span></p>
 
-<p>CocoonJS の売りは何よりも WebGL 対応による爆速の描画パフォーマンスです。
-それを裏付けるように、WebGL のデモが沢山載っています。</p>
-
-<!--
-* 3D horse - A poligonal 3D horse running in place
-* Ludei Logo - Ludei logo with falling drops of water
-* NeHe cube - Textured 3D Cube rotating in mid-air
-* PlayCanvas Doom3 Gangnam - Demo created using PlayCanvas. Three monsters from Doom3 dancing to the sound of Gangnam Style まさかのカンナム・スタイル！
-* Striped Tunnel - An endless dizzying striped tunnel
-* Three.js Cubemap - Three heads illuminated with a cubemap
-* Watery texture - A texture distorted to look like rippling water
--->
-
-
-<p><span class="block-center">↓走る 3D 馬↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-3d-horse.png" width="569" alt="WebGL - 3D horse デモ" /></span></p>
-
-<p><span class="block-center">↓Ludei社の 3D ロゴ↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-ludei-logo.png" width="569" alt="WebGL - Ludei Logo デモ" /></span></p>
-
-<p><span class="block-center">↓ぬるぬる回転する 3D キューブ↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-nehe-cube.png" width="569" alt="WebGL - NeHe cube デモ" /></span></p>
-
-<p><span class="block-center">↓まさかのカンナムスタイル↓</span>
-<span class="block-center">（Doom3 のモンスター達がカンナムスタイルを踊る）</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-playcanvas-doom3-gangnam.png" width="569" alt="WebGL - PlayCanvas Doom3 Gangnam デモ" /></span></p>
-
-<p><span class="block-center">↓シェーダベースのねじれトンネル↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-striped-tunnel.png" width="569" alt="WebGL - Striped Tunnel デモ" /></span></p>
-
-<p><span class="block-center">↓シェーダベースの水波↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-watery-texture.png" width="569" alt="WebGL - Watery texture デモ" /></span></p>
-
-<!--
-### WebView 
-
-WebView support in Canvas+
--->
-
-
-<h2>その他のデモ</h2>
-
-<p>CocoonJS Launcher には載っていないデモもあります。
-すべてのデモ一覧は<a href="http://cocoonjsservice.ludei.com/cocoonjslaunchersvr/demo-list/">こちら</a>のページで確認できます。</p>
-
-<p><span class="block-center" style="border: 1px solid #9b9b9b">
-<a href="https://cocoonjsservice.ludei.com/cocoonjslaunchersvr/demo-list/"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-list.png" alt="デモ一覧" /></a>
-</span>
-<span class="block-center">（TRY OUT THE DEMOS - <a href="https://www.ludei.com/">Ludei</a> サイトより）</span></p>
-
-<p>デモ一覧ではソースコードをダウンロードできるので、「DEMOS」に乗っていなくても後述の「YOUR APP」で動かす事ができます。</p>
-
-<h1>YOUR APP</h1>
-
-<p>YOUR APP では自作コードや外部デモコードを直接 CocoonJS Launcher で動かす事ができます。
-やり方は ZIP ファイルを転送して実行する方法と URL を指定して実行する方法の２通りあります。</p>
-
-<h2>ログイン</h2>
-
-<p>YOUR APP を使うためには、まず CocoonJS Cloud サービスへの登録が必要です。</p>
-
-<p><a href="https://sso.ludei.com/signup">https://sso.ludei.com/signup</a></p>
-
-<p>登録が完了したら、登録したメールアドレスとパスワードでログインできます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-login.png" width="320" alt="ログイン画面" />
-</span></p>
-
-<h2>ZIP ファイル転送して実行</h2>
-
-<p>ZIP ファイルで転送して置くと、オフラインでも CocoonJS Launcher で自分のコードを実行する事ができます。
-注意点として index.html は ZIP フォルダーのルートパスにおく必要があります。</p>
-
-<h3>iOS の場合</h3>
-
-<ol>
-<li>iOS デバイスを PC に繋ぎ、iTunes を立ち上げます。</li>
-<li><p>デバイスを選択して、APP のファイル共有画面を開きます。
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/itune-file-share-1.png" alt="iTune ファイル共有" />
-</span></p></li>
-<li><p>CocoonJS を選択して、転送するファイルをドラッグまたは「追加&hellip;」ボタンで追加します。
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/itune-file-share-2.png" alt="iTune ファイル共有" />
-</span></p></li>
-<li><p>YOUR APP の DOCUMENTS に追加された ZIP ファイルが表示されます。</p></li>
-<li>実行したい ZIP ファイルを選択して、実行環境を選択すると実行画面に切り替わります。
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-documents.png" width="320" alt="ログイン画面" />
-</span></li>
-</ol>
-
-
-<h3>Android の場合</h3>
-
-<p>Android の場合は SD カードに ZIP ファイルを転送します。</p>
-
-<p>SD カードへのファイル転送には色んな方法がありますが、ここでは Android SDK を使う場合のファイル転送コマンドを記載します。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>adb push &lt;ZIPファイルのパス&gt; /sdcard/</span></code></pre></td></tr></table></div></figure>
-
-
-<p>ファイル転送が完了したら、同じく YOUR APP の DOCUMENTS に追加された ZIP ファイルが表示されます。</p>
-
-<h2>URL を指定して実行</h2>
-
-<p>HTML ページの URL を指定するとウェブサーバー上のコードを直接実行できます。（index.html は省略可）</p>
-
-<p>また、<a href="https://cocoonjsservice.ludei.com/cocoonjslaunchersvr/demo-list/">デモ一覧</a>の
-ダウンロードリンクのように ZIP ファイルの URL を指定すると、その ZIP ファイルがダウンロードされ実行されます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-url.png" width="320" alt="ログイン画面" />
-</span></p>
-
-<h1>デバッグツール</h1>
-
-<p>デモ・アプリ実行画面の「FPS」表示をタップするとデバッグコンソールにアクセスできます。</p>
-
-<h2>ログ出力</h2>
-
-<p>デバッグコンソールには CocoonJS 既定のログと JavaScript の <code>console</code> 出力が表示されます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console.png" width="320" alt="デバッグコンソール" />
-</span></p>
-
-<p>下端の All / Console / Warnings / Errors タブでログの種類毎にフィルタリングして表示する事ができます。</p>
-
-<ul>
-<li>All: すべてのログ</li>
-<li>Console: デバッグ・情報ログ（console.debug, console.log, console.info）</li>
-<li>Warnings: 警告ログ（console.warn）</li>
-<li>Errors: エラーログ（console.error）</li>
-</ul>
-
-
-<h2>Actions メニュー</h2>
-
-<p>「Actions」をタップすると以下のメニューが表示されます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-actions-menu.png" width="320" alt="Actions メニュー" />
-</span></p>
-
-<ul>
-<li>Exit:  実行中のデモ・アプリを終了します。</li>
-<li>Reload: 実行中のデモ・アプリを再読み込みします。</li>
-<li>Profile: 実行パフォーマンスを計測して、プロファイルデータを出力します。</li>
-<li>MemoryLog: デバッグコンソールに現在のメモリログを出力します。</li>
-</ul>
-
-
-<p><span class="block-center">↓Profile 開始↓</span>
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-profile-start.png" width="320" alt="Actions メニュー" />
-</span></p>
-
-<p><span class="block-center">↓MemoryLog 出力↓</span>
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-memory-log.png" width="320" alt="Actions メニュー" />
-</span></p>
-
-<h1>設定</h1>
-
-<p>CocoonJS Launcher の設定画面では、デモ・アプリを実行する際のカスタマイズ可能ないくつかのオプションが用意されています。</p>
-
-<h2>設定ボタンの場所</h2>
-
-<p>設定画面は「DEMOS」ではデモ選択画面の右上「・・・」から、「YOUR APP」では下端の「SETTINGS」ボタンからアクセスできます。</p>
-
-<p><span class="block-center">↓DEMOS↓</span>
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demos-settings-button.png" width="320" alt="DEMOS の設定ボタン" />
-</span></p>
-
-<p><span class="block-center">↓YOUR APP↓</span>
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-settings-button.png" width="320" alt="YOUR APP の設定ボタン" />
-</span></p>
-
-<h2>設定画面</h2>
-
-<p>主に以下のオプションが変更可能です。</p>
-
-<ul>
-<li>Orientation mode: デモ・アプリの実行中の端末向きを設定できます。</li>
-<li>Debug enabled: デバッグ機能をアクティブ/非アクティブできます。</li>
-<li>Debug position: デバッグボタン（FPS 表示）の位置を変更できます。</li>
-</ul>
-
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/settings.png" width="320" alt="設定画面" />
-</span></p>
-
-<p>設定可能なオプションは OS によって異なる場合があります。</p>
+<p>CocoonJS で開発したアプリのコンテンツは、アプリを再配布しなくても
+CocoonJS Cloud サービスの管理画面から簡単にアップデートができます。</p>
 
 <h1>まとめ</h1>
 
-<p>CocoonJS はこの CocoonJS Launcher により実機テストやデバッグが簡単にできるので、他のネイティブアプリ開発ツールに比べて開発速度が早いです。</p>
+<p>CocoonJS は日本国内ではまだあまり知られておらず、日本語ドキュメントや関連ブログ記事も少ないです。（ほぼ無い）</p>
 
-<p>ぜひ CocoonJS Launcher をダウンロードして、CocoonJS のすばらしいデモを体験してみてください。</p>
-
-<p>次回からは実際に CocoonJS で動くコードの実装方法をまとめて行きます。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[CocoonJS Launcher の使い方]]></title>
-    <link href="http://front-core.org/ja/blog/2014/01/05/cocoonjs-launcher/"/>
-    <updated>2014-01-05T00:00:00+09:00</updated>
-    <id>http://front-core.org/ja/blog/2014/01/05/cocoonjs-launcher</id>
-    <content type="html"><![CDATA[<p>CocoonJS Launcher は CocoonJS 用に開発してアプリやゲームを、簡単に実機でテスト・デバッグできるアプリです。
-現在 iOS 版と Android 版があります。</p>
-
-<p><span class="block-center">
-&nbsp;
-<a href="https://itunes.apple.com/en/app/cocoonjs-by-ludei/id519623307?mt=8"><img src="http://front-core.org/images/post/cocoonjs-launcher/app-store.png" height="60" width="172" alt="CocoonJS Launcher - iOS 版" /></a>
-&nbsp;
-<a href="https://play.google.com/store/apps/details?id=com.ideateca.cocoonjslauncher&amp;hl=en"><img src="http://front-core.org/images/post/cocoonjs-launcher/google-play.png" height="60" width="172" alt="CocoonJS Launcher - Android 版" /></a>
-&nbsp;
-</span></p>
-
-<!-- more -->
-
-
-<h1>メインメニュー</h1>
-
-<p>CocoonJS Launcher アプリを立ち上げると、スプラッシュスクリーンの後にメインメニュー画面が表示されます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/main-menu.png" width="320" alt="メインメニュー" />
-</span></p>
-
-<h1>DEMOS</h1>
-
-<p>メインメニューで DEMOS を選択すると、 CocoonJS の素敵なところを体験できるデモ一覧が表示されます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demos.png" width="320" alt="DEMOS" />
-</span></p>
-
-<h2>使い方</h2>
-
-<p>一覧からデモを選択すると、デモの説明と実行環境の選択ボタンが表示されます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-selected-screen.png" width="320" alt="デモ選択画面" />
-</span></p>
-
-<p>選択できる実行環境は CANVAS+ / WEBVIEW+ / WEBVIEW の３種類があります。
-CANVAS+ / WEBVIEW+ は CocoonJS の実行環境、WEBVIEW はシステム WebView です。（参照：<a href="http://front-core.org/ja/blog/2014/12/16/about-cocoonjs/">爆速の HTML5 クロス・プラットフォーム CocoonJS</a>）</p>
-
-<p>iOS 8 未満の iOS では WEBVIEW+ は表示されません。
-またデモに対応しない実行環境はグレーアウトされ選択できません。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/runtime-gray-out.png" width="320" alt="デモ選択画面（非対応実行環境のグレーアウト）" />
-</span></p>
-
-<p>実行環境を１つ選択すると、ソースコードがダウンロードされた後、デモ実行画面に切り替わります。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-running-screen.png" width="569" alt="デモ実行画面" />
-</span></p>
-
-<p>CANVAS+ を選択した場合は画面の端っこに表示される「FPS(frames per second)」から動作パフォーマンスを確認できます。</p>
-
-<p>描画パフォーマンスは CANVAS+ が断然早いです！
-違う実行環境を選択してパフォーマンスを比較してみてください。</p>
-
-<p>実行中のデモを終了したい場合は「FPS」表示をタップしてデバッグコンソールにアクセスし、「Actions」をタップして表示されるメニューから「Exit」を選択すると終了します。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-actions.png" width="569" alt="Actions メニュー" />
-</span></p>
-
-<h2>デモ一覧</h2>
-
-<p>ここでは iOS 版 v2.1.1.1 に載っているデモをいくつか紹介します。</p>
-
-<h3>Ads</h3>
-
-<p>CocoonJS 拡張機能の「アプリ内広告」を使ったデモです。バナー広告とフルスクリーン広告の表示を確認できます。</p>
-
-<p><span class="block-center">↓バナー広告↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-ads-1.png" width="569" alt="Ads デモ - バーナー広告" /></span></p>
-
-<p><span class="block-center">↓フルスクリーン広告↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-ads-2.png" width="569" alt="Ads デモ - フルスクリーン広告" /></span></p>
-
-<h3>Box2D</h3>
-
-<p>CocoonJS には Box2D がネイティヴで実装されており、JS から box2dweb API を通じて制御する事ができます。
-このデモではネイティヴパフォーマンスで動く 2D 物理演算処理のシミュレーションを確認できます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-box2d.png" width="569" alt="Box2D デモ" />
-</span></p>
-
-<ul>
-<li>＋ ボタン： 小惑星（らしい）が20個ずつ落ちて来きます。</li>
-<li>ー ボタン： 逆に20個ずつ消えます。</li>
-</ul>
-
-
-<!--
-### Facebook 
-
-Facebook login and friend images
-
-![Facebook デモ](/images/post/cocoonjs-launcher/demo-facebook.png)
-
-### Google Play Games 
-
-Google Play Games demo
--->
-
-
-<h3>Keyboard</h3>
-
-<p>CocoonJS 実行環境の CANVAS+ / WEBVIEW+ から OS のネイティヴキーボードを呼び出す事ができます。</p>
-
-<p><span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-keyboard.png" width="569" alt="Keyboard デモ" /></span></p>
-
-<p><span class="block-center">↓URL入力の例↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-keyboard-url.png" width="569" alt="Keyboard デモ - URL入力" /></span></p>
-
-<h3>Location</h3>
-
-<p>CocoonJS では端末の位置情報システムにアクセスする事ができます。このデモでは現在の経緯度や高度などの位置情報を確認できます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-location.png" width="569" alt="Location デモ" />
-</span></p>
-
-<h3>Multichannel Sound</h3>
-
-<p>CocoonJS はモバイルブラウザの HTML5 オーディオ要素に関する制約をすべて解消してくれます。
-このデモではマルチチャンネルのオーディオ再生を確認できます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multichannel-sound.png" width="569" alt="Multichannel Sound デモ" />
-</span></p>
-
-<h3>Multiplayer</h3>
-
-<p>CocoonJS の「マルチプレイヤー」サポート機能のデモです。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multiplayer.png" width="569" alt="Multiplayer デモ" />
-</span></p>
-
-<ul>
-<li><p><strong>Multiplayer Match:</strong> CocoonJS 拡張機能の「iOS ゲームセンター連携」を使ったマルチプレイヤーマッチのデモ（現在 iOS ゲームセンターのみ対応）</p></li>
-<li><p><strong>Local Match:</strong> １つの端末でターン制によるマルチプレイができる様にする「Loopback モード」のデモ</p></li>
-</ul>
-
-
-<p><span class="block-center">↓Multiplayer Match↓</span>
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multiplayer-match.png" width="569" alt="Multiplayer デモ" />
-</span></p>
-
-<p><span class="block-center">↓Local Match↓</span>
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-multiplayer-local-match.png" width="569" alt="Multiplayer デモ" />
-</span></p>
-
-<!--
-### Notifications 
-
-Push and Local notifications
--->
-
-
-<h3>Rate</h3>
-
-<p>CocoonJS の「レーティング」サポート機能のデモです。
-これにより CocoonJS で開発したアプリから App Store や Google Play のレビューページに簡単に遷移する事ができます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-rate.png" width="569" alt="Rate デモ" />
-</span></p>
-
-<p><span class="block-center">↓ストアのレビューページ↓</span>
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-rate-store-screen.png" width="569" alt="Rate デモ" />
-</span></p>
-
-<h3>Sumon</h3>
-
-<p>実際にストアで配信中の CocoonJS で作られた「Sumon」と言うゲームのサンプルです。</p>
-
-<ul>
-<li><a href="https://itunes.apple.com/app/id470147794">Sumon - iOS 版</a></li>
-<li><a href="https://play.google.com/store/apps/details?id=com.ideateca.sumon&amp;hl=en">Sumon - Android 版</a></li>
-</ul>
-
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demo-sumon.png" width="569" alt="Sumon デモ" />
-</span></p>
-
-<!--
-### Vibration 
-
-Test for the device vibration capability
--->
-
-
-<h3>WebGL</h3>
-
-<p>CocoonJS の売りは何よりも WebGL 対応による爆速の描画パフォーマンスです。
-それを裏付けるように、WebGL のデモが沢山載っています。</p>
-
-<!--
-* 3D horse - A poligonal 3D horse running in place
-* Ludei Logo - Ludei logo with falling drops of water
-* NeHe cube - Textured 3D Cube rotating in mid-air
-* PlayCanvas Doom3 Gangnam - Demo created using PlayCanvas. Three monsters from Doom3 dancing to the sound of Gangnam Style まさかのカンナム・スタイル！
-* Striped Tunnel - An endless dizzying striped tunnel
-* Three.js Cubemap - Three heads illuminated with a cubemap
-* Watery texture - A texture distorted to look like rippling water
--->
-
-
-<p><span class="block-center">↓走る 3D 馬↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-3d-horse.png" width="569" alt="WebGL - 3D horse デモ" /></span></p>
-
-<p><span class="block-center">↓Ludei社の 3D ロゴ↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-ludei-logo.png" width="569" alt="WebGL - Ludei Logo デモ" /></span></p>
-
-<p><span class="block-center">↓ぬるぬる回転する 3D キューブ↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-nehe-cube.png" width="569" alt="WebGL - NeHe cube デモ" /></span></p>
-
-<p><span class="block-center">↓まさかのカンナムスタイル↓</span>
-<span class="block-center">（Doom3 のモンスター達がカンナムスタイルを踊る）</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-playcanvas-doom3-gangnam.png" width="569" alt="WebGL - PlayCanvas Doom3 Gangnam デモ" /></span></p>
-
-<p><span class="block-center">↓シェーダベースのねじれトンネル↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-striped-tunnel.png" width="569" alt="WebGL - Striped Tunnel デモ" /></span></p>
-
-<p><span class="block-center">↓シェーダベースの水波↓</span>
-<span class="block-center"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-webgl-watery-texture.png" width="569" alt="WebGL - Watery texture デモ" /></span></p>
-
-<!--
-### WebView 
-
-WebView support in Canvas+
--->
-
-
-<h2>その他のデモ</h2>
-
-<p>CocoonJS Launcher には載っていないデモもあります。
-すべてのデモ一覧は<a href="http://cocoonjsservice.ludei.com/cocoonjslaunchersvr/demo-list/">こちら</a>のページで確認できます。</p>
-
-<p><span class="block-center" style="border: 1px solid #9b9b9b">
-<a href="https://cocoonjsservice.ludei.com/cocoonjslaunchersvr/demo-list/"><img src="http://front-core.org/images/post/cocoonjs-launcher/demo-list.png" alt="デモ一覧" /></a>
-</span>
-<span class="block-center">（TRY OUT THE DEMOS - <a href="https://www.ludei.com/">Ludei</a> サイトより）</span></p>
-
-<p>デモ一覧ではソースコードをダウンロードできるので、「DEMOS」に乗っていなくても後述の「YOUR APP」で動かす事ができます。</p>
-
-<h1>YOUR APP</h1>
-
-<p>YOUR APP では自作コードや外部デモコードを直接 CocoonJS Launcher で動かす事ができます。
-やり方は ZIP ファイルを転送して実行する方法と URL を指定して実行する方法の２通りあります。</p>
-
-<h2>ログイン</h2>
-
-<p>YOUR APP を使うためには、まず CocoonJS Cloud サービスへの登録が必要です。</p>
-
-<p><a href="https://sso.ludei.com/signup">https://sso.ludei.com/signup</a></p>
-
-<p>登録が完了したら、登録したメールアドレスとパスワードでログインできます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-login.png" width="320" alt="ログイン画面" />
-</span></p>
-
-<h2>ZIP ファイル転送して実行</h2>
-
-<p>ZIP ファイルで転送して置くと、オフラインでも CocoonJS Launcher で自分のコードを実行する事ができます。
-注意点として index.html は ZIP フォルダーのルートパスにおく必要があります。</p>
-
-<h3>iOS の場合</h3>
-
-<ol>
-<li>iOS デバイスを PC に繋ぎ、iTunes を立ち上げます。</li>
-<li><p>デバイスを選択して、APP のファイル共有画面を開きます。
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/itune-file-share-1.png" alt="iTune ファイル共有" />
-</span></p></li>
-<li><p>CocoonJS を選択して、転送するファイルをドラッグまたは「追加&hellip;」ボタンで追加します。
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/itune-file-share-2.png" alt="iTune ファイル共有" />
-</span></p></li>
-<li><p>YOUR APP の DOCUMENTS に追加された ZIP ファイルが表示されます。</p></li>
-<li>実行したい ZIP ファイルを選択して、実行環境を選択すると実行画面に切り替わります。
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-documents.png" width="320" alt="ログイン画面" />
-</span></li>
-</ol>
-
-
-<h3>Android の場合</h3>
-
-<p>Android の場合は SD カードに ZIP ファイルを転送します。</p>
-
-<p>SD カードへのファイル転送には色んな方法がありますが、ここでは Android SDK を使う場合のファイル転送コマンドを記載します。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>adb push &lt;ZIPファイルのパス&gt; /sdcard/</span></code></pre></td></tr></table></div></figure>
-
-
-<p>ファイル転送が完了したら、同じく YOUR APP の DOCUMENTS に追加された ZIP ファイルが表示されます。</p>
-
-<h2>URL を指定して実行</h2>
-
-<p>HTML ページの URL を指定するとウェブサーバー上のコードを直接実行できます。（index.html は省略可）</p>
-
-<p>また、<a href="https://cocoonjsservice.ludei.com/cocoonjslaunchersvr/demo-list/">デモ一覧</a>の
-ダウンロードリンクのように ZIP ファイルの URL を指定すると、その ZIP ファイルがダウンロードされ実行されます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-url.png" width="320" alt="ログイン画面" />
-</span></p>
-
-<h1>デバッグツール</h1>
-
-<p>デモ・アプリ実行画面の「FPS」表示をタップするとデバッグコンソールにアクセスできます。</p>
-
-<h2>ログ出力</h2>
-
-<p>デバッグコンソールには CocoonJS 既定のログと JavaScript の <code>console</code> 出力が表示されます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console.png" width="320" alt="デバッグコンソール" />
-</span></p>
-
-<p>下端の All / Console / Warnings / Errors タブでログの種類毎にフィルタリングして表示する事ができます。</p>
-
-<ul>
-<li>All: すべてのログ</li>
-<li>Console: デバッグ・情報ログ（console.debug, console.log, console.info）</li>
-<li>Warnings: 警告ログ（console.warn）</li>
-<li>Errors: エラーログ（console.error）</li>
-</ul>
-
-
-<h2>Actions メニュー</h2>
-
-<p>「Actions」をタップすると以下のメニューが表示されます。</p>
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-actions-menu.png" width="320" alt="Actions メニュー" />
-</span></p>
-
-<ul>
-<li>Exit:  実行中のデモ・アプリを終了します。</li>
-<li>Reload: 実行中のデモ・アプリを再読み込みします。</li>
-<li>Profile: 実行パフォーマンスを計測して、プロファイルデータを出力します。</li>
-<li>MemoryLog: デバッグコンソールに現在のメモリログを出力します。</li>
-</ul>
-
-
-<p><span class="block-center">↓Profile 開始↓</span>
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-profile-start.png" width="320" alt="Actions メニュー" />
-</span></p>
-
-<p><span class="block-center">↓MemoryLog 出力↓</span>
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/debug-console-memory-log.png" width="320" alt="Actions メニュー" />
-</span></p>
-
-<h1>設定</h1>
-
-<p>CocoonJS Launcher の設定画面では、デモ・アプリを実行する際のカスタマイズ可能ないくつかのオプションが用意されています。</p>
-
-<h2>設定ボタンの場所</h2>
-
-<p>設定画面は「DEMOS」ではデモ選択画面の右上「・・・」から、「YOUR APP」では下端の「SETTINGS」ボタンからアクセスできます。</p>
-
-<p><span class="block-center">↓DEMOS↓</span>
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/demos-settings-button.png" width="320" alt="DEMOS の設定ボタン" />
-</span></p>
-
-<p><span class="block-center">↓YOUR APP↓</span>
-<span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/your-app-settings-button.png" width="320" alt="YOUR APP の設定ボタン" />
-</span></p>
-
-<h2>設定画面</h2>
-
-<p>主に以下のオプションが変更可能です。</p>
-
-<ul>
-<li>Orientation mode: デモ・アプリの実行中の端末向きを設定できます。</li>
-<li>Debug enabled: デバッグ機能をアクティブ/非アクティブできます。</li>
-<li>Debug position: デバッグボタン（FPS 表示）の位置を変更できます。</li>
-</ul>
-
-
-<p><span class="block-center">
-<img src="http://front-core.org/images/post/cocoonjs-launcher/settings.png" width="320" alt="設定画面" />
-</span></p>
-
-<p>設定可能なオプションは OS によって異なる場合があります。</p>
-
-<h1>まとめ</h1>
-
-<p>CocoonJS はこの CocoonJS Launcher により実機テストやデバッグが簡単にできるので、他のネイティブアプリ開発ツールに比べて開発速度が早いです。</p>
-
-<p>ぜひ CocoonJS Launcher をダウンロードして、CocoonJS のすばらしいデモを体験してみてください。</p>
-
-<p>次回からは実際に CocoonJS で動くコードの実装方法をまとめて行きます。</p>
+<p>今回は CocoonJS の概要だけずらっと並べただけですが、使い方など詳しい内容はそれぞれ別の記事でまとめて行きます。</p>
 ]]></content>
   </entry>
   
