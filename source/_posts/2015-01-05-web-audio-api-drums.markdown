@@ -107,7 +107,8 @@ html5rocksのチュートリアルを見ながら実装しています｡
 				var source = context.createBufferSource();
 				source.buffer = _this.buffer;
 				source.connect(context.destination);
-				//noteOn は古い書き方なので､start を使う
+				// noteOn は古い書き方なので､start を使う
+				// ここで音が鳴ります
 				source.start(0);
 				this.className = 'tap';
 			});
@@ -120,12 +121,17 @@ html5rocksのチュートリアルを見ながら実装しています｡
 			_this.loadBuffer(_this.url);
 		}
 	};
+
+	// 音声ファイルをロード
 	var kick = new AudioBufferLoader('kick', 'sound/kick.m4a');
 	kick.load();
+
 	var cymbal = new AudioBufferLoader('cymbal', 'sound/cymbal.m4a');
 	cymbal.load();
+
 	var hat = new AudioBufferLoader('hat', 'sound/hat.m4a');
 	hat.load();
+
 	var snare = new AudioBufferLoader('snare', 'sound/snare.m4a');
 	snare.load();
 }(this));
