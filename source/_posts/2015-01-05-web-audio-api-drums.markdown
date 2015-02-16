@@ -36,15 +36,17 @@ Web Audio API とは､ 音声ファイルを単に再生するだけでなく�
 # コード
 
 html5rocksのチュートリアルを見ながら実装しています｡  
-より詳しい解説はこちらをご参照ください｡  
-<http://www.html5rocks.com/ja/tutorials/webaudio/intro/>
+より詳しい解説はこちらをご参照ください｡
+
+* [Web Audio API の基礎](http://www.html5rocks.com/ja/tutorials/webaudio/intro/)
 
 下記リンクも参考にさせて頂きました｡
-<http://qiita.com/fnobi/items/2f08a67800dec1d61f21>  
-<http://qiita.com/sou/items/5688d4e7d3a37b4e2ff1>
 
+* [WebAudioAPIで遊べるようになった](http://qiita.com/fnobi/items/2f08a67800dec1d61f21)
+* [Mobile Safari, Chrome for Android での Web Audio API 覚え書き](http://qiita.com/sou/items/5688d4e7d3a37b4e2ff1)
 
-```javascript
+```js index.html https://github.com/front-core/web-audio-api-drums-sample/blob/master/index.html#L69-L160 link
+
 ;(function (window, undefined) {
 	var isTouchDevice = 'ontouchend' in document;
 	var eventNames = {
