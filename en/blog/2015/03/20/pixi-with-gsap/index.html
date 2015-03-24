@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>
+      
+        
+          PIXI と GSAP で 2D フル WebGL
+         - 
+      FrontCore
+    </title>
+    
+    <meta name="author" content="FrontCore">
+
+    
+    <meta name="description" content="PIXI と GSAP で 2D フル WebGL (Japanese) by Shindeok Kang
+· March 20, 2015 posted in&nbsp;Webgl 最強の 2D WebGL レンダラー PIXI と
+最強のトゥイーンライブラリ GSAP を使って
+2D フル &hellip;">
+    
+    
+
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimal-ui">
+
+    <link rel="icon" href="/images/favicon.46506898.png">
+    
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Frontcore.org">
+    <link rel="apple-touch-icon-precomposed" href="/images/apple-touch-icon-precomposed.71fb2c51.png">
+
+    
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    
+    
+    <link rel="canonical" href="http://front-core.org/en/blog/2015/03/20/pixi-with-gsap">
+    
+    <link href="/en/atom.xml" rel="alternate" title="FrontCore" type="application/atom+xml">
+    
+    
+
+    <link rel="stylesheet" href="/styles/main.c8ddc36b.css">
+
+    <script src="/scripts/vendor/modernizr.d1e46096.js"></script><script type="text/javascript">var _gaq=_gaq||[];_gaq.push(["_setAccount","UA-60618937-1"]),_gaq.push(["_trackPageview"]),function(){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src=("https:"==document.location.protocol?"https://ssl":"http://www")+".google-analytics.com/ga.js";var e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(t,e)}();</script></head><body class="language-en">
+    
+    <div id="main-container">
+      <header id="header">
+        <div class="container">
+          <nav class="main-navigation" role="navigation">
+            <ul>
+              <li><a href="/en">Blog</a></li>
+              <li><a href="/en/blog/archives">Archives</a></li>
+              <li><a href="/en/about">About</a></li>
+              
+              
+              
+              
+            </ul>
+          </nav>
+          
+          <button class="navigation-toggle">Menu</button>
+          
+          <h1 role="banner">
+            <a class="logo" href="/en">Frontcore</a>
+          </h1>
+        </div>
+      </header>
+      
+      <div id="content">
+        <div class="container">
+          <div class="blog-post">
+  <article class="entry" role="article">
+    
+  <header>
+    
+      <h1 class="entry-title">
+        <span>PIXI と GSAP で 2D フル WebGL</span><span> (Japanese)</span></h1>
+    
+
+    
+      <div class="meta">
+        
+        
+  
+
+
+
+  
+
+
+
+  by <span class="author"><a href="https://twitter.com/heavymery">Shindeok Kang</a></span>
+·
+  
+
+
+
+  March 20, 2015
+
+
+
+  
+
+
+        
+        
+        
+        
+        
+        
+        
+        <p>
+
+
+  <span class="categories">posted in&nbsp;<a class="category" href="/en/blog/categories/webgl">Webgl</a></span>
+</p>
+        
+      </div>
+    
+  </header>
+
+
+
+  <div class="entry-content full-article"><p>最強の 2D WebGL レンダラー <a href="http://www.pixijs.com/">PIXI</a>  と
+最強のトゥイーンライブラリ <a href="https://greensock.com/gsap">GSAP</a> を使って
+2D フル WebGL サイトを作る方法を紹介します。</p>
+
+<p><span class="block-center">
+<img src="/images/post/pixi-with-gsap/demo-title.f7f49b89.png" width="320" alt="PIXI with GSAP">
+</span></p>
+
+
+
+
+<h1>PIXI と GSAP について</h1>
+
+<h3>PIXI (Pixi.js) の素敵なところ</h3>
+
+<ul>
+<li>WebGL フル対応だから爆速！</li>
+<li>2D 専用の WebGL はこれしか無い！</li>
+<li>WebGL 未対応ブラウザーでは自動的に Canvas 2D API にフォールバック</li>
+<li>様々な WebGL フィルターが使える</li>
+<li>ブレンドモードが充実</li>
+<li>アトラスフォーマットの Sprite シートをサポート</li>
+</ul>
+
+
+<h3>GSAP (GreenSock Animation Platform) の素敵なところ</h3>
+
+<ul>
+<li>高機能（トゥイーンアニメーションに良くある、かゆい所がほぼない）</li>
+<li>爆速！</li>
+<li>どんなレンダリング系ライブラリとも一緒に使える</li>
+</ul>
+
+
+<h3>リソース</h3>
+
+<ul>
+<li><a href="http://www.goodboydigital.com/pixijs/docs/">Pixi.js API ドキュメント</a></li>
+<li><a href="http://www.html5gamedevs.com/forum/15-pixijs/">Pixi.js フォーラム</a></li>
+<li><a href="https://greensock.com/docs/#/HTML5/GSAP/">HTML5 GSAP API ドキュメント</a></li>
+<li><a href="https://greensock.com/forums/">HTML5 GSAP フォーラム</a></li>
+</ul>
+
+
+<h3>PIXI + GSAP 使用事例</h3>
+
+<p>既に PIXI と GSAP を使った素敵な使用事例が沢山あります。</p>
+
+<ul>
+<li><a href="https://kickwithchrome.withgoogle.com/">Kick with Chrome</a></li>
+<li><a href="http://www.goodboydigital.com/runpixierun/">RUNpixieRUN</a></li>
+<li><a href="http://www.mcdonalds.co.uk/ukhome/promotions/bigmac.html">Big Mac :: McDonalds.co.uk</a></li>
+<li><a href="http://www.shanemielke.com/archives/usopen-sessions/">US Open Sessions - Motion Demo</a></li>
+<li><a href="http://alfredservice.com/">Alfred | Toronto&rsquo;s 24/7 Dry Cleaning, Shoe Care and More</a></li>
+<li><a href="http://40together.razorfishawards.com/">McDonald&rsquo;s 40th Anniversary</a></li>
+<li><a href="http://www.soleilnoir.net/dreamon/">Soleil Noir • Dream on</a></li>
+</ul>
+
+
+<h1>2D フル WebGL 作り方</h1>
+
+<p>こんな感じのデモを作ります。</p>
+
+<p><span class="block-center">
+<img src="/images/post/pixi-with-gsap/demo.6c994cbf.png" alt="PIXI with GSAP">
+</span></p>
+
+<p>実際に動くデモは「<a href="http://front-core.org/pixi-with-gsap/">こちら</a>」、
+ソースコードは「<a href="https://github.com/front-core/pixi-with-gsap">こちら</a>」から確認できます。</p>
+
+<h2>1. ページ設定</h2>
+
+<p>フル WebGL なので最低限の DOM とスタイルのみ記載します。</p>
+
+<figure class="code"><figcaption><span>index.html</span><a href="https://github.com/front-core/pixi-with-gsap/blob/master/index.html">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span><span class="line"><span class="nt">&lt;html&gt;</span>
+</span><span class="line">  <span class="nt">&lt;head&gt;</span>
+</span><span class="line">    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;viewport&quot;</span> <span class="na">content=</span><span class="s">&quot;width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui&quot;</span><span class="nt">&gt;</span>
+</span><span class="line">
+</span><span class="line">    <span class="nt">&lt;style&gt;</span>
+</span><span class="line">      <span class="c">/* 不要な余白などスタイルをリセット */</span>
+</span><span class="line">      <span class="nt">body</span> <span class="p">{</span>
+</span><span class="line">        <span class="k">padding</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+</span><span class="line">        <span class="k">margin</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+</span><span class="line">        <span class="k">overflow</span><span class="o">:</span> <span class="k">hidden</span><span class="p">;</span>
+</span><span class="line">      <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">      <span class="c">/* メイン表示領域を画面いっぱいにする */</span>
+</span><span class="line">      <span class="nc">.container</span> <span class="p">{</span>
+</span><span class="line">        <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class="line">        <span class="k">width</span><span class="o">:</span> <span class="m">100%</span><span class="p">;</span>
+</span><span class="line">        <span class="k">height</span><span class="o">:</span> <span class="m">100%</span><span class="p">;</span>
+</span><span class="line">        <span class="k">overflow</span><span class="o">:</span> <span class="k">hidden</span><span class="p">;</span>
+</span><span class="line">      <span class="p">}</span>
+</span><span class="line">    <span class="nt">&lt;/style&gt;</span>
+</span><span class="line">  <span class="nt">&lt;/head&gt;</span>
+</span><span class="line">
+</span><span class="line">  <span class="nt">&lt;body&gt;</span>
+</span><span class="line">    <span class="c">&lt;!-- Canvas が追加される場所 --&gt;</span>
+</span><span class="line">    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;canvas-container&quot;</span> <span class="na">class=</span><span class="s">&quot;container&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class="line">
+</span><span class="line">    <span class="c">&lt;!-- PIXI --&gt;</span>
+</span><span class="line">    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;scripts/vendor/pixi.dev.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class="line">
+</span><span class="line">    <span class="c">&lt;!-- GSAP --&gt;</span>
+</span><span class="line">    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;scripts/vendor/gsap/TweenMax.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class="line">    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;scripts/vendor/gsap/TimelineMax.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class="line">
+</span><span class="line">    <span class="c">&lt;!-- メインスクリプト --&gt;</span>
+</span><span class="line">    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;scripts/main.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class="line">  <span class="nt">&lt;/body&gt;</span>
+</span><span class="line"><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>2. Canvans と PixiJS レンダラーを初期化</h2>
+
+<p>まず Canvas 要素を生成して <code>canvas-container</code> の中に配置します。</p>
+
+<figure class="code"><figcaption><span>main.js</span><a href="https://github.com/front-core/pixi-with-gsap/blob/master/scripts/main.js#L12-L13">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">var</span> <span class="nx">canvas</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;canvas&#39;</span><span class="p">);</span>
+</span><span class="line"><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;canvas-container&#39;</span><span class="p">).</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">canvas</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>生成した Canvas を引数に PixiJS レンダラーを初期化します。フルスクリーンにしたいので
+サイズに <code>window</code> の <code>innerWidth/Height</code> を指定、デバイスピクセル比を <code>resolution</code> に指定します。</p>
+
+<figure class="code"><figcaption><span>main.js</span><a href="https://github.com/front-core/pixi-with-gsap/blob/master/scripts/main.js#L16">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">var</span> <span class="nx">renderer</span> <span class="o">=</span> <span class="nx">PIXI</span><span class="p">.</span><span class="nx">autoDetectRenderer</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">innerWidth</span><span class="p">,</span> <span class="nb">window</span><span class="p">.</span><span class="nx">innerHeight</span><span class="p">,</span> <span class="p">{</span>
+</span><span class="line">  <span class="nx">view</span><span class="o">:</span> <span class="nx">canvas</span><span class="p">,</span>
+</span><span class="line">  <span class="nx">resolution</span><span class="o">:</span> <span class="nb">window</span><span class="p">.</span><span class="nx">devicePixelRatio</span>
+</span><span class="line"><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>その後ステージを生成します。ステージに追加された要素が画面に表示されます。</p>
+
+<figure class="code"><figcaption><span>main.js</span><a href="https://github.com/front-core/pixi-with-gsap/blob/master/scripts/main.js#L34">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">var</span> <span class="nx">stage</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PIXI</span><span class="p">.</span><span class="nx">Stage</span><span class="p">(</span><span class="mh">0x263332</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>デバイスピクセル比が 2 以上の場合、Canvas のサイズがその倍に大きくなるので、Transform で縮小します。</p>
+
+<figure class="code"><figcaption><span>main.js</span><a href="https://github.com/front-core/pixi-with-gsap/blob/master/scripts/main.js#L26-L30">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">var</span> <span class="nx">canvasScale</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="nb">window</span><span class="p">.</span><span class="nx">devicePixelRatio</span><span class="p">;</span>
+</span><span class="line"><span class="nx">canvas</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">transform</span> <span class="o">=</span> <span class="s1">&#39;scale3d(&#39;</span> <span class="o">+</span> <span class="nx">canvasScale</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="nx">canvasScale</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="nx">canvasScale</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">;</span>
+</span><span class="line"><span class="nx">canvas</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">transformOrigin</span> <span class="o">=</span> <span class="s1">&#39;0 0&#39;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>実際に画面上の描画はレンダラーの <code>render</code> メソッドで行われるので、
+毎アニメーションフレームごとに <code>render</code> が実行される様に設定します。</p>
+
+<figure class="code"><figcaption><span>main.js</span><a href="https://github.com/front-core/pixi-with-gsap/blob/master/scripts/main.js#L37-L41">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">var</span> <span class="nx">renderPerFrame</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">  <span class="nb">window</span><span class="p">.</span><span class="nx">requestAnimFrame</span><span class="p">(</span><span class="nx">renderPerFrame</span><span class="p">);</span>
+</span><span class="line">  <span class="nx">renderer</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">stage</span><span class="p">);</span>
+</span><span class="line"><span class="p">};</span>
+</span><span class="line">
+</span><span class="line"><span class="nx">renderPerFrame</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ブラウザがリサイズされた時はレンダラーの <code>resize</code> メソッドで再度フィットさせます。</p>
+
+<figure class="code"><figcaption><span>main.js</span><a href="https://github.com/front-core/pixi-with-gsap/blob/master/scripts/main.js#L286-L292">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;resize&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">  <span class="nx">renderer</span><span class="p">.</span><span class="nx">resize</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">innerWidth</span><span class="p">,</span> <span class="nb">window</span><span class="p">.</span><span class="nx">innerHeight</span><span class="p">);</span>
+</span><span class="line"><span class="p">},</span> <span class="nx">fales</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>3. 表示要素を生成（画像リソース系）</h2>
+
+<p>PIXI はデバイスのピクセル比ごとの画像ファイルを扱う事ができます。
+ここではデバイスのピクセル比から最適な画像ファイルを決定するコードを記載します。</p>
+
+<figure class="code"><figcaption><span>main.js</span><a href="https://github.com/front-core/pixi-with-gsap/blob/master/scripts/main.js#L56-L65">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">var</span> <span class="nx">suffix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span><span class="line"><span class="k">if</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">devicePixelRatio</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">  <span class="nx">suffix</span> <span class="o">=</span> <span class="s1">&#39;@3x&#39;</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">devicePixelRatio</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">  <span class="nx">suffix</span> <span class="o">=</span> <span class="s1">&#39;@2x&#39;</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="kd">var</span> <span class="nx">titleImageUrl</span> <span class="o">=</span> <span class="s1">&#39;images/title&#39;</span> <span class="o">+</span> <span class="nx">suffix</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>画像などの外部リソースは <code>AssetLoader</code> を使って読み込みます。</p>
+
+<figure class="code"><figcaption><span>main.js</span><a href="https://github.com/front-core/pixi-with-gsap/blob/master/scripts/main.js#L67-L73">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">var</span> <span class="nx">assetLoader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PIXI</span><span class="p">.</span><span class="nx">AssetLoader</span><span class="p">([</span>
+</span><span class="line">  <span class="nx">titleImageUrl</span>
+</span><span class="line"><span class="p">]);</span>
+</span><span class="line"><span class="nx">assetLoader</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>リソースの読み込みが完了したら、そのリソースで表示要素を生成できます。
+ここではタイトルの画像「PIXI with GSAP」を左上に表示するコードを記載します。</p>
+
+<figure class="code"><figcaption><span>main.js</span><a href="https://github.com/front-core/pixi-with-gsap/blob/master/scripts/main.js#L75-L122">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="nx">assetLoader</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;onComplete&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">  <span class="c1">// 画像リソースからテクスチャー生成</span>
+</span><span class="line">  <span class="kd">var</span> <span class="nx">titleTexture</span> <span class="o">=</span> <span class="nx">PIXI</span><span class="p">.</span><span class="nx">Texture</span><span class="p">.</span><span class="nx">fromImage</span><span class="p">(</span><span class="nx">titleImageUrl</span><span class="p">);</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1">// テクスチャーのデバイスピクセル比対応</span>
+</span><span class="line">  <span class="nx">titleTexture</span><span class="p">.</span><span class="nx">baseTexture</span><span class="p">.</span><span class="nx">resolution</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">devicePixelRatio</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1">// 表示要素を生成</span>
+</span><span class="line">  <span class="nx">title</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PIXI</span><span class="p">.</span><span class="nx">Sprite</span><span class="p">(</span><span class="nx">titleTexture</span><span class="p">);</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1">// タイトルを左上に配置</span>
+</span><span class="line">  <span class="nx">title</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+</span><span class="line">  <span class="nx">title</span><span class="p">.</span><span class="nx">y</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1">// ステージに配置して表示</span>
+</span><span class="line">  <span class="nx">stage</span><span class="p">.</span><span class="nx">addChild</span><span class="p">(</span><span class="nx">title</span><span class="p">);</span>
+</span><span class="line"><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>4. 表示要素を生成（グラフィック系）</h2>
+
+<p>PIXI では複雑な WebGL の描画処理も簡単です。
+ここでは簡単な矩形を描画するコードを記載します。</p>
+
+<figure class="code"><figcaption><span>main.js</span><a href="https://github.com/front-core/pixi-with-gsap/blob/master/scripts/main.js#L180-L202">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">var</span> <span class="nx">rectangle</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PIXI</span><span class="p">.</span><span class="nx">Graphics</span><span class="p">();</span>
+</span><span class="line"><span class="nx">rectangle</span><span class="p">.</span><span class="nx">beginFill</span><span class="p">(</span><span class="mh">0x1abc9c</span><span class="p">);</span>
+</span><span class="line"><span class="nx">rectangle</span><span class="p">.</span><span class="nx">drawRect</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+</span><span class="line"><span class="nx">rectangle</span><span class="p">.</span><span class="nx">alpha</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line"><span class="nx">stage</span><span class="p">.</span><span class="nx">addChild</span><span class="p">(</span><span class="nx">rectangle</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>矩形を表示するだけじゃ面白く無いんで、アニメーションさせたいと思います。
+ここで GSAP です！
+ここでは GSAP の <code>TimelineMax</code> と <code>TweenMax</code> を使って、
+矩形をランダムな位置から落ちながら消えるアニメーションのコードを記載します。</p>
+
+<figure class="code"><figcaption><span>main.js</span><a href="https://github.com/front-core/pixi-with-gsap/blob/master/scripts/main.js#L130-L178">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="kd">var</span> <span class="nx">animateDropTween</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">element</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">  <span class="kd">var</span> <span class="nx">fromX</span> <span class="o">=</span> <span class="nx">getRandomInt</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="nb">window</span><span class="p">.</span><span class="nx">innerWidth</span> <span class="o">-</span> <span class="mi">10</span><span class="p">);</span>
+</span><span class="line">  <span class="kd">var</span> <span class="nx">fromY</span> <span class="o">=</span> <span class="nx">getRandomInt</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">window</span><span class="p">.</span><span class="nx">innerHeight</span> <span class="o">/</span> <span class="mi">4</span><span class="p">);</span>
+</span><span class="line">  <span class="kd">var</span> <span class="nx">distY</span> <span class="o">=</span> <span class="nx">getRandomArbitrary</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="nb">window</span><span class="p">.</span><span class="nx">innerHeight</span><span class="p">);</span>
+</span><span class="line">
+</span><span class="line">  <span class="kd">var</span> <span class="nx">duration</span> <span class="o">=</span> <span class="nx">getRandomArbitrary</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class="line">  <span class="kd">var</span> <span class="nx">delay</span> <span class="o">=</span> <span class="nx">getRandomArbitrary</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">);</span>
+</span><span class="line">
+</span><span class="line">  <span class="kd">var</span> <span class="nx">timeline</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TimelineLite</span><span class="p">({</span>
+</span><span class="line">    <span class="nx">delay</span><span class="o">:</span> <span class="nx">delay</span><span class="p">,</span>
+</span><span class="line">    <span class="nx">paused</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class="line">    <span class="nx">onComplete</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">      <span class="nx">animateDropTween</span><span class="p">(</span><span class="nx">element</span><span class="p">)</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">  <span class="p">});</span>
+</span><span class="line">
+</span><span class="line">  <span class="nx">timeline</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span>
+</span><span class="line">    <span class="nx">TweenMax</span><span class="p">.</span><span class="nx">fromTo</span><span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">duration</span><span class="p">,</span> <span class="p">{</span>
+</span><span class="line">      <span class="nx">alpha</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class="line">      <span class="nx">x</span><span class="o">:</span> <span class="nx">fromX</span><span class="p">,</span>
+</span><span class="line">      <span class="nx">y</span><span class="o">:</span> <span class="nx">fromY</span>
+</span><span class="line">    <span class="p">},</span> <span class="p">{</span>
+</span><span class="line">      <span class="nx">alpha</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class="line">      <span class="nx">y</span><span class="o">:</span> <span class="nx">fromY</span> <span class="o">+</span> <span class="nx">distY</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+</span><span class="line">      <span class="nx">ease</span><span class="o">:</span> <span class="nx">Linear</span><span class="p">.</span><span class="nx">easeNone</span><span class="p">,</span>
+</span><span class="line">    <span class="p">})</span>
+</span><span class="line">  <span class="p">);</span>
+</span><span class="line">
+</span><span class="line">  <span class="nx">timeline</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span>
+</span><span class="line">    <span class="nx">TweenMax</span><span class="p">.</span><span class="nx">to</span><span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">duration</span><span class="p">,</span> <span class="p">{</span>
+</span><span class="line">      <span class="nx">alpha</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class="line">      <span class="nx">y</span><span class="o">:</span> <span class="nx">fromY</span> <span class="o">+</span> <span class="nx">distY</span><span class="p">,</span>
+</span><span class="line">      <span class="nx">ease</span><span class="o">:</span> <span class="nx">Linear</span><span class="p">.</span><span class="nx">easeNone</span><span class="p">,</span>
+</span><span class="line">    <span class="p">})</span>
+</span><span class="line">  <span class="p">);</span>
+</span><span class="line">
+</span><span class="line">  <span class="nx">timeline</span><span class="p">.</span><span class="nx">play</span><span class="p">();</span>
+</span><span class="line"><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>5. フルスクリーン API 対応</h2>
+
+<p>動くのは現在 Chrome と FireFox だけなんですが、
+フルフラッシュサイトに良くあるフルスクリーン切り替えボタンを右上に表示しました。
+<br>（参考：<a href="http://caniuse.com/#feat=fullscreen">Can I use&hellip; Full Screen API</a>）</p>
+
+<figure class="code"><figcaption><span>main.js</span><a href="https://github.com/front-core/pixi-with-gsap/blob/master/scripts/main.js#L204-L259">source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+</pre></td><td class="code"><pre><code class="js"><span class="line"><span class="c1">// フルスクリーンモードにする</span>
+</span><span class="line"><span class="kd">var</span> <span class="nx">requestFullScreen</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">  <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">requestFullScreen</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">requestFullScreen</span><span class="p">();</span>
+</span><span class="line">  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">mozRequestFullScreen</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">mozRequestFullScreen</span><span class="p">();</span>
+</span><span class="line">  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">webkitRequestFullScreen</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">webkitRequestFullScreen</span><span class="p">(</span><span class="nx">Element</span><span class="p">.</span><span class="nx">ALLOW_KEYBOARD_INPUT</span><span class="p">);</span>
+</span><span class="line">  <span class="p">}</span>
+</span><span class="line"><span class="p">};</span>
+</span><span class="line">
+</span><span class="line"><span class="c1">// フルスクリーンモードを解除する</span>
+</span><span class="line"><span class="kd">var</span> <span class="nx">exitFullScreen</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="line">  <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">cancelFullScreen</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="nb">document</span><span class="p">.</span><span class="nx">cancelFullScreen</span><span class="p">();</span>
+</span><span class="line">  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">mozCancelFullScreen</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="nb">document</span><span class="p">.</span><span class="nx">mozCancelFullScreen</span><span class="p">();</span>
+</span><span class="line">  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">webkitCancelFullScreen</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">    <span class="nb">document</span><span class="p">.</span><span class="nx">webkitCancelFullScreen</span><span class="p">();</span>
+</span><span class="line">  <span class="p">}</span>
+</span><span class="line"><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>まとめ</h1>
+
+<p>今回は PIXI + GSAP のブラウザ向けの使い方を紹介しましたが、
+CocoonJS の様に WebGL 対応クロスプラットフォームを使えばハイブリッドアプリも作る事ができます。</p>
+
+<p>次回は CocoonJS 用 PIXI + GSAP の使い方を紹介します。</p>
+</div>
+
+
+    <footer>
+      
+        <div class="sharing">
+  
+    <a href="//twitter.com/share" class="twitter-share-button" data-url="http://front-core.org/en/blog/2015/03/20/pixi-with-gsap/" data-via="frontcoreOrg" data-lang="en"></a>
+  
+  
+  
+    <div class="g-plusone" data-href="http://front-core.org/en/blog/2015/03/20/pixi-with-gsap/" data-size="medium"></div>
+  
+  
+  
+    <div class="fb-like" data-href="http://front-core.org/en/blog/2015/03/20/pixi-with-gsap/" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
+  
+</div>
+
+      
+
+      
+      
+        
+
+          
+            
+            
+          
+
+        
+      
+        
+      
+        
+
+          
+            
+
+            
+              
+              
+            
+          
+
+        
+      
+        
+      
+        
+      
+        
+
+          
+            
+
+            
+              
+              
+            
+          
+
+        
+      
+        
+      
+        
+
+          
+            
+
+            
+              
+              
+            
+          
+
+        
+      
+        
+
+          
+            
+
+            
+              
+              
+            
+          
+
+        
+      
+        
+      
+        
+
+          
+            
+
+            
+              
+              
+            
+          
+
+        
+      
+        
+      
+    </footer>
+  </article>
+
+  
+    <section class="comments">
+      <h1>Comments</h1>
+      <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+    </section>
+  
+  
+  <div class="pagination">
+    
+      <a class="basic-alignment left" href="/en/blog/2014/12/16/about-cocoonjs/" title="Previous Post: 爆速の HTML5 クロス・プラットフォーム CocoonJS">&laquo; <span>爆速の HTML5 クロス・プラットフォーム CocoonJS</span></a>
+    
+
+    
+  </div>
+
+</div>
+
+
+  <aside class="sidebar">
+    
+      <section class="recent-posts">
+  <h1>Recent Posts</h1>
+  
+  <ul>
+    
+    
+      <li class="post">
+        <a href="/en/blog/2015/03/20/pixi-with-gsap/"><span>PIXI と GSAP で 2D フル WebGL</span><span> (Japanese)</span></a>
+      </li>
+    
+      <li class="post">
+        <a href="/en/blog/2015/02/07/nodejs-express-socketio-webaudio/"><span>リアルタイム通信して複数デバイス上で音声を再生する(Node.js + Socket.IO + Web Audio API)</span><span> (Japanese)</span></a>
+      </li>
+    
+      <li class="post">
+        <a href="/en/blog/2015/01/27/openframeworks-arduino-ltika/"><span>OpenFrameworks+ArduinoでLチカ</span><span> (Japanese)</span></a>
+      </li>
+    
+      <li class="post">
+        <a href="/en/blog/2015/01/05/web-audio-api-drums/"><span>ブラウザで楽器も作れる！Web Audio API でドラムを作成</span><span> (Japanese)</span></a>
+      </li>
+    
+      <li class="post">
+        <a href="/en/blog/2015/01/05/cocoonjs-launcher/"><span>CocoonJS Launcher の使い方</span><span> (Japanese)</span></a>
+      </li>
+    
+  </ul>
+</section>
+<section class="categories">
+  <h1>Categories</h1>
+  
+  <ul>
+    
+      <li>
+        <a href="/en/blog/categories/cocoonjs">Cocoonjs</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/webaudio">Webaudio</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/openframeworks">Openframeworks</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/arduino">Arduino</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/nodejs">Nodejs</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/express">Express</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/socketio">Socketio</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/heroku">Heroku</a>
+      </li>
+    
+      <li>
+        <a href="/en/blog/categories/webgl">Webgl</a>
+      </li>
+    
+  </ul>
+</section>
+<section class="github">
+  <h1>GitHub Repositories</h1>
+  
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  
+  
+
+</section>
+
+<section class="follow-us">
+  <h1>Follow us</h1>
+  
+  <ul>
+    <li><a class="github" href="https://github.com/front-core">GitHub</a></li>
+    <li><a class="twitter" href="https://twitter.com/frontcoreOrg">Twitter</a></li>
+    <li><a class="rss" href="/en/atom.xml">RSS</a></li>
+  </ul>
+</section>
+
+
+<section class="language-switch">
+  <h1>Languages</h1>
+
+  <ul>
+    
+      <li><a href="/en/blog/2015/03/20/pixi-with-gsap/" disabled="disabled">English</a></li>
+      <li><a href="/ja/blog/2015/03/20/pixi-with-gsap/">Japanese</a></li>
+    
+  </ul>
+</section>
+
+    
+  </aside>
+
+
+        </div>
+      </div>
+      
+      <div id="sticky-footer-area"></div>
+
+      <div class="overlay"></div>
+    </div>
+    
+    <footer id="footer" role="contentinfo">
+      <div class="container">
+        <div class="share-buttons">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://front-core.org" data-lang="en" data-text="FrontCore"></a>
+
+          <div class="g-plusone" data-href="http://front-core.org" data-size="medium"></div>
+
+          <div class="fb-like" data-href="http://front-core.org" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
+        </div>
+
+        <p class="copyright">
+          Copyright &copy; 2015 FrontCore
+        </p>
+
+        <p class="powered-by">
+          Powered by <a href="http://octopress.org">Octopress</a>
+        </p>
+      </div>
+    </footer>
+    
+    
+
+    <script src="/scripts/vendor.db02b173.js"></script><script src="/scripts/plugins.dfc4c65a.js"></script><script src="/scripts/main.2646bef6.js"></script><script type="text/javascript">var disqus_shortname="front-core",disqus_identifier="http://front-core.org/en/blog/2015/03/20/pixi-with-gsap/",disqus_url="http://front-core.org/en/blog/2015/03/20/pixi-with-gsap/",disqus_script="embed.js";!function(){var e=document.createElement("script");e.type="text/javascript",e.async=!0,e.src="//"+disqus_shortname+".disqus.com/"+disqus_script,(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(e)}();</script><div id="fb-root"></div>
+
+  
+    <script>!function(e,n,t){var a,c=e.getElementsByTagName(n)[0];e.getElementById(t)||(a=e.createElement(n),a.id=t,a.async=!0,a.src="//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1",c.parentNode.insertBefore(a,c))}(document,"script","facebook-jssdk");</script><script type="text/javascript">!function(){var e=document.createElement("script");e.type="text/javascript",e.async=!0,e.src="https://apis.google.com/js/plusone.js";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)}();</script><script type="text/javascript">!function(){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src="//platform.twitter.com/widgets.js",document.getElementsByTagName("head")[0].appendChild(t)}();</script><script type="text/javascript">jQuery(function(){github.showRepos({user:"front-core",count:5,skip_forks:!0,target:"#gh_repos"})});</script></body></html>
