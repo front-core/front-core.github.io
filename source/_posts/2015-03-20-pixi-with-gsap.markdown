@@ -281,9 +281,20 @@ var animateDropTween = function(element) {
 
 動くのは現在 Chrome と FireFox だけなんですが、
 フルフラッシュサイトに良くあるフルスクリーン切り替えボタンを右上に表示しました。
-（参考：[Can I use... Full Screen API](http://caniuse.com/#feat=fullscreen)）
+<br>（参考：[Can I use... Full Screen API](http://caniuse.com/#feat=fullscreen)）
 
 ```js main.js https://github.com/front-core/pixi-with-gsap/blob/master/scripts/main.js#L204-L259 source
+// フルスクリーンモードにする
+var requestFullScreen = function() {
+  if (document.documentElement.requestFullScreen) {
+    document.documentElement.requestFullScreen();
+  } else if (document.documentElement.mozRequestFullScreen) {
+    document.documentElement.mozRequestFullScreen();
+  } else if (document.documentElement.webkitRequestFullScreen) {
+    document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+  }
+};
+
 // フルスクリーンモードを解除する
 var exitFullScreen = function() {
   if (document.cancelFullScreen) {
@@ -293,12 +304,6 @@ var exitFullScreen = function() {
   } else if (document.webkitCancelFullScreen) {
     document.webkitCancelFullScreen();
   }
-};
-
-// フルスクリーンモード切り替えボタンの状態を更新
-var updateScreenModeButton = function() {
-  screenModeFullButton.visible = !isFullScreen();
-  screenModeNormalButton.visible = isFullScreen();
 };
 ```
 
